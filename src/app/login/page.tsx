@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/login-form";
+import { getLoginErrorMessage, sanitizeNextPath } from "@/lib/auth";
 
 type LoginPageProps = {
   searchParams: Promise<{ next?: string; error?: string }>;
@@ -6,14 +7,8 @@ type LoginPageProps = {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
-  const nextPath =
-    params.next && params.next.startsWith("/") && !params.next.startsWith("//")
-      ? params.next
-      : "/shows";
-  const initialError =
-    params.error === "auth_callback_failed"
-      ? "Sign-in failed. Request a new magic link and try again."
-      : undefined;
+  const nextPath = sanitizeNextPath(params.next);
+  const initialError = getLoginErrorMessage(params.error);
 
   return (
     <main className="flex min-h-full flex-1 items-center justify-center px-4 py-16">
@@ -25,7 +20,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           Sign in
         </h1>
         <p className="mt-2 text-base text-[var(--muted)]">
-          Use a magic link sent to your email. No password needed.
+          Continue with Google, or use an email magic link as a fallback.
         </p>
         <div className="mt-8">
           <LoginForm nextPath={nextPath} initialError={initialError} />

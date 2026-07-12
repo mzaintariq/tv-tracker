@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Personal TV and Movie Tracker
+
+Next.js app for private TV and movie tracking, backed by Supabase Auth and Postgres.
+
+## Authentication
+
+Supported sign-in methods:
+
+- **Continue with Google** (primary)
+- **Email magic link** (secondary fallback)
+
+Both flows return through `/auth/callback` and land on `/shows` when successful.
+
+Google OAuth credentials are configured in the hosted Supabase project. This app only needs the public Supabase URL and publishable key — never a Google client secret or Supabase service-role key.
+
+### Supabase Auth URL settings
+
+Keep the **Site URL** as production:
+
+- Site URL: `https://tracktv.vercel.app`
+
+Add these under **Redirect URLs** (exact match required — no query strings):
+
+```text
+http://localhost:3000/auth/callback
+https://tracktv.vercel.app/auth/callback
+```
+
+Optional wildcards for local/preview flexibility:
+
+```text
+http://localhost:3000/**
+https://*-*.vercel.app/**
+```
+
+Important: the app’s `redirectTo` must match an allowlist entry exactly. Appending `?next=…` causes Supabase to reject the URL and fall back to the Site URL (so a localhost Google sign-in can land on production). Post-login destination is stored in a short-lived cookie instead.
+
+Existing users who later sign in with Google using the same verified email should resolve to the same Supabase user/profile through Supabase identity linking.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
+cp .env.example .env.local
+# fill NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
 
-## Learn More
+## Docs
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `docs/PRODUCT_REQUIREMENTS.md`, `docs/BUILD_PLAN.md`, `docs/DECISIONS.md`, and `docs/TASKS.md`.

@@ -108,19 +108,24 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ## Phase 2 — Deployment and Google authentication
 
-* [ ] Import GitHub repository into Vercel
-* [ ] Add Supabase environment variables to Vercel
-* [ ] Deploy production application
+* [x] Import GitHub repository into Vercel
+* [x] Add Supabase environment variables to Vercel
+* [x] Deploy production application
 * [ ] Configure Supabase Site URL
 * [ ] Configure production redirect URL
 * [ ] Test production magic-link login
-* [ ] Create Google Cloud project
-* [ ] Configure OAuth consent screen
-* [ ] Create Google OAuth web client
+* [x] Create Google Cloud project
+* [x] Configure OAuth consent screen
+* [x] Create Google OAuth web client
 * [ ] Configure authorized origins
-* [ ] Configure Supabase callback URL
-* [ ] Enable Google provider in Supabase
-* [ ] Add Continue with Google button
+* [x] Configure Supabase callback URL
+* [x] Enable Google provider in Supabase
+* [x] Add Continue with Google button
+* [x] Keep email magic-link as secondary fallback
+* [x] Reuse `/auth/callback` for Google and magic-link redirects
+* [x] Add friendly OAuth error handling
+* [x] Add loading and disabled states for auth actions
+* [x] Add automated tests for auth helpers
 * [ ] Test Google login locally
 * [ ] Test Google login in production
 * [ ] Verify secrets are not exposed
