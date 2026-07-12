@@ -1,6 +1,22 @@
 import { afterEach, describe, expect, it } from "vitest";
 
+import { requireEnvValue } from "@/lib/env-value";
 import { getPublicEnv, isValidEmail } from "@/lib/env";
+
+describe("requireEnvValue", () => {
+  it("returns non-empty values", () => {
+    expect(requireEnvValue("EXAMPLE", " value ")).toBe(" value ");
+  });
+
+  it("throws for missing values", () => {
+    expect(() => requireEnvValue("EXAMPLE", undefined)).toThrow(
+      "Missing required environment variable: EXAMPLE",
+    );
+    expect(() => requireEnvValue("EXAMPLE", "   ")).toThrow(
+      "Missing required environment variable: EXAMPLE",
+    );
+  });
+});
 
 describe("getPublicEnv", () => {
   const originalUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

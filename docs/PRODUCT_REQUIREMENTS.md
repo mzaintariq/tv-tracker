@@ -259,11 +259,13 @@ The Movies section must contain:
 
 ### Watch Next
 
-Display movies added to the user’s library but not watched.
+Display movies added to the user’s library but not watched (`watched_at IS NULL`).
 
 ### Watched
 
-Display watched movies ordered by watched date.
+Display watched movies (`watched_at IS NOT NULL`) ordered by watched date.
+
+Movie watch state is derived from `watched_at` only. Do not use a separate movie status column. Favourites use a separate `is_favourite` boolean.
 
 Allow users to:
 

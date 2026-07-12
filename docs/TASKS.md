@@ -133,32 +133,32 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ## Phase 3 — TMDB and Explore
 
-* [ ] Create TMDB account and credentials
+* [x] Create TMDB account and credentials
 * [ ] Add `TMDB_API_READ_TOKEN` locally
 * [ ] Add TMDB token to Vercel
-* [ ] Create typed TMDB server client
-* [ ] Add television search
-* [ ] Add movie search
-* [ ] Add trending television
-* [ ] Add trending movies
-* [ ] Add media-type filters
-* [ ] Add debounced search
-* [ ] Add loading state
-* [ ] Add empty state
-* [ ] Add error state
-* [ ] Create `media_items` migration
-* [ ] Create `user_shows` migration
-* [ ] Create `user_movies` migration
-* [ ] Add indexes
-* [ ] Add unique constraints
-* [ ] Add Row Level Security
-* [ ] Add show to library
-* [ ] Remove show from library
-* [ ] Add movie to watchlist
-* [ ] Remove movie from watchlist
-* [ ] Prevent duplicate records
+* [x] Create typed TMDB server client
+* [x] Add television search
+* [x] Add movie search
+* [x] Add trending television
+* [x] Add trending movies
+* [x] Add media-type filters
+* [x] Add debounced search
+* [x] Add loading state
+* [x] Add empty state
+* [x] Add error state
+* [x] Create `media_items` migration
+* [x] Create `user_shows` migration
+* [x] Create `user_movies` migration
+* [x] Add indexes
+* [x] Add unique constraints
+* [x] Add Row Level Security
+* [x] Add show to library
+* [x] Remove show from library
+* [x] Add movie to watchlist
+* [x] Remove movie from watchlist
+* [x] Prevent duplicate records
 * [ ] Test user privacy
-* [ ] Run validation commands
+* [x] Run validation commands
 * [ ] Commit and merge Phase 3
 
 ## Phase 4 — Television tracking
