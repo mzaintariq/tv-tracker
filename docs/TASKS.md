@@ -67,7 +67,7 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Add profile update policy
 * [x] Add profile page
 * [x] Allow display-name editing
-* [ ] Test profile privacy with two users
+* [x] Test profile privacy with two users
 
 ### Navigation and appearance
 
@@ -89,14 +89,14 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Review generated migration
 * [x] Apply migration with `npx supabase db push`
 * [x] Test magic-link login
-* [ ] Test auth callback
+* [x] Test auth callback
 * [x] Test sign-out
 * [x] Test protected routes
 * [x] Test profile creation
 * [x] Test profile editing
 * [x] Test mobile navigation
 * [x] Test desktop navigation
-* [ ] Test dark mode
+* [x] Test dark mode
 * [x] Run lint
 * [x] Run TypeScript checking
 * [x] Run unit tests
@@ -111,13 +111,13 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Import GitHub repository into Vercel
 * [x] Add Supabase environment variables to Vercel
 * [x] Deploy production application
-* [ ] Configure Supabase Site URL
-* [ ] Configure production redirect URL
-* [ ] Test production magic-link login
+* [x] Configure Supabase Site URL
+* [x] Configure production redirect URL
+* [x] Test production magic-link login
 * [x] Create Google Cloud project
 * [x] Configure OAuth consent screen
 * [x] Create Google OAuth web client
-* [ ] Configure authorized origins
+* [x] Configure authorized origins
 * [x] Configure Supabase callback URL
 * [x] Enable Google provider in Supabase
 * [x] Add Continue with Google button
@@ -126,10 +126,10 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Add friendly OAuth error handling
 * [x] Add loading and disabled states for auth actions
 * [x] Add automated tests for auth helpers
-* [ ] Test Google login locally
-* [ ] Test Google login in production
-* [ ] Verify secrets are not exposed
-* [ ] Commit and merge Phase 2
+* [x] Test Google login locally
+* [x] Test Google login in production
+* [x] Verify secrets are not exposed
+* [x] Commit and merge Phase 2
 
 ## Phase 3 — TMDB and Explore
 
