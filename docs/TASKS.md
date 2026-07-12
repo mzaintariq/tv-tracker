@@ -14,21 +14,21 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Initialize Git repository
 * [x] Create GitHub repository
 * [x] Push base project to GitHub
-* [ ] Create Supabase hosted project
-* [ ] Add Supabase values to `.env.local`
-* [ ] Create `.env.example`
-* [ ] Confirm `.env.local` is ignored
-* [ ] Install Supabase CLI
-* [ ] Run `npx supabase init`
-* [ ] Log in to Supabase CLI
-* [ ] Link repository to hosted Supabase project
-* [ ] Configure local Supabase authentication URLs
-* [ ] Add `PRODUCT_REQUIREMENTS.md`
-* [ ] Add `BUILD_PLAN.md`
-* [ ] Add `DECISIONS.md`
-* [ ] Add `TASKS.md`
-* [ ] Add `AGENTS.md`
-* [ ] Commit and push project documentation
+* [x] Create Supabase hosted project
+* [x] Add Supabase values to `.env.local`
+* [x] Create `.env.example`
+* [x] Confirm `.env.local` is ignored
+* [x] Install Supabase CLI
+* [x] Run `npx supabase init`
+* [x] Log in to Supabase CLI
+* [x] Link repository to hosted Supabase project
+* [x] Configure local Supabase authentication URLs
+* [x] Add `PRODUCT_REQUIREMENTS.md`
+* [x] Add `BUILD_PLAN.md`
+* [x] Add `DECISIONS.md`
+* [x] Add `TASKS.md`
+* [x] Add `AGENTS.md`
+* [x] Commit and push project documentation
 
 ## Phase 1 — Application foundation
 
