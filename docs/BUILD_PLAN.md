@@ -170,6 +170,7 @@ Implement:
 * Add show to library
 * Add movie to watchlist
 * Remove items from library
+* Server-only Supabase admin client for shared metadata writes
 
 ### Database work
 
@@ -181,15 +182,19 @@ Create migrations for:
 * Required indexes
 * Unique constraints
 * Row Level Security for user-owned records
+* `media_items` SELECT-only for authenticated users (writes via admin client)
+
+Movie watch state uses `watched_at` (`NULL` = Watch Next, non-`NULL` = Watched). No movie status column.
 
 ### Acceptance criteria
 
 * Users can search for shows and movies
 * Users can browse trending media
 * TMDB token remains server-side
+* `SUPABASE_SECRET_KEY` remains server-side
 * Users can add and remove media
 * Duplicate library entries are prevented
-* Cached metadata is stored correctly
+* Cached metadata is stored correctly via admin upsert after TMDB fetch
 * One user cannot access another user’s library
 
 ---
@@ -431,8 +436,9 @@ Implement:
 
 ## Security requirements for every phase
 
-* Never expose the Supabase service-role key
+* Never expose the Supabase service-role key or `SUPABASE_SECRET_KEY`
 * Never expose the TMDB bearer token
+* Shared `media_items` rows are SELECT-only for authenticated clients; writes go through the server-only admin client after a TMDB fetch
 * Never commit `.env.local`
 * All user-owned tables must have Row Level Security
 * Use `auth.uid()` in user-data policies
