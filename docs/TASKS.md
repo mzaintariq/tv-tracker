@@ -134,8 +134,8 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 ## Phase 3 — TMDB and Explore
 
 * [x] Create TMDB account and credentials
-* [ ] Add `TMDB_API_READ_TOKEN` locally
-* [ ] Add TMDB token to Vercel
+* [x] Add `TMDB_API_READ_TOKEN` locally
+* [x] Add TMDB token to Vercel
 * [x] Create typed TMDB server client
 * [x] Add television search
 * [x] Add movie search
@@ -159,7 +159,7 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Prevent duplicate records
 * [ ] Test user privacy
 * [x] Run validation commands
-* [ ] Commit and merge Phase 3
+* [x] Commit and merge Phase 3
 
 ## Phase 4 — Television tracking
 
