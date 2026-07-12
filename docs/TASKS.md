@@ -34,77 +34,77 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ### Setup
 
-* [ ] Create `phase/01-foundation` branch
-* [ ] Ask Cursor to inspect repository before editing
-* [ ] Review Cursor’s proposed Phase 1 plan
+* [x] Create `phase/01-foundation` branch
+* [x] Ask Cursor to inspect repository before editing
+* [x] Review Cursor’s proposed Phase 1 plan
 
 ### Supabase clients
 
-* [ ] Add browser Supabase client
-* [ ] Add server Supabase client
-* [ ] Add session refresh handling
-* [ ] Add environment-variable validation
+* [x] Add browser Supabase client
+* [x] Add server Supabase client
+* [x] Add session refresh handling
+* [x] Add environment-variable validation
 
 ### Authentication
 
-* [ ] Add login page
-* [ ] Add email magic-link form
-* [ ] Add authentication callback route
-* [ ] Add sign-out action
-* [ ] Protect authenticated routes
-* [ ] Redirect unauthenticated users to login
-* [ ] Add authentication error handling
+* [x] Add login page
+* [x] Add email magic-link form
+* [x] Add authentication callback route
+* [x] Add sign-out action
+* [x] Protect authenticated routes
+* [x] Redirect unauthenticated users to login
+* [x] Add authentication error handling
 
 ### Profiles
 
-* [ ] Create profiles migration
-* [ ] Add foreign key to `auth.users`
-* [ ] Add profile timestamps
-* [ ] Add automatic profile creation trigger
-* [ ] Enable Row Level Security
-* [ ] Add profile select policy
-* [ ] Add profile insert policy
-* [ ] Add profile update policy
-* [ ] Add profile page
-* [ ] Allow display-name editing
+* [x] Create profiles migration
+* [x] Add foreign key to `auth.users`
+* [x] Add profile timestamps
+* [x] Add automatic profile creation trigger
+* [x] Enable Row Level Security
+* [x] Add profile select policy
+* [x] Add profile insert policy
+* [x] Add profile update policy
+* [x] Add profile page
+* [x] Allow display-name editing
 * [ ] Test profile privacy with two users
 
 ### Navigation and appearance
 
-* [ ] Add TV Shows route
-* [ ] Add Movies route
-* [ ] Add Explore route
-* [ ] Add Profile route
-* [ ] Add mobile bottom navigation
-* [ ] Add desktop navigation
-* [ ] Add light theme
-* [ ] Add dark theme
-* [ ] Add system theme
-* [ ] Persist theme preference
-* [ ] Add loading states
-* [ ] Add error states
+* [x] Add TV Shows route
+* [x] Add Movies route
+* [x] Add Explore route
+* [x] Add Profile route
+* [x] Add mobile bottom navigation
+* [x] Add desktop navigation
+* [x] Add light theme
+* [x] Add dark theme
+* [x] Add system theme
+* [x] Persist theme preference
+* [x] Add loading states
+* [x] Add error states
 
 ### Validation
 
-* [ ] Review generated migration
-* [ ] Apply migration with `npx supabase db push`
-* [ ] Test magic-link login
+* [x] Review generated migration
+* [x] Apply migration with `npx supabase db push`
+* [x] Test magic-link login
 * [ ] Test auth callback
-* [ ] Test sign-out
-* [ ] Test protected routes
-* [ ] Test profile creation
-* [ ] Test profile editing
-* [ ] Test mobile navigation
-* [ ] Test desktop navigation
+* [x] Test sign-out
+* [x] Test protected routes
+* [x] Test profile creation
+* [x] Test profile editing
+* [x] Test mobile navigation
+* [x] Test desktop navigation
 * [ ] Test dark mode
-* [ ] Run lint
-* [ ] Run TypeScript checking
-* [ ] Run unit tests
-* [ ] Run production build
-* [ ] Commit Phase 1
-* [ ] Push Phase 1 branch
-* [ ] Create pull request
-* [ ] Merge Phase 1 into main
+* [x] Run lint
+* [x] Run TypeScript checking
+* [x] Run unit tests
+* [x] Run production build
+* [x] Commit Phase 1
+* [x] Push Phase 1 branch
+* [X] Create pull request
+* [x] Merge Phase 1 into main
 
 ## Phase 2 — Deployment and Google authentication
 
