@@ -163,35 +163,35 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ## Phase 4 — Television tracking
 
-* [ ] Create `episodes` migration
-* [ ] Create `watched_episodes` migration
-* [ ] Add indexes and unique constraints
-* [ ] Add Row Level Security
-* [ ] Synchronize show metadata
-* [ ] Synchronize seasons
-* [ ] Synchronize episodes
-* [ ] Add show details view
-* [ ] Add episode list
-* [ ] Mark episode watched
-* [ ] Mark episode unwatched
-* [ ] Edit watched date
-* [ ] Mark season watched
-* [ ] Mark season unwatched
-* [ ] Mark previous episodes watched
-* [ ] Add Start from Episode 1 option
-* [ ] Add Select Next Episode option
-* [ ] Add Select Watched Seasons option
-* [ ] Add favourite toggle
-* [ ] Add active status
-* [ ] Add paused status
-* [ ] Add dropped status
-* [ ] Calculate progress
-* [ ] Exclude future episodes
-* [ ] Exclude Season 0
+* [x] Create `episodes` migration
+* [x] Create `watched_episodes` migration
+* [x] Add indexes and unique constraints
+* [x] Add Row Level Security
+* [x] Synchronize show metadata
+* [x] Synchronize seasons
+* [x] Synchronize episodes
+* [x] Add show details view
+* [x] Add episode list
+* [x] Mark episode watched
+* [x] Mark episode unwatched
+* [x] Edit watched date
+* [x] Mark season watched
+* [x] Mark season unwatched
+* [x] Mark previous episodes watched
+* [x] Add Start from Episode 1 option
+* [x] Add Select Next Episode option
+* [x] Add Select Watched Seasons option
+* [x] Add favourite toggle
+* [x] Add active status
+* [x] Add paused status
+* [x] Add dropped status
+* [x] Calculate progress
+* [x] Exclude future episodes
+* [x] Exclude Season 0
 * [ ] Add transactional bulk actions
 * [ ] Test user privacy
 * [ ] Run validation commands
-* [ ] Commit and merge Phase 4
+* [x] Commit and merge Phase 4
 
 ## Phase 5 — Watch List categories
 
