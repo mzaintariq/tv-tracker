@@ -29,6 +29,16 @@ export function MediaCard({ item }: MediaCardProps) {
   function handleToggle() {
     setError(null);
 
+    if (
+      inLibrary &&
+      item.mediaType === "movie" &&
+      !window.confirm(
+        "Remove this movie? Its watched date and favourite state will be permanently deleted. Shared movie metadata will remain cached.",
+      )
+    ) {
+      return;
+    }
+
     startTransition(async () => {
       const result = inLibrary
         ? await removeFromLibrary(item.mediaType, item.tmdbId)

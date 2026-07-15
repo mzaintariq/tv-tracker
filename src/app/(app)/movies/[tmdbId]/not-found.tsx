@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function MovieNotFound() { return <div className="mx-auto max-w-xl text-center"><h1 className="text-3xl font-semibold">Movie not found</h1><p className="mt-2 text-[var(--muted)]">This movie is not in your library.</p><Link href="/movies" className="mt-4 inline-block rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]">Back to Movies</Link></div>; }

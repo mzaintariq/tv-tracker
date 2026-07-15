@@ -235,29 +235,29 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ## Phase 7 — Movies and profile statistics
 
-* [ ] Add movie Watch Next
-* [ ] Add watched movies
-* [ ] Add movie favourites
-* [ ] Mark movie watched
-* [ ] Mark movie unwatched
-* [ ] Edit movie watched date
-* [ ] Calculate episodes watched
-* [ ] Calculate television viewing time
-* [ ] Add episode-runtime fallback
-* [ ] Calculate movies watched
-* [ ] Calculate movie viewing time
-* [ ] Calculate tracked shows
-* [ ] Calculate caught-up shows
-* [ ] Calculate completed shows
-* [ ] Add all shows grid
-* [ ] Add favourite shows grid
-* [ ] Add all movies grid
-* [ ] Add favourite movies grid
-* [ ] Add paused shows list
-* [ ] Add dropped shows list
-* [ ] Format months, days and hours
-* [ ] Label viewing time as estimated
-* [ ] Test statistics
+* [x] Add movie Watch Next
+* [x] Add watched movies
+* [x] Add movie favourites
+* [x] Mark movie watched
+* [x] Mark movie unwatched
+* [x] Edit movie watched date
+* [x] Calculate episodes watched
+* [x] Calculate television viewing time
+* [x] Add episode-runtime fallback
+* [x] Calculate movies watched
+* [x] Calculate movie viewing time
+* [x] Calculate tracked shows
+* [x] Calculate caught-up shows
+* [x] Calculate completed shows
+* [ ] Add all shows grid (removed from Phase 7 scope; dedicated Shows page)
+* [x] Add favourite shows grid
+* [ ] Add all movies grid (removed from Phase 7 scope; dedicated Movies page)
+* [x] Add favourite movies grid
+* [ ] Add paused shows list (removed from Phase 7 scope; dedicated Shows page)
+* [ ] Add dropped shows list (removed from Phase 7 scope; dedicated Shows page)
+* [x] Format minutes, hours, days and hours
+* [x] Label viewing time as estimated
+* [x] Test statistics
 * [ ] Run validation commands
 * [ ] Commit and merge Phase 7
 
