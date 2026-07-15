@@ -20,3 +20,5 @@
 - Treat episode metadata as stale after 24 hours. Recheck shared freshness in one batched read immediately before automatic synchronization.
 - Reuse the Phase 4 ended interpretation (`tmdb_status` equal to `Ended`, case-insensitive). Ended shows are not refreshed automatically, so a revived ended series may require manual Refresh Metadata in Phase 6.
 - Phase 6 retains full-season synchronization. Very long-running ongoing shows may generate more TMDB requests; incremental season synchronization is deferred.
+- Movie removal deletes the `user_movies` membership row and therefore also deletes that movie's personal `watched_at` and `is_favourite` state. Shared `media_items` metadata remains cached. Unlike television episode history, movie history is not independently preserved, so removed movies no longer contribute to profile movie statistics.
+- Phase 7 profile statistics are derived rather than stored. Television episode count and estimated time include all accessible `watched_episodes`, including history preserved after show removal; show-state counts and all movie statistics use current library memberships.

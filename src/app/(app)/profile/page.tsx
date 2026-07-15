@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ProfileForm } from "@/components/profile/profile-form";
+import { StatisticsSummary } from "@/components/profile/statistics-summary";
 import { displayNameFromEmail } from "@/lib/profile";
+import { loadProfilePageData } from "@/lib/profile/data";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/types/database";
 
@@ -37,9 +39,10 @@ export default async function ProfilePage() {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } satisfies Profile);
+  const pageData = await loadProfilePageData(user.id);
 
   return (
-    <section className="mx-auto w-full max-w-3xl">
+    <section className="mx-auto w-full max-w-6xl">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-[var(--foreground)]">
@@ -58,6 +61,7 @@ export default async function ProfilePage() {
           email={user.email ?? "Unknown email"}
         />
       </div>
+      <div className="mt-12"><StatisticsSummary statistics={pageData.statistics} shows={pageData.shows} movies={pageData.movies} /></div>
     </section>
   );
 }

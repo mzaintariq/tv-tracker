@@ -1,0 +1,15 @@
+import { MovieCard } from "@/components/movies/movie-card";
+import { ShowCard } from "@/components/shows/show-card";
+import { formatDuration, type ProfileStatistics } from "@/lib/profile/statistics";
+import type { MovieSnapshot } from "@/lib/movies/movies";
+import type { DerivedShow } from "@/lib/shows/watch-list";
+
+const labels: Array<[keyof Pick<ProfileStatistics, "trackedShows" | "episodesWatched" | "moviesInLibrary" | "moviesWatched" | "favouriteShows" | "favouriteMovies" | "completedShows" | "caughtUpShows">, string]> = [["trackedShows", "Tracked shows"], ["episodesWatched", "Episodes watched"], ["moviesInLibrary", "Movies in library"], ["moviesWatched", "Movies watched"], ["favouriteShows", "Favourite shows"], ["favouriteMovies", "Favourite movies"], ["completedShows", "Completed shows"], ["caughtUpShows", "Caught-up shows"]];
+
+export function StatisticsSummary({ statistics, shows, movies }: { statistics: ProfileStatistics; shows: DerivedShow[]; movies: MovieSnapshot[] }) {
+  const times = [["Television", statistics.tvMinutes], ["Movies", statistics.movieMinutes], ["Combined", statistics.totalMinutes]] as const;
+  const compareTitle = (left: { media: { title: string; tmdb_id: number } }, right: { media: { title: string; tmdb_id: number } }) => left.media.title.localeCompare(right.media.title, undefined, { sensitivity: "base" }) || left.media.tmdb_id - right.media.tmdb_id;
+  const favouriteShows = shows.filter((show) => show.membership.is_favourite).sort(compareTitle).slice(0, 4);
+  const favouriteMovies = movies.filter((movie) => movie.membership.is_favourite).sort(compareTitle).slice(0, 4);
+  return <div className="space-y-8"><section><h2 className="text-2xl font-semibold">Statistics</h2><dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">{labels.map(([key, label]) => <div key={key} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4"><dt className="text-sm text-[var(--muted)]">{label}</dt><dd className="mt-1 text-2xl font-semibold">{statistics[key]}</dd></div>)}</dl></section><section><h2 className="text-2xl font-semibold">Estimated watch time</h2><div className="mt-3 grid gap-3 sm:grid-cols-3">{times.map(([label, minutes]) => { const value = formatDuration(minutes); return <div key={label} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4"><h3 className="font-semibold">{label}</h3><p className="mt-2 text-xl font-semibold">{value.daysAndHours}</p><p className="text-sm text-[var(--muted)]">{value.hours} · {value.minutes}</p></div>; })}</div></section>{favouriteShows.length ? <section><h2 className="text-2xl font-semibold">Favourite shows</h2><ul className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">{favouriteShows.map((show) => <li key={show.membership.id}><ShowCard show={show} /></li>)}</ul></section> : null}{favouriteMovies.length ? <section><h2 className="text-2xl font-semibold">Favourite movies</h2><ul className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">{favouriteMovies.map((movie) => <li key={movie.membership.id}><MovieCard movie={movie} /></li>)}</ul></section> : null}</div>;
+}

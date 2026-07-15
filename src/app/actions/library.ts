@@ -160,14 +160,20 @@ export async function removeFromLibrary(
       return { error: error.message };
     }
   } else {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("user_movies")
       .delete()
       .eq("user_id", user.id)
-      .eq("media_item_id", mediaItem.id);
+      .eq("media_item_id", mediaItem.id)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
       return { error: error.message };
+    }
+
+    if (!data) {
+      return { error: "That movie is not in your library." };
     }
   }
 
