@@ -212,7 +212,7 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Ensure dropped shows are excluded from Watch Next
 * [x] Test category transitions
 * [x] Run validation commands
-* [ ] Commit and merge Phase 5
+* [x] Commit and merge Phase 5
 
 ## Phase 6 — Upcoming episodes
 
@@ -231,7 +231,7 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Use cached data during TMDB failure
 * [x] Test upcoming rules
 * [x] Run validation commands
-* [ ] Commit and merge Phase 6
+* [x] Commit and merge Phase 6
 
 ## Phase 7 — Movies and profile statistics
 
@@ -259,7 +259,7 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Label viewing time as estimated
 * [x] Test statistics
 * [ ] Run validation commands
-* [ ] Commit and merge Phase 7
+* [x] Commit and merge Phase 7
 
 ## Phase 8 — TV Time import
 
