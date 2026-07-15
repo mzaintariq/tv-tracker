@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 
 import { addToLibrary, removeFromLibrary } from "@/app/actions/library";
@@ -73,6 +74,14 @@ export function MediaCard({ item }: MediaCardProps) {
         </p>
       </div>
 
+      {!inLibrary && item.mediaType === "tv" ? (
+        <Link
+          href={`/shows/${item.tmdbId}`}
+          className="flex h-10 items-center justify-center rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)]"
+        >
+          Set progress
+        </Link>
+      ) : (
       <button
         type="button"
         onClick={handleToggle}
@@ -86,6 +95,7 @@ export function MediaCard({ item }: MediaCardProps) {
       >
         {isPending ? "Saving…" : inLibrary ? "Remove" : "Add"}
       </button>
+      )}
 
       {error ? (
         <p className="text-sm text-[var(--danger)]" role="alert">

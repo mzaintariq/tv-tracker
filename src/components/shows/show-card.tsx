@@ -1,0 +1,6 @@
+import Image from "next/image"; import Link from "next/link";
+import { posterUrl, titleInitials, yearFromDate } from "@/lib/media/types";
+import type { ShowCardData } from "@/lib/shows/data";
+import { ProgressBar } from "@/components/shows/progress-bar";
+
+export function ShowCard({ show }: { show: ShowCardData }) { const image = posterUrl(show.media.poster_path); return <article className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)]"><Link href={`/shows/${show.media.tmdb_id}`} className="block"><div className="relative aspect-[2/3] bg-[var(--surface-elevated)]">{image ? <Image src={image} alt={`${show.media.title} poster`} fill className="object-cover" sizes="(max-width: 640px) 50vw, 25vw" /> : <span className="flex h-full items-center justify-center text-2xl font-semibold text-[var(--muted)]">{titleInitials(show.media.title)}</span>}</div><div className="space-y-3 p-4"><div><h2 className="font-semibold">{show.media.title} {show.membership.is_favourite ? <span aria-label="Favourite">★</span> : null}</h2><p className="text-sm capitalize text-[var(--muted)]">{yearFromDate(show.media.release_date) ?? "Year unknown"} · {show.membership.status}</p></div><ProgressBar progress={show.progress} /></div></Link></article>; }

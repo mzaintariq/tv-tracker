@@ -49,6 +49,14 @@ export async function addToLibrary(
   }
 
   const mediaType: MediaType = mediaTypeRaw;
+
+  if (mediaType === "tv") {
+    return {
+      error:
+        "TV shows must be added through the show progress setup workflow.",
+    };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -75,44 +83,24 @@ export async function addToLibrary(
       };
     }
 
-    if (mediaType === "tv") {
-      const { error } = await supabase.from("user_shows").insert({
-        user_id: user.id,
-        media_item_id: mediaItem.id,
-      });
+    const { error } = await supabase.from("user_movies").insert({
+      user_id: user.id,
+      media_item_id: mediaItem.id,
+    });
 
-      if (error) {
-        if (uniqueViolation(error)) {
-          return { error: "This show is already in your library." };
-        }
-
-        return { error: error.message };
+    if (error) {
+      if (uniqueViolation(error)) {
+        return { error: "This movie is already in your watchlist." };
       }
-    } else {
-      const { error } = await supabase.from("user_movies").insert({
-        user_id: user.id,
-        media_item_id: mediaItem.id,
-      });
 
-      if (error) {
-        if (uniqueViolation(error)) {
-          return { error: "This movie is already in your watchlist." };
-        }
-
-        return { error: error.message };
-      }
+      return { error: error.message };
     }
 
     revalidatePath("/explore");
     revalidatePath("/shows");
     revalidatePath("/movies");
 
-    return {
-      success:
-        mediaType === "tv"
-          ? "Added to your library."
-          : "Added to your watchlist.",
-    };
+    return { success: "Added to your watchlist." };
   } catch (error) {
     if (error instanceof TmdbApiError) {
       return { error: "Could not fetch media details from TMDB." };
