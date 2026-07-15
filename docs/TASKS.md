@@ -195,23 +195,23 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ## Phase 5 — Watch List categories
 
-* [ ] Add Watch Next
-* [ ] Add Recently Watched
-* [ ] Add Haven’t Watched for a While
-* [ ] Add Haven’t Started
-* [ ] Add Caught Up
-* [ ] Add Completed
-* [ ] Add Paused
-* [ ] Add Dropped
-* [ ] Add Undo watched action
-* [ ] Add yellow progress bar
-* [ ] Add green progress bar
-* [ ] Add purple progress bar
-* [ ] Ensure categories do not conflict
-* [ ] Ensure paused shows are excluded from Watch Next
-* [ ] Ensure dropped shows are excluded from Watch Next
-* [ ] Test category transitions
-* [ ] Run validation commands
+* [x] Add Watch Next
+* [x] Add Recently Watched
+* [x] Add Haven’t Watched for a While
+* [x] Add Haven’t Started
+* [x] Add Caught Up
+* [x] Add Completed
+* [x] Add Paused
+* [x] Add Dropped
+* [x] Add Undo watched action
+* [x] Add yellow progress bar
+* [x] Add green progress bar
+* [x] Add purple progress bar
+* [x] Ensure categories do not conflict
+* [x] Ensure paused shows are excluded from Watch Next
+* [x] Ensure dropped shows are excluded from Watch Next
+* [x] Test category transitions
+* [x] Run validation commands
 * [ ] Commit and merge Phase 5
 
 ## Phase 6 — Upcoming episodes
