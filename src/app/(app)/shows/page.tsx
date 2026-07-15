@@ -1,10 +1,4 @@
-import { PlaceholderPage } from "@/components/ui/placeholder-page";
+import Link from "next/link"; import { redirect } from "next/navigation";
+import { ShowCard } from "@/components/shows/show-card"; import { loadShows } from "@/lib/shows/data"; import { createClient } from "@/lib/supabase/server";
 
-export default function ShowsPage() {
-  return (
-    <PlaceholderPage
-      title="TV Shows"
-      description="Your watch list and upcoming episodes will live here in a later phase."
-    />
-  );
-}
+export default async function ShowsPage() { const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser(); if (!user) redirect("/login"); const shows = await loadShows(user.id); return <section className="mx-auto w-full max-w-6xl space-y-6"><div><h1 className="text-3xl font-semibold tracking-tight">TV Shows</h1><p className="mt-2 text-[var(--muted)]">Your tracked television library.</p></div>{shows.length ? <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{shows.map((show) => <li key={show.membership.id}><ShowCard show={show} /></li>)}</ul> : <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center"><h2 className="text-xl font-semibold">No shows yet</h2><p className="mt-2 text-[var(--muted)]">Find a show in Explore and set your starting progress.</p><Link href="/explore?type=tv" className="mt-4 inline-block rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]">Explore shows</Link></div>}</section>; }

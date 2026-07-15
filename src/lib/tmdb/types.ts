@@ -49,7 +49,20 @@ export type TmdbTvDetails = TmdbTvListItem & {
   status?: string;
   episode_run_time?: number[];
   external_ids?: TmdbExternalIds;
+  seasons?: TmdbSeasonSummary[];
 };
+
+export type TmdbSeasonSummary = {
+  id: number; season_number: number; episode_count: number; name: string;
+  air_date?: string | null; poster_path: TmdbImagePath;
+};
+
+export type TmdbEpisode = {
+  id: number; episode_number: number; season_number: number; name: string;
+  air_date?: string | null; runtime?: number | null; overview?: string;
+};
+
+export type TmdbSeasonDetails = TmdbSeasonSummary & { episodes: TmdbEpisode[] };
 
 export type TmdbMovieDetails = TmdbMovieListItem & {
   status?: string;

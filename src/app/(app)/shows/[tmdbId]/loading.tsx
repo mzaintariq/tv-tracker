@@ -1,0 +1,1 @@
+export default function ShowDetailLoading() { return <div className="mx-auto max-w-5xl animate-pulse space-y-6"><div className="h-10 w-64 rounded bg-[var(--surface-elevated)]" /><div className="h-64 rounded-xl bg-[var(--surface-elevated)]" /><div className="h-96 rounded-xl bg-[var(--surface-elevated)]" /></div>; }

@@ -17,11 +17,13 @@ export class TmdbApiError extends Error {
 type FetchTmdbOptions = {
   path: string;
   searchParams?: Record<string, string | number | boolean | undefined>;
+  forceRefresh?: boolean;
 };
 
 export async function fetchTmdb<T>({
   path,
   searchParams,
+  forceRefresh = false,
 }: FetchTmdbOptions): Promise<T> {
   const token = getTmdbApiReadToken();
   const url = new URL(`${TMDB_API_BASE_URL}${path}`);
@@ -41,7 +43,7 @@ export async function fetchTmdb<T>({
       Authorization: `Bearer ${token}`,
       Accept: "application/json",
     },
-    next: { revalidate: 300 },
+    ...(forceRefresh ? { cache: "no-store" as const } : { next: { revalidate: 300 } }),
   });
 
   if (!response.ok) {
