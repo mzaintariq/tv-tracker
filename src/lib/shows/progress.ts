@@ -1,4 +1,5 @@
 import type { Episode } from "@/types/database";
+import { isShowEnded } from "@/lib/shows/status";
 
 export type ProgressState = "none" | "partial" | "caught-up" | "complete";
 export type ShowProgress = { watched: number; total: number; percentage: number; state: ProgressState };
@@ -19,5 +20,5 @@ export function calculateShowProgress(
   const percentage = total === 0 ? 0 : Math.round((watched / total) * 100);
   if (watched === 0) return { watched, total, percentage, state: "none" };
   if (watched < total) return { watched, total, percentage, state: "partial" };
-  return { watched, total, percentage, state: tmdbStatus?.toLowerCase() === "ended" ? "complete" : "caught-up" };
+  return { watched, total, percentage, state: isShowEnded(tmdbStatus) ? "complete" : "caught-up" };
 }

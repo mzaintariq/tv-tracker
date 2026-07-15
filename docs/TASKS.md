@@ -216,21 +216,21 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ## Phase 6 — Upcoming episodes
 
-* [ ] Query future episodes
-* [ ] Exclude Season 0
-* [ ] Exclude paused shows
-* [ ] Exclude dropped shows
-* [ ] Group episodes by date
-* [ ] Sort dates ascending
-* [ ] Show all announced future episodes
-* [ ] Group same-day season releases
-* [ ] Add grouped-release expansion
-* [ ] Add timezone-aware display
-* [ ] Add stale metadata checks
-* [ ] Add lazy metadata refresh
-* [ ] Use cached data during TMDB failure
-* [ ] Test upcoming rules
-* [ ] Run validation commands
+* [x] Query future episodes
+* [x] Exclude Season 0
+* [x] Exclude paused shows
+* [x] Exclude dropped shows
+* [x] Group episodes by date
+* [x] Sort dates ascending
+* [x] Show all announced future episodes
+* [x] Group same-day season releases
+* [x] Add grouped-release expansion
+* [x] Add timezone-aware display
+* [x] Add stale metadata checks
+* [x] Add lazy metadata refresh
+* [x] Use cached data during TMDB failure
+* [x] Test upcoming rules
+* [x] Run validation commands
 * [ ] Commit and merge Phase 6
 
 ## Phase 7 — Movies and profile statistics

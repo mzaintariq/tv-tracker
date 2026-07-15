@@ -61,6 +61,7 @@ export type Database = {
           average_episode_runtime_minutes: number | null;
           tmdb_status: string | null;
           last_synced_at: string;
+          episodes_synced_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -79,6 +80,7 @@ export type Database = {
           average_episode_runtime_minutes?: number | null;
           tmdb_status?: string | null;
           last_synced_at?: string;
+          episodes_synced_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -97,6 +99,7 @@ export type Database = {
           average_episode_runtime_minutes?: number | null;
           tmdb_status?: string | null;
           last_synced_at?: string;
+          episodes_synced_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
