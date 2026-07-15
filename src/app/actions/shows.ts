@@ -3,11 +3,50 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { synchronizeShow } from "@/lib/shows/sync";
+import { regularSeasonSyncSucceeded, settleWithConcurrency, shouldAutomaticallyRefreshEpisodes, UPCOMING_SHOW_REFRESH_CONCURRENCY } from "@/lib/shows/freshness";
 import { isShowStatus, parseInitialProgress, parseNonNegativeInteger, parsePositiveInteger, parseTmdbId, parseUuid, parseManualWatchedAt, type ValidInitialProgress } from "@/lib/shows/validation";
 
 export type ShowActionResult = { error?: string; success?: string; warning?: string };
 async function authenticated() { const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser(); return { supabase, user }; }
-function refresh(tmdbId: number) { revalidatePath("/shows"); revalidatePath(`/shows/${tmdbId}`); revalidatePath("/explore"); }
+function refresh(tmdbId: number) { revalidatePath("/shows"); revalidatePath("/shows/upcoming"); revalidatePath(`/shows/${tmdbId}`); revalidatePath("/explore"); }
+
+export type UpcomingRefreshResult = { attempted: number; failed: number; partial: number };
+
+function parseTmdbIds(value: unknown): number[] {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.flatMap((item) => {
+    const parsed = parseTmdbId(item);
+    return parsed === null ? [] : [parsed];
+  }))].slice(0, 100);
+}
+
+export async function refreshStaleUpcoming(tmdbIdsRaw: unknown): Promise<UpcomingRefreshResult> {
+  const requestedIds = parseTmdbIds(tmdbIdsRaw);
+  const empty = { attempted: 0, failed: 0, partial: 0 };
+  if (!requestedIds.length) return empty;
+  const { supabase, user } = await authenticated();
+  if (!user) return { ...empty, failed: requestedIds.length };
+
+  const membershipResult = await supabase.from("user_shows").select("media_item_id").eq("user_id", user.id).eq("status", "active");
+  if (membershipResult.error) return { ...empty, failed: requestedIds.length };
+  if (!membershipResult.data?.length) return empty;
+  const mediaIds = membershipResult.data.map((membership) => membership.media_item_id);
+  const mediaResult = await supabase.from("media_items").select("id,tmdb_id,tmdb_status,episodes_synced_at").eq("media_type", "tv").in("id", mediaIds).in("tmdb_id", requestedIds);
+  if (mediaResult.error) return { ...empty, failed: requestedIds.length };
+
+  const now = new Date();
+  const candidates = (mediaResult.data ?? []).filter((media) =>
+    shouldAutomaticallyRefreshEpisodes("active", media.tmdb_status, media.episodes_synced_at, now));
+  let failed = 0;
+  let partial = 0;
+  const settled = await settleWithConcurrency(candidates, UPCOMING_SHOW_REFRESH_CONCURRENCY, (candidate) => synchronizeShow(candidate.tmdb_id, true));
+  for (const result of settled) {
+    if (result.status === "rejected") failed += 1;
+    else if (!regularSeasonSyncSucceeded(result.value.failedSeasons)) partial += 1;
+  }
+  revalidatePath("/shows/upcoming");
+  return { attempted: candidates.length, failed, partial };
+}
 
 export async function syncShowMetadata(tmdbIdRaw: unknown): Promise<ShowActionResult> {
   const tmdbId = parseTmdbId(tmdbIdRaw); if (tmdbId === null) return { error: "Invalid TMDB show ID." };

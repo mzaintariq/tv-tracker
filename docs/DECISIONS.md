@@ -15,3 +15,8 @@
 - Show all announced upcoming episodes.
 - Group same-day season releases.
 - Support light, dark and system themes.
+- Track television episode-cache freshness separately in nullable `media_items.episodes_synced_at`; it advances only after every announced regular season has been fetched and its episode rows persisted. Season 0 does not affect this timestamp.
+- Load Upcoming from cached rows first, then use a one-attempt client coordinator to refresh stale active non-ended shows with show concurrency two and re-render once.
+- Treat episode metadata as stale after 24 hours. Recheck shared freshness in one batched read immediately before automatic synchronization.
+- Reuse the Phase 4 ended interpretation (`tmdb_status` equal to `Ended`, case-insensitive). Ended shows are not refreshed automatically, so a revived ended series may require manual Refresh Metadata in Phase 6.
+- Phase 6 retains full-season synchronization. Very long-running ongoing shows may generate more TMDB requests; incremental season synchronization is deferred.
