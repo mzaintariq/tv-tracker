@@ -7,8 +7,20 @@ describe("movie favourites decision interaction", () => {
 
   it("refreshes only after a successful decision and displays its result", () => {
     const decision = controls.slice(controls.indexOf("export function IssueDecision"), controls.indexOf("export function SkipCoordinateButton"));
-    expect(decision).toContain("if (result.error)");
-    expect(decision.indexOf("if (result.error)")).toBeLessThan(decision.indexOf("router.refresh()"));
+    const actionResult = decision.indexOf("const result=await resolveImportIssue");
+    const errorCheck = decision.indexOf("if (result.error)");
+    const successMessage = decision.indexOf('setMessage(result.success ?? "Decision saved.")');
+    const refreshNotification = decision.indexOf("notifyResolutionRefresh(importId)");
+    const errorPath = decision.slice(errorCheck, successMessage);
+
+    expect(actionResult).toBeGreaterThan(-1);
+    expect(errorCheck).toBeGreaterThan(actionResult);
+    expect(errorPath).toContain("setError(mutationError(result))");
+    expect(errorPath).toContain("return;");
+    expect(errorPath).not.toContain("notifyResolutionRefresh");
+    expect(successMessage).toBeGreaterThan(errorCheck);
+    expect(refreshNotification).toBeGreaterThan(successMessage);
+    expect(decision).not.toContain("router.refresh()");
     expect(decision).toContain('role="status"');
     expect(actions).toContain("Movie favourites will be imported.");
     expect(actions).toContain("Movie favourites will not be imported.");
