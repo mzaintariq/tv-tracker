@@ -302,7 +302,7 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Add persisted aggregate Apply progress and polling UX
 * [ ] Production hardening: refactor long-running Apply into bounded resumable requests
 * [x] Run validation commands
-* [ ] Commit and merge Phase 8
+* [x] Commit and merge Phase 8
 
 ## Phase 9 — Export, PWA and polish
 
