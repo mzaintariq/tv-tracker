@@ -306,10 +306,10 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ## Phase 9 — Export, PWA and polish
 
-* [ ] Add user JSON export
-* [ ] Include provider IDs in export
-* [ ] Include watched dates in export
-* [ ] Include tracking statuses in export
+* [x] Add user JSON export
+* [x] Include provider IDs in export
+* [x] Include watched dates in export
+* [x] Include tracking statuses in export
 * [ ] Add PWA manifest
 * [ ] Add application icons
 * [ ] Add installable mobile experience
