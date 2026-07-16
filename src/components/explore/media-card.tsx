@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { addToLibrary, removeFromLibrary } from "@/app/actions/library";
+import { addToLibrary, prepareShowProgress, removeFromLibrary } from "@/app/actions/library";
 import type { ExploreMediaItem } from "@/lib/media/types";
 import { posterUrl, titleInitials } from "@/lib/media/types";
 
@@ -13,6 +13,7 @@ type MediaCardProps = {
 };
 
 export function MediaCard({ item }: MediaCardProps) {
+  const router = useRouter();
   const [inLibrary, setInLibrary] = useState(item.inLibrary);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -53,6 +54,18 @@ export function MediaCard({ item }: MediaCardProps) {
     });
   }
 
+  function handleSetProgress() {
+    setError(null);
+    startTransition(async () => {
+      const result = await prepareShowProgress(item.tmdbId);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      router.push(`/shows/${item.tmdbId}`);
+    });
+  }
+
   return (
     <article className="flex flex-col gap-3">
       <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-[var(--surface-elevated)]">
@@ -85,12 +98,14 @@ export function MediaCard({ item }: MediaCardProps) {
       </div>
 
       {!inLibrary && item.mediaType === "tv" ? (
-        <Link
-          href={`/shows/${item.tmdbId}`}
+        <button
+          type="button"
+          onClick={handleSetProgress}
+          disabled={isPending}
           className="flex h-10 items-center justify-center rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)]"
         >
-          Set progress
-        </Link>
+          {isPending ? "Preparing…" : "Set progress"}
+        </button>
       ) : (
       <button
         type="button"

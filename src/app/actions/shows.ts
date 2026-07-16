@@ -6,6 +6,7 @@ import { synchronizeShow } from "@/lib/shows/sync";
 import { regularSeasonSyncSucceeded, settleWithConcurrency, shouldAutomaticallyRefreshEpisodes, UPCOMING_SHOW_REFRESH_CONCURRENCY } from "@/lib/shows/freshness";
 import { isShowStatus, parseInitialProgress, parseNonNegativeInteger, parsePositiveInteger, parseTmdbId, parseUuid, parseManualWatchedAt, type ValidInitialProgress } from "@/lib/shows/validation";
 import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
+import { initializeProgress } from "@/lib/shows/initialize-progress";
 
 export type ShowActionResult = { error?: string; success?: string; warning?: string };
 async function authenticated() { const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser(); return { supabase, user }; }
@@ -51,14 +52,8 @@ export async function refreshStaleUpcoming(tmdbIdsRaw: unknown): Promise<Upcomin
 
 export async function syncShowMetadata(tmdbIdRaw: unknown): Promise<ShowActionResult> {
   const tmdbId = parseTmdbId(tmdbIdRaw); if (tmdbId === null) return { error: "Invalid TMDB show ID." };
-  const { supabase, user } = await authenticated(); if (!user) return { error: "You must be signed in." };
-  const { data: mediaItem, error: mediaError } = await supabase.from("media_items").select("id").eq("tmdb_id", tmdbId).eq("media_type", "tv").maybeSingle();
-  if (mediaError) return { error: "Could not verify this show." };
-  if (!mediaItem) return { error: "Add this show before refreshing its metadata." };
-  const { data: membership, error: membershipError } = await supabase.from("user_shows").select("id").eq("user_id", user.id).eq("media_item_id", mediaItem.id).maybeSingle();
-  if (membershipError) return { error: "Could not verify your show library." };
-  if (!membership) return { error: "Add this show before refreshing its metadata." };
-  try { const result = await synchronizeShow(tmdbId, true); refresh(tmdbId); return result.failedSeasons.length ? { success: "Available metadata was refreshed.", warning: `Could not refresh season${result.failedSeasons.length === 1 ? "" : "s"} ${result.failedSeasons.join(", ")}. Cached data was kept.` } : { success: "Metadata refreshed." }; }
+  const { user } = await authenticated(); if (!user) return { error: "You must be signed in." };
+  try { const result = await synchronizeShow(tmdbId, true); refresh(tmdbId); const failedRegular = result.failedSeasons.filter((season) => season > 0); const synchronizedRegular = result.synchronizedSeasons.some((season) => season > 0); if (failedRegular.length && !synchronizedRegular) return { error: "Episode information could not be loaded. Please try again." }; return result.failedSeasons.length ? { success: "Available metadata was refreshed.", warning: `Could not refresh season${result.failedSeasons.length === 1 ? "" : "s"} ${result.failedSeasons.join(", ")}. Cached data was kept.` } : { success: "Metadata refreshed." }; }
   catch { return { error: "Could not refresh metadata. Cached episodes are still available." }; }
 }
 
@@ -68,11 +63,15 @@ export async function initializeShow(tmdbIdRaw: unknown, selectionRaw: unknown):
   const selection = parseInitialProgress(selectionRaw); if (!selection) return { error: "Invalid initial progress selection." };
   const { supabase, user } = await authenticated(); if (!user) return { error: "You must be signed in." };
   try {
-    const synced = await synchronizeShow(tmdbId, true); const failedRegular = synced.failedSeasons.filter((season) => season > 0);
-    if (selection.mode !== "start" && failedRegular.length) return { error: `Could not synchronize regular season${failedRegular.length === 1 ? "" : "s"} ${failedRegular.join(", ")}. The show was not added.` };
-    const args = { p_media_item_id: synced.mediaItemId, p_mode: selection.mode, p_season_number: selection.mode === "before_episode" ? selection.seasonNumber : null, p_episode_number: selection.mode === "before_episode" ? selection.episodeNumber : null, p_season_numbers: selection.mode === "seasons" ? selection.seasonNumbers : null };
-    const { error } = await supabase.rpc("initialize_user_show", args); if (error) return { error: error.message };
-    refresh(tmdbId); return { success: "Show added to your library.", warning: synced.failedSeasons.includes(0) ? "Season 0 could not be synchronized, but regular progress was initialized." : undefined };
+    const existing = selection.mode === "start" ? await supabase.from("media_items").select("id").eq("tmdb_id", tmdbId).eq("media_type", "tv").maybeSingle() : { data: null, error: null };
+    if (existing.error) return { error: "Could not verify this show." };
+    const result = await initializeProgress(selection, existing.data?.id ?? null, () => synchronizeShow(tmdbId, true), async (mediaItemId) => {
+      const args = { p_media_item_id: mediaItemId, p_mode: selection.mode, p_season_number: selection.mode === "before_episode" ? selection.seasonNumber : null, p_episode_number: selection.mode === "before_episode" ? selection.episodeNumber : null, p_season_numbers: selection.mode === "seasons" ? selection.seasonNumbers : null };
+      const initialized = await supabase.rpc("initialize_user_show", args);
+      return { error: initialized.error?.message ?? null };
+    });
+    if (result.error) return { error: result.error };
+    refresh(tmdbId); return { success: "Show added to your library.", warning: result.failedSeasons?.includes(0) ? "Season 0 could not be synchronized, but regular progress was initialized." : undefined };
   } catch { return { error: "Could not synchronize this show. It was not added." }; }
 }
 

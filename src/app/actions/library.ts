@@ -21,6 +21,25 @@ export type LibraryActionState = {
   success?: string;
 };
 
+export async function prepareShowProgress(tmdbIdRaw: string | number): Promise<LibraryActionState> {
+  const tmdbId = parseTmdbId(tmdbIdRaw);
+  if (tmdbId === null) return { error: "TMDB ID must be a positive integer." };
+  const supabase = await createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) return { error: "You must be signed in to set show progress." };
+  try {
+    const cacheRow = await upsertMediaItem("tv", tmdbId);
+    const { error } = await createAdminClient().from("media_items").upsert(cacheRow, { onConflict: "tmdb_id,media_type" });
+    if (error) return { error: "Could not prepare this show. Please try again." };
+    revalidatePath(`/shows/${tmdbId}`);
+    revalidatePath("/explore");
+    return { success: "Show metadata is ready." };
+  } catch (error) {
+    if (error instanceof TmdbApiError && error.status === 404) return { error: "This TV show could not be found." };
+    return { error: "Could not prepare this show. Please try again." };
+  }
+}
+
 function uniqueViolation(error: { code?: string; message?: string }): boolean {
   return error.code === "23505" || Boolean(error.message?.includes("duplicate"));
 }
