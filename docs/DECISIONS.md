@@ -22,3 +22,9 @@
 - Phase 6 retains full-season synchronization. Very long-running ongoing shows may generate more TMDB requests; incremental season synchronization is deferred.
 - Movie removal deletes the `user_movies` membership row and therefore also deletes that movie's personal `watched_at` and `is_favourite` state. Shared `media_items` metadata remains cached. Unlike television episode history, movie history is not independently preserved, so removed movies no longer contribute to profile movie statistics.
 - Phase 7 profile statistics are derived rather than stored. Television episode count and estimated time include all accessible `watched_episodes`, including history preserved after show removal; show-state counts and all movie statistics use current library memberships.
+- Phase 8 uses a two-upload TV Time workflow: Analyze fingerprints and discards the ZIP; Apply requires the same ZIP and discards it again. Raw exports and irrelevant personal/security CSV rows are never persisted.
+- TV Time legacy Unix `watch_date` values are authoritative; otherwise timezone-less `created_at` is interpreted as UTC and disclosed as an assumption.
+- Multiple source events collapse to the latest source event. Existing TrackTV watched dates win and are never overwritten by default.
+- TV Time active, non-archived shows may become active memberships. Removed, archived, and inactive shows import as history-only. Existing paused/dropped state and existing favourites are preserved; imported favourites are additive.
+- Phase 8 retains the one-date watch-state model and does not add rewatch-event or separate removed-movie-history storage.
+- Phase 8 matching is resumable with database leases. One confirmed TV show is applied transactionally only after every coordinate resolves or is explicitly skipped.

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { synchronizeShow } from "@/lib/shows/sync";
 import { regularSeasonSyncSucceeded, settleWithConcurrency, shouldAutomaticallyRefreshEpisodes, UPCOMING_SHOW_REFRESH_CONCURRENCY } from "@/lib/shows/freshness";
 import { isShowStatus, parseInitialProgress, parseNonNegativeInteger, parsePositiveInteger, parseTmdbId, parseUuid, parseManualWatchedAt, type ValidInitialProgress } from "@/lib/shows/validation";
+import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
 
 export type ShowActionResult = { error?: string; success?: string; warning?: string };
 async function authenticated() { const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser(); return { supabase, user }; }
@@ -27,15 +28,15 @@ export async function refreshStaleUpcoming(tmdbIdsRaw: unknown): Promise<Upcomin
   const { supabase, user } = await authenticated();
   if (!user) return { ...empty, failed: requestedIds.length };
 
-  const membershipResult = await supabase.from("user_shows").select("media_item_id").eq("user_id", user.id).eq("status", "active");
-  if (membershipResult.error) return { ...empty, failed: requestedIds.length };
-  if (!membershipResult.data?.length) return empty;
-  const mediaIds = membershipResult.data.map((membership) => membership.media_item_id);
-  const mediaResult = await supabase.from("media_items").select("id,tmdb_id,tmdb_status,episodes_synced_at").eq("media_type", "tv").in("id", mediaIds).in("tmdb_id", requestedIds);
-  if (mediaResult.error) return { ...empty, failed: requestedIds.length };
+  const mediaResult = await supabase.rpc("load_upcoming_refresh_candidates", { p_tmdb_ids: requestedIds });
+  if (mediaResult.error) {
+    logSafeReadFailure("shows", "load_upcoming_refresh_candidates", mediaResult.error, mediaResult.status);
+    return { ...empty, failed: requestedIds.length };
+  }
 
   const now = new Date();
-  const candidates = (mediaResult.data ?? []).filter((media) =>
+  const rows = Array.isArray(mediaResult.data) ? mediaResult.data as Array<{ tmdb_id: number; tmdb_status: string | null; episodes_synced_at: string | null }> : [];
+  const candidates = rows.filter((media) =>
     shouldAutomaticallyRefreshEpisodes("active", media.tmdb_status, media.episodes_synced_at, now));
   let failed = 0;
   let partial = 0;

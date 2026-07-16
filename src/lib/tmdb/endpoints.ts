@@ -38,11 +38,12 @@ export async function getTrendingMovies(): Promise<TmdbMovieListItem[]> {
   return data.results.filter((item) => !item.adult);
 }
 
-export async function searchTv(query: string): Promise<TmdbTvListItem[]> {
+export async function searchTv(query: string, firstAirYear?: number): Promise<TmdbTvListItem[]> {
   const data = await fetchTmdb<TmdbPaginatedResponse<TmdbTvListItem>>({
     path: "/search/tv",
     searchParams: {
       query,
+      first_air_date_year: firstAirYear,
       ...excludeAdultParams(),
     },
   });
@@ -52,11 +53,13 @@ export async function searchTv(query: string): Promise<TmdbTvListItem[]> {
 
 export async function searchMovies(
   query: string,
+  primaryReleaseYear?: number,
 ): Promise<TmdbMovieListItem[]> {
   const data = await fetchTmdb<TmdbPaginatedResponse<TmdbMovieListItem>>({
     path: "/search/movie",
     searchParams: {
       query,
+      primary_release_year: primaryReleaseYear,
       ...excludeAdultParams(),
     },
   });

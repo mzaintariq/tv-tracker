@@ -1,11 +1,12 @@
 import "server-only";
 
 import { calculateShowProgress, type ShowProgress } from "@/lib/shows/progress";
-import { deriveWatchList, type TrackedShowSnapshot, type WatchListCategories } from "@/lib/shows/watch-list";
+import { deriveWatchList, type TrackedShowSnapshot, type WatchListCategories, type WatchListEpisode, type WatchListMedia, type WatchListWatchedEpisode } from "@/lib/shows/watch-list";
 import { createClient } from "@/lib/supabase/server";
+import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
 import type { Episode, MediaItem, UserShow, WatchedEpisode } from "@/types/database";
 
-export type ShowCardData = { membership: UserShow; media: MediaItem; progress: ShowProgress };
+export type ShowCardData = { membership: UserShow; media: WatchListMedia; progress: ShowProgress };
 export type ShowDetailData = { membership: UserShow | null; media: MediaItem; episodes: Episode[]; watched: WatchedEpisode[] };
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -23,42 +24,33 @@ export async function loadShows(userId: string): Promise<ShowCardData[]> {
   return memberships.flatMap((membership) => { const media = mediaMap.get(membership.media_item_id); return media ? [{ membership, media, progress: calculateShowProgress(episodeMap.get(media.id) ?? [], watchedIds, media.tmdb_status, today()) }] : []; });
 }
 
-export async function loadWatchList(userId: string, now = new Date()): Promise<WatchListCategories> {
+export async function loadWatchList(_userId: string, now = new Date()): Promise<WatchListCategories> {
+  void _userId;
   const supabase = await createClient();
-  const { data: memberships, error } = await supabase
-    .from("user_shows")
-    .select("*")
-    .eq("user_id", userId);
-  if (error) throw new Error("Could not load your tracked shows.");
-
   const timestamp = now.toISOString();
   const currentDate = timestamp.slice(0, 10);
-  if (!memberships?.length) return deriveWatchList([], currentDate, timestamp);
+  const episodeDataResult = await supabase.rpc("load_watch_list_episode_data");
+  if (episodeDataResult.error) {
+    const code = logSafeReadFailure("shows", "load_watch_list_episode_data", episodeDataResult.error, episodeDataResult.status);
+    throw new Error(`Could not load show metadata. [${code}]`);
+  }
 
-  const mediaIds = memberships.map((membership) => membership.media_item_id);
-  const [mediaResult, episodeResult] = await Promise.all([
-    supabase.from("media_items").select("*").eq("media_type", "tv").in("id", mediaIds),
-    supabase.from("episodes").select("*").in("media_item_id", mediaIds),
-  ]);
-  if (mediaResult.error || episodeResult.error) throw new Error("Could not load show metadata.");
+  const episodeData = episodeDataResult.data as { memberships?: UserShow[]; media?: WatchListMedia[]; episodes?: WatchListEpisode[]; watched?: WatchListWatchedEpisode[] } | null;
+  const memberships = Array.isArray(episodeData?.memberships) ? episodeData.memberships : [];
+  const media = Array.isArray(episodeData?.media) ? episodeData.media : [];
+  const episodes = Array.isArray(episodeData?.episodes) ? episodeData.episodes : [];
+  const watchedRows = Array.isArray(episodeData?.watched) ? episodeData.watched : [];
 
-  const episodes = episodeResult.data ?? [];
-  const episodeIds = episodes.map((episode) => episode.id);
-  const watchedResult = episodeIds.length
-    ? await supabase.from("watched_episodes").select("*").eq("user_id", userId).in("episode_id", episodeIds)
-    : { data: [], error: null };
-  if (watchedResult.error) throw new Error("Could not load your episode history.");
-
-  const mediaById = new Map((mediaResult.data ?? []).map((media) => [media.id, media]));
-  const episodesByMediaId = new Map<string, Episode[]>();
+  const mediaById = new Map(media.map((item) => [item.id, item]));
+  const episodesByMediaId = new Map<string, WatchListEpisode[]>();
   for (const episode of episodes) {
     const rows = episodesByMediaId.get(episode.media_item_id) ?? [];
     rows.push(episode);
     episodesByMediaId.set(episode.media_item_id, rows);
   }
   const episodeById = new Map(episodes.map((episode) => [episode.id, episode]));
-  const watchedByMediaId = new Map<string, WatchedEpisode[]>();
-  for (const watched of watchedResult.data ?? []) {
+  const watchedByMediaId = new Map<string, WatchListWatchedEpisode[]>();
+  for (const watched of watchedRows) {
     const episode = episodeById.get(watched.episode_id);
     if (!episode) continue;
     const rows = watchedByMediaId.get(episode.media_item_id) ?? [];

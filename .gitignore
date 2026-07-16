@@ -41,3 +41,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Personal TV Time GDPR export
+local-data/
+
+# Local Supabase SQL editor scratch files
+supabase/snippets/

@@ -70,7 +70,7 @@ export function normalizeSearchQuery(raw: string): string | null {
 
 export function posterUrl(
   posterPath: string | null,
-  size: "w185" | "w342" | "w500" = "w342",
+  size: "w92" | "w185" | "w342" | "w500" = "w342",
 ): string | null {
   if (!posterPath) {
     return null;

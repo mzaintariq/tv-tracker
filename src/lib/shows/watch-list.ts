@@ -1,5 +1,10 @@
 import { calculateShowProgress, isReleasedRegularEpisode, type ShowProgress } from "@/lib/shows/progress";
-import type { Episode, MediaItem, UserShow, WatchedEpisode } from "@/types/database";
+import type { MediaItem, UserShow } from "@/types/database";
+
+export type WatchListMedia = Pick<MediaItem, "id" | "tmdb_id" | "title" | "poster_path" | "release_date" | "tmdb_status">;
+
+export type WatchListEpisode = { id: string; media_item_id: string; season_number: number; episode_number: number; title: string; air_date: string | null };
+export type WatchListWatchedEpisode = { id: string; episode_id: string; watched_at: string };
 
 export const INACTIVITY_THRESHOLD_DAYS = 30;
 export const RECENTLY_WATCHED_LIMIT = 10;
@@ -15,9 +20,9 @@ export type PrimaryShowState =
 
 export type TrackedShowSnapshot = {
   membership: UserShow;
-  media: MediaItem;
-  episodes: Episode[];
-  watched: WatchedEpisode[];
+  media: WatchListMedia;
+  episodes: WatchListEpisode[];
+  watched: WatchListWatchedEpisode[];
 };
 
 export type DerivedShow = TrackedShowSnapshot & {
@@ -26,12 +31,12 @@ export type DerivedShow = TrackedShowSnapshot & {
   latestRegularWatchedAt: string | null;
 };
 
-export type WatchNextItem = DerivedShow & { episode: Episode };
+export type WatchNextItem = DerivedShow & { episode: WatchListEpisode };
 export type RecentlyWatchedItem = {
   membership: UserShow;
-  media: MediaItem;
-  episode: Episode;
-  watched: WatchedEpisode;
+  media: WatchListMedia;
+  episode: WatchListEpisode;
+  watched: WatchListWatchedEpisode;
 };
 
 export type WatchListCategories = {
@@ -47,11 +52,11 @@ export type WatchListCategories = {
   needsEpisodeData: DerivedShow[];
 };
 
-const titleCompare = (left: { media: MediaItem }, right: { media: MediaItem }) =>
+const titleCompare = (left: { media: WatchListMedia }, right: { media: WatchListMedia }) =>
   left.media.title.localeCompare(right.media.title, undefined, { sensitivity: "base" }) ||
   left.media.tmdb_id - right.media.tmdb_id;
 
-function latestTimestamp(rows: readonly WatchedEpisode[]): string | null {
+function latestTimestamp(rows: readonly WatchListWatchedEpisode[]): string | null {
   let latest: string | null = null;
   for (const row of rows) if (latest === null || row.watched_at > latest) latest = row.watched_at;
   return latest;
@@ -108,7 +113,7 @@ export function deriveWatchList(
     .sort((left, right) =>
       (left.latestRegularWatchedAt ?? "").localeCompare(right.latestRegularWatchedAt ?? "") || titleCompare(left, right));
 
-  const episodeById = new Map<string, { show: DerivedShow; episode: Episode }>();
+  const episodeById = new Map<string, { show: DerivedShow; episode: WatchListEpisode }>();
   for (const show of shows) for (const episode of show.episodes) episodeById.set(episode.id, { show, episode });
   const recentlyWatched = shows
     .flatMap((show) => show.watched.flatMap((watched) => {

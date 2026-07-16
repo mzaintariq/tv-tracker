@@ -1,20 +1,19 @@
 import "server-only";
 
-import { deriveMovieSections, type MovieSections, type MovieSnapshot } from "@/lib/movies/movies";
+import { deriveMovieSections, type MovieLibraryMedia, type MovieSections, type MovieSnapshot } from "@/lib/movies/movies";
 import { createClient } from "@/lib/supabase/server";
+import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
 
-export async function loadMovies(userId: string): Promise<MovieSections> {
+export async function loadMovies(_userId: string): Promise<MovieSections> {
+  void _userId;
   const supabase = await createClient();
-  const { data: memberships, error } = await supabase.from("user_movies").select("id,user_id,media_item_id,watched_at,is_favourite,created_at,updated_at").eq("user_id", userId);
-  if (error) throw new Error("Could not load your movies.");
-  if (!memberships?.length) return deriveMovieSections([]);
-  const { data: media, error: mediaError } = await supabase.from("media_items").select("*").eq("media_type", "movie").in("id", memberships.map((row) => row.media_item_id));
-  if (mediaError) throw new Error("Could not load movie metadata.");
-  const mediaById = new Map((media ?? []).map((row) => [row.id, row]));
-  return deriveMovieSections(memberships.flatMap((membership) => {
-    const item = mediaById.get(membership.media_item_id);
-    return item ? [{ membership, media: item }] : [];
-  }));
+  const result = await supabase.rpc("load_movie_library_data");
+  if (result.error) {
+    const code = logSafeReadFailure("movies", "load_movie_library_data", result.error, result.status);
+    throw new Error(`Could not load movie metadata. [${code}]`);
+  }
+  const payload = result.data as { movies?: MovieSnapshot<MovieLibraryMedia>[] } | null;
+  return deriveMovieSections(Array.isArray(payload?.movies) ? payload.movies : []);
 }
 
 export async function loadMovieDetail(userId: string, tmdbId: number): Promise<MovieSnapshot | null> {

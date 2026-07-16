@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { posterUrl, titleInitials, yearFromDate } from "@/lib/media/types";
-import type { MovieSnapshot } from "@/lib/movies/movies";
+import type { MovieLibraryMedia, MovieSnapshot } from "@/lib/movies/movies";
 
-export function MovieCard({ movie }: { movie: MovieSnapshot }) {
+export function MovieCard({ movie }: { movie: MovieSnapshot<MovieLibraryMedia> }) {
   const image = posterUrl(movie.media.poster_path);
   return <article className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)]">
     <Link href={`/movies/${movie.media.tmdb_id}`} className="block">

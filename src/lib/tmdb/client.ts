@@ -38,20 +38,15 @@ export async function fetchTmdb<T>({
     }
   }
 
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-    ...(forceRefresh ? { cache: "no-store" as const } : { next: { revalidate: 300 } }),
-  });
-
-  if (!response.ok) {
-    throw new TmdbApiError(
-      `TMDB request failed (${response.status})`,
-      response.status,
-    );
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+      ...(forceRefresh ? { cache: "no-store" as const } : { next: { revalidate: 300 } }),
+    });
+    if (response.ok) return (await response.json()) as T;
+    if ((response.status !== 429 && response.status < 500) || attempt === 2) throw new TmdbApiError(`TMDB request failed (${response.status})`,response.status);
+    const retryAfter=Number(response.headers.get("retry-after")); const delay=Number.isFinite(retryAfter)&&retryAfter>=0?Math.min(retryAfter*1000,5000):250*(attempt+1);
+    await new Promise((resolve)=>setTimeout(resolve,delay));
   }
-
-  return (await response.json()) as T;
+  throw new TmdbApiError("TMDB request failed",500);
 }

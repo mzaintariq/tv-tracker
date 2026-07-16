@@ -1,24 +1,28 @@
 import type { Episode, MediaItem, UserShow } from "@/types/database";
 
+export type UpcomingMembership = Pick<UserShow, "media_item_id" | "status">;
+export type UpcomingMedia = Pick<MediaItem, "id" | "tmdb_id" | "title" | "poster_path" | "tmdb_status" | "episodes_synced_at">;
+export type UpcomingEpisode = Pick<Episode, "id" | "media_item_id" | "season_number" | "episode_number" | "title" | "air_date" | "tmdb_episode_id">;
+
 export type UpcomingSnapshot = {
-  membership: UserShow;
-  media: MediaItem;
-  episodes: Episode[];
+  membership: UpcomingMembership;
+  media: UpcomingMedia;
+  episodes: UpcomingEpisode[];
 };
 
 export type UpcomingSingleItem = {
   kind: "episode";
   key: string;
-  media: MediaItem;
-  episode: Episode;
+  media: UpcomingMedia;
+  episode: UpcomingEpisode;
 };
 
 export type UpcomingSeasonItem = {
   kind: "season";
   key: string;
-  media: MediaItem;
+  media: UpcomingMedia;
   seasonNumber: number;
-  episodes: Episode[];
+  episodes: UpcomingEpisode[];
 };
 
 export type UpcomingItem = UpcomingSingleItem | UpcomingSeasonItem;
@@ -63,7 +67,7 @@ export function upcomingDateLabel(airDate: string, today: string): string {
   }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
-const titleCompare = (left: MediaItem, right: MediaItem) =>
+const titleCompare = (left: UpcomingMedia, right: UpcomingMedia) =>
   left.title.localeCompare(right.title, undefined, { sensitivity: "base" }) ||
   left.tmdb_id - right.tmdb_id;
 
@@ -82,7 +86,7 @@ export function deriveUpcoming(
   snapshots: readonly UpcomingSnapshot[],
   today: string,
 ): UpcomingDateGroup[] {
-  const releases = new Map<string, { airDate: string; media: MediaItem; seasonNumber: number; episodes: Episode[] }>();
+  const releases = new Map<string, { airDate: string; media: UpcomingMedia; seasonNumber: number; episodes: UpcomingEpisode[] }>();
 
   for (const snapshot of snapshots) {
     if (snapshot.membership.status !== "active") continue;
