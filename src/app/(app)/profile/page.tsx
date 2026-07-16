@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ProfileForm } from "@/components/profile/profile-form";
@@ -61,6 +62,7 @@ export default async function ProfilePage() {
           email={user.email ?? "Unknown email"}
         />
       </div>
+      <div className="mt-8 rounded-xl border border-[var(--border)] p-5"><h2 className="text-xl font-semibold">Import from TV Time</h2><p className="mt-1 text-[var(--muted)]">Privately analyze and import your TV Time GDPR export.</p><Link href="/profile/import" className="mt-3 inline-block rounded-lg border border-[var(--border)] px-3 py-2 font-medium">Open TV Time import</Link></div>
       <div className="mt-12"><StatisticsSummary statistics={pageData.statistics} shows={pageData.shows} movies={pageData.movies} /></div>
     </section>
   );

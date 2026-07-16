@@ -265,41 +265,43 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ### Discovery
 
-* [ ] Back up original TV Time export
-* [ ] Create anonymized working copy
-* [ ] Inspect export file structure
-* [ ] Document identifiers
-* [ ] Document watched-date fields
-* [ ] Document episode records
-* [ ] Document movie records
-* [ ] Document favourite fields
-* [ ] Document missing data
-* [ ] Create `docs/TVTIME_IMPORT_FORMAT.md`
+* [x] Back up original TV Time export
+* [x] Create anonymized working copy
+* [x] Inspect export file structure
+* [x] Document identifiers
+* [x] Document watched-date fields
+* [x] Document episode records
+* [x] Document movie records
+* [x] Document favourite fields
+* [x] Document missing data
+* [x] Create `docs/TVTIME_IMPORT_FORMAT.md`
 
 ### Implementation
 
-* [ ] Create `imports` migration
-* [ ] Create `import_unmatched_items` migration
-* [ ] Enable Row Level Security
-* [ ] Add ZIP parsing
-* [ ] Add import adapter
-* [ ] Add dry-run preview
-* [ ] Match using TMDB ID
-* [ ] Match using IMDb ID
-* [ ] Match using TVDB ID
-* [ ] Add title and year fallback
-* [ ] Add episode-number fallback
-* [ ] Add ambiguous-match handling
-* [ ] Add manual resolution
-* [ ] Add duplicate detection
-* [ ] Preserve watched dates
-* [ ] Preserve favourites
-* [ ] Add transactional import
-* [ ] Make import idempotent
-* [ ] Add final import summary
-* [ ] Add anonymized fixture tests
-* [ ] Confirm raw ZIP is not stored
-* [ ] Run validation commands
+* [x] Create `imports` migration
+* [x] Create import mapping, item, and issue infrastructure
+* [x] Enable Row Level Security
+* [x] Add ZIP parsing
+* [x] Add import adapter
+* [x] Add dry-run preview
+* [x] Reuse confirmed TV Time source-to-TMDB mappings
+* [x] Document that the audited export supplies no usable IMDb IDs
+* [x] Document that the audited export supplies no usable TVDB IDs
+* [x] Add title and year fallback
+* [x] Add season and episode-number matching
+* [x] Add ambiguous-match handling
+* [x] Add manual resolution
+* [x] Add duplicate detection
+* [x] Preserve watched dates
+* [x] Preserve favourites
+* [x] Add transactional import
+* [x] Make import idempotent
+* [x] Add final import summary
+* [x] Add anonymized fixture tests
+* [x] Confirm raw ZIP is not stored
+* [x] Add persisted aggregate Apply progress and polling UX
+* [ ] Production hardening: refactor long-running Apply into bounded resumable requests
+* [x] Run validation commands
 * [ ] Commit and merge Phase 8
 
 ## Phase 9 — Export, PWA and polish

@@ -1,0 +1,11 @@
+begin;
+select plan(3);
+insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
+values ('00000000-0000-0000-0000-000000000000','14000000-0000-0000-0000-000000000001','authenticated','authenticated','phase8-bulk@example.invalid','',now(),'{}','{}',now(),now());
+select public.initialize_tv_time_import('14000000-0000-0000-0000-000000000001',repeat('4',64),'{}','{}','[{"mediaType":"movie","sourceKey":"a","sourceTitle":"A","releaseDate":null,"importMode":"watch_next_movie","matchContext":{"version":1,"kind":"movie","releaseDate":null},"sourceRecordCount":1,"normalizedEventCount":0,"collapsedEventCount":0,"sourceItemDigest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{"mediaType":"movie","sourceKey":"b","sourceTitle":"B","releaseDate":null,"importMode":"watch_next_movie","matchContext":{"version":1,"kind":"movie","releaseDate":null},"sourceRecordCount":1,"normalizedEventCount":0,"collapsedEventCount":0,"sourceItemDigest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},{"mediaType":"movie","sourceKey":"c","sourceTitle":"C","releaseDate":null,"importMode":"watch_next_movie","matchContext":{"version":1,"kind":"movie","releaseDate":null},"sourceRecordCount":1,"normalizedEventCount":0,"collapsedEventCount":0,"sourceItemDigest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}]','[{"issueKey":"decision","issueType":"movie_favourites_confirmation","isBlocking":true,"details":{}}]') as import_id \gset
+update public.import_items set match_status=case source_key when 'a' then 'ambiguous' when 'b' then 'unmatched' else 'pending' end where import_id=:'import_id';
+select is(public.skip_all_unresolved_tv_time_media('14000000-0000-0000-0000-000000000001',:'import_id'),2,'Skip all affects unresolved media only');
+select ok((select count(*)=2 from public.import_items where import_id=:'import_id' and match_status='skipped') and (select match_status='pending' from public.import_items where import_id=:'import_id' and source_key='c'),'Skip all preserves pending and non-target states');
+select is((select status from public.import_issues where import_id=:'import_id' and issue_type='movie_favourites_confirmation'),'open','Skip all preserves non-media blocking decisions');
+select * from finish();
+rollback;
