@@ -67,7 +67,7 @@ export function MediaCard({ item }: MediaCardProps) {
   return (
     <article className="flex flex-col gap-3">
       <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-[var(--surface-elevated)]">
-        <MediaPoster source={item.posterPath} title={item.title} alt={`${item.title} poster`} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw" fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]" />
+        <MediaPoster source={item.posterPath} title={item.title} alt="" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw" fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]" />
       </div>
 
       <div className="min-w-0 space-y-1">

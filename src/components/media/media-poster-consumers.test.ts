@@ -34,4 +34,15 @@ describe("MediaPoster consumers", () => {
       expect(source).toContain('alt=""');
     }
   });
+
+  it("uses decorative posters beside visible card titles and decorative favourite glyphs", () => {
+    for (const path of ["src/components/explore/media-card.tsx", "src/components/shows/show-card.tsx", "src/components/movies/movie-card.tsx"]) {
+      expect(readFileSync(path, "utf8")).toContain('alt=""');
+    }
+    for (const path of ["src/components/shows/show-card.tsx", "src/components/movies/movie-card.tsx"]) {
+      const source = readFileSync(path, "utf8");
+      expect(source).toContain('aria-hidden="true"');
+      expect(source).toContain('className="sr-only"');
+    }
+  });
 });

@@ -47,6 +47,8 @@ describe("automatic matching progress", () => {
     expect(markup).toContain("2 remaining");
     expect(markup).toContain("need your review");
     expect(markup).toContain("all normalized media items");
+    expect(markup).not.toContain('aria-live="polite"');
+    expect(markup).toContain("Automatic matching started.");
   });
 
   it("updates stale counts serially without overlapping requests", async () => {

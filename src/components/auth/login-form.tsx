@@ -28,6 +28,7 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
   const pending = googlePending || magicPending;
   const error = googleState.error ?? magicState.error ?? initialError;
   const success = magicState.success;
+  const emailDescription = error ? "login-error" : undefined;
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -44,7 +45,7 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
       </form>
 
       {error ? (
-        <p className="text-sm text-[var(--danger)]" role="alert">
+        <p id="login-error" className="text-sm text-[var(--danger)]" role="alert">
           {error}
         </p>
       ) : null}
@@ -59,15 +60,18 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
 
       <form action={magicAction} className="flex w-full flex-col gap-4">
         <input type="hidden" name="next" value={nextPath} />
-        <label className="flex flex-col gap-2 text-sm font-medium text-[var(--foreground)]">
+        <label htmlFor="login-email" className="flex flex-col gap-2 text-sm font-medium text-[var(--foreground)]">
           Email
           <input
+            id="login-email"
             type="email"
             name="email"
             required
             autoComplete="email"
             placeholder="you@example.com"
             disabled={pending}
+            aria-describedby={emailDescription}
+            aria-invalid={error ? true : undefined}
             className="h-12 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-base text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
           />
         </label>

@@ -12,6 +12,11 @@ async function chooseFile(renderer: ReactTestRenderer): Promise<void> { await ac
 beforeEach(() => { vi.clearAllMocks(); globalThis.IS_REACT_ACT_ENVIRONMENT = true; });
 
 describe("ImportUploadForm response handling", () => {
+  it("labels the required ZIP input and associates instructions", async () => {
+    const renderer = await mount(); const input = renderer.root.findByType("input");
+    expect(input.props).toMatchObject({ id: "tv-time-analyze-zip", required: true, "aria-describedby": "tv-time-analyze-zip-instructions" });
+    expect(renderer.root.findByProps({ htmlFor: input.props.id }).children.join("")).toContain("ZIP");
+  });
   it("navigates after a valid Analyze success", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ importId: "created" }), { status: 200 })));
     const renderer = await mount(); await chooseFile(renderer);
@@ -21,7 +26,7 @@ describe("ImportUploadForm response handling", () => {
   it("preserves a known safe validation error", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: "zip_compressed_too_large", error: "The ZIP exceeds 3.5 MB." }), { status: 400 })));
     const renderer = await mount(); await chooseFile(renderer);
-    expect(renderer.root.findByProps({ role: "alert" }).children).toContain("The ZIP exceeds 3.5 MB."); expect(router.push).not.toHaveBeenCalled();
+    expect(renderer.root.findByType("input").props["aria-invalid"]).toBe(true); expect(renderer.root.findByProps({ role: "alert" }).children).toContain("The ZIP exceeds 3.5 MB."); expect(router.push).not.toHaveBeenCalled();
   });
 
   it.each([

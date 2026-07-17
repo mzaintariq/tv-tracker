@@ -67,6 +67,8 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
           required
           maxLength={80}
           defaultValue={profile.display_name ?? ""}
+          aria-describedby={state.error ? "profile-error" : undefined}
+          aria-invalid={state.error ? true : undefined}
           className="h-12 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2"
         />
       </div>
@@ -93,7 +95,7 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
       </div>
 
       {state.error ? (
-        <p className="text-sm text-[var(--danger)]" role="alert">
+        <p id="profile-error" className="text-sm text-[var(--danger)]" role="alert">
           {state.error}
         </p>
       ) : null}

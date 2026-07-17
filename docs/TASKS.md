@@ -338,3 +338,15 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Add a reduced-motion baseline for pulse and transition effects
 * [x] Preserve loading announcements and hide decorative skeletons
 * [x] Add focused landmark, skip-link, focus, safe-area, and motion tests
+
+### Phase 9D.2 — Forms, names, grouping, and feedback
+
+* [x] Associate login and profile errors with affected fields
+* [x] Group show setup modes and watched seasons with native fieldsets
+* [x] Add contextual names and validation hooks to watched-date controls
+* [x] Label import uploads, filters, search, manual IDs, and candidate actions
+* [x] Remove duplicate poster and favourite announcements from media cards
+* [x] Complete progressbar semantics and narrow polling live regions
+* [x] Keep route-error controls outside alert regions
+* [x] Add focused accessibility render and behavior tests
+* [ ] Existing gap: expose the stored profile timezone through a dedicated editor in its owning product scope

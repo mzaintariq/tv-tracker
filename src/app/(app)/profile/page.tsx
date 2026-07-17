@@ -70,7 +70,7 @@ export default async function ProfilePage() {
         <p className="mt-2 max-w-3xl text-sm text-[var(--muted)]">
           The export excludes your email, internal IDs, TV Time source files, and import diagnostics. It is generated on demand and is not retained by TrackTV.
         </p>
-        <a href="/api/export" className="mt-3 inline-block rounded-lg border border-[var(--border)] px-3 py-2 font-medium">
+        <a href="/api/export" aria-label="Download TrackTV data as JSON" className="mt-3 inline-block rounded-lg border border-[var(--border)] px-3 py-2 font-medium">
           Download your data
         </a>
       </section>

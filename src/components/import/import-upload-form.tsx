@@ -10,6 +10,9 @@ type Feedback = { kind: "error" | "status"; text: string };
 
 export function ImportUploadForm({ mode, importId, initialProgress }: { mode: "analyze" | "apply"; importId?: string; initialProgress?: ImportApplyProgress }) {
   const router = useRouter(); const [pending, setPending] = useState(false); const pendingRef = useRef(false); const [feedback, setFeedback] = useState<Feedback>();
+  const inputId = `tv-time-${mode}-zip`;
+  const instructionsId = `${inputId}-instructions`;
+  const feedbackId = `${inputId}-feedback`;
   async function upload(file: File) {
     if (pendingRef.current) return; pendingRef.current = true; setPending(true); setFeedback(undefined);
     try {
@@ -29,5 +32,5 @@ export function ImportUploadForm({ mode, importId, initialProgress }: { mode: "a
     } catch { setFeedback({ kind: "error", text: IMPORT_UPLOAD_FALLBACK }); }
     finally { pendingRef.current = false; setPending(false); }
   }
-  return <div className="space-y-3"><input type="file" accept=".zip,application/zip" disabled={pending} onChange={(event) => { const file = event.target.files?.[0]; if (file) void upload(file); }} /><p className="text-sm text-[var(--muted)]">Maximum 3.5 MB. The ZIP is processed in memory and is never stored. {mode === "apply" ? "Choose the exact ZIP analyzed for this session." : "You will upload it again only when applying the import."}</p>{mode === "apply" && importId && initialProgress ? <ImportApplyProgressPanel key={initialProgress.updatedAt} importId={importId} initialProgress={initialProgress} requestPending={pending} /> : pending ? <p role="status">Processing…</p> : null}{feedback ? <p role={feedback.kind === "error" ? "alert" : "status"}>{feedback.text}</p> : null}</div>;
+  return <div className="space-y-3"><label htmlFor={inputId} className="block font-medium">{mode === "apply" ? "Choose the TV Time ZIP to apply" : "Choose a TV Time ZIP to analyze"}</label><input id={inputId} type="file" accept=".zip,application/zip" required aria-describedby={`${instructionsId}${feedback ? ` ${feedbackId}` : ""}`} aria-invalid={feedback?.kind === "error" ? true : undefined} disabled={pending} onChange={(event) => { const file = event.target.files?.[0]; if (file) void upload(file); }} /><p id={instructionsId} className="text-sm text-[var(--muted)]">Required format: a ZIP file, maximum 3.5 MB. The ZIP is processed in memory and is never stored. {mode === "apply" ? "Choose the exact ZIP analyzed for this session." : "You will upload it again only when applying the import."}</p>{mode === "apply" && importId && initialProgress ? <ImportApplyProgressPanel key={initialProgress.updatedAt} importId={importId} initialProgress={initialProgress} requestPending={pending} /> : pending ? <p role="status">Processing import ZIP…</p> : null}{feedback ? <p id={feedbackId} role={feedback.kind === "error" ? "alert" : "status"}>{feedback.text}</p> : null}</div>;
 }

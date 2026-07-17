@@ -28,6 +28,6 @@ export function QuickEpisodeAction({
       {pending ? "Saving…" : label}
     </button>
     {result?.error ? <p role="alert" className="text-xs text-[var(--danger)]">{result.error}</p> : null}
-    {result?.success ? <p aria-live="polite" className="text-xs text-[var(--success)]">{result.success}</p> : null}
+    {result?.success ? <p role="status" className="text-xs text-[var(--success)]">{result.success}</p> : null}
   </div>;
 }

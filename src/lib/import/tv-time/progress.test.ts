@@ -78,6 +78,9 @@ describe("Apply progress presentation", () => {
     expect(markup).toContain("5 items applied · 15 items remaining");
     expect(markup).toContain("Skipped: 2 TV · 3 movies");
     expect(markup).toContain("Already applied units remain saved");
+    expect(markup.match(/role="progressbar"/g)).toHaveLength(2);
+    expect(markup).not.toContain('aria-live="polite"');
+    expect(markup).toContain('role="alert"');
     expect(markup).not.toContain("constraint");
   });
 
