@@ -14,7 +14,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main className="flex min-h-full flex-1 items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-          TV Tracker
+          TrackTV
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[var(--foreground)]">
           Sign in

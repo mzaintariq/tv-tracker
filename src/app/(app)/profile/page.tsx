@@ -62,6 +62,18 @@ export default async function ProfilePage() {
           email={user.email ?? "Unknown email"}
         />
       </div>
+      <section className="mt-8 rounded-xl border border-[var(--border)] p-5">
+        <h2 className="text-xl font-semibold">Download your data</h2>
+        <p className="mt-1 max-w-3xl text-[var(--muted)]">
+          Download a private JSON copy of your profile preferences, tracked shows, watched episode history, movies, favourites, and watched dates.
+        </p>
+        <p className="mt-2 max-w-3xl text-sm text-[var(--muted)]">
+          The export excludes your email, internal IDs, TV Time source files, and import diagnostics. It is generated on demand and is not retained by TrackTV.
+        </p>
+        <a href="/api/export" className="mt-3 inline-block rounded-lg border border-[var(--border)] px-3 py-2 font-medium">
+          Download your data
+        </a>
+      </section>
       <div className="mt-8 rounded-xl border border-[var(--border)] p-5"><h2 className="text-xl font-semibold">Import from TV Time</h2><p className="mt-1 text-[var(--muted)]">Privately analyze and import your TV Time GDPR export.</p><Link href="/profile/import" className="mt-3 inline-block rounded-lg border border-[var(--border)] px-3 py-2 font-medium">Open TV Time import</Link></div>
       <div className="mt-12"><StatisticsSummary statistics={pageData.statistics} shows={pageData.shows} movies={pageData.movies} /></div>
     </section>
