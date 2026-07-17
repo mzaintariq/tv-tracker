@@ -49,7 +49,7 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
           type="email"
           value={email}
           disabled
-          className="h-12 w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 text-[var(--muted)]"
+          className="h-12 w-full min-w-0 max-w-full rounded-lg border border-[var(--control-border)] bg-[var(--surface-elevated)] px-3 text-[var(--muted)]"
         />
       </div>
 
@@ -69,7 +69,7 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
           defaultValue={profile.display_name ?? ""}
           aria-describedby={state.error ? "profile-error" : undefined}
           aria-invalid={state.error ? true : undefined}
-          className="h-12 w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2"
+          className="interactive-control touch-target h-12 w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-[var(--foreground)]"
         />
       </div>
 
@@ -84,7 +84,7 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
           id="theme"
           name="theme"
           defaultValue={profile.theme}
-          className="h-12 w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2"
+          className="interactive-control touch-target h-12 w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-[var(--foreground)]"
         >
           {THEME_VALUES.map((value) => (
             <option key={value} value={value}>
@@ -108,7 +108,7 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
       <button
         type="submit"
         disabled={pending}
-        className="h-12 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] transition enabled:hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        className="touch-target h-12 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)]"
       >
         {pending ? "Saving…" : "Save profile"}
       </button>

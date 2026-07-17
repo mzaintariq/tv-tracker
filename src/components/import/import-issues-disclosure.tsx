@@ -7,7 +7,7 @@ import { buildImportIssueDisplayModel, issueStatusLabel, issueTypeLabel, type Im
 import { IssueDecision } from "./import-controls";
 
 function DisclosureButton({ expanded, controls, children, onClick }: { expanded: boolean; controls: string; children: React.ReactNode; onClick: () => void }) {
-  return <button type="button" className="flex w-full min-w-0 items-center justify-between gap-3 text-left" aria-expanded={expanded} aria-controls={controls} onClick={onClick}><span className="min-w-0 break-words">{children}</span><span aria-hidden="true" className="shrink-0">{expanded ? "▾" : "▸"}</span></button>;
+  return <button type="button" className="interactive-control touch-target flex w-full min-w-0 items-center justify-between gap-3 rounded-lg border border-transparent bg-transparent px-2 text-left hover:border-[var(--control-border)]" aria-expanded={expanded} aria-controls={controls} onClick={onClick}><span className="min-w-0 break-words">{children}</span><span aria-hidden="true" className="shrink-0">{expanded ? "▾" : "▸"}</span></button>;
 }
 
 function CoordinateText({ issue }: { issue: ImportIssueForDisplay }) {

@@ -64,7 +64,7 @@ export default async function ShowDetailPage({ params }: { params: Promise<{ tmd
                 </div>
                 {detail.membership ? <SeasonControls tmdbId={tmdbId} mediaId={detail.media.id} season={season} /> : null}
               </div>
-              <ol className="min-w-0 divide-y divide-[var(--border)] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+              <ol className="min-w-0 divide-y divide-[var(--border)] rounded-xl border border-[var(--border)] bg-[var(--surface)]">
                 {episodes.map((episode) => (
                   <li key={episode.id} className="min-w-0 space-y-3 p-4">
                     <div className="min-w-0">

@@ -85,7 +85,7 @@ export function MediaCard({ item }: MediaCardProps) {
           type="button"
           onClick={handleSetProgress}
           disabled={isPending}
-          className="flex h-10 max-w-full items-center justify-center whitespace-normal rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)]"
+          className="flex touch-target h-11 max-w-full items-center justify-center whitespace-normal rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)]"
         >
           {isPending ? "Preparing…" : "Set progress"}
         </button>
@@ -97,8 +97,8 @@ export function MediaCard({ item }: MediaCardProps) {
         aria-label={`${actionLabel}: ${item.title}`}
         className={
           inLibrary
-            ? "h-10 max-w-full whitespace-normal rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-elevated)] disabled:opacity-60"
-            : "h-10 max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-60"
+            ? "interactive-control touch-target h-11 max-w-full whitespace-normal rounded-lg border bg-[var(--surface)] px-3 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-elevated)]"
+            : "touch-target h-11 max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)]"
         }
       >
         {isPending ? "Saving…" : inLibrary ? "Remove" : "Add"}

@@ -79,7 +79,7 @@ export function ExploreToolbar({ filter, query }: ExploreToolbarProps) {
             placeholder="Search TMDB…"
             autoComplete="off"
             onChange={(event) => setSearchValue(event.target.value)}
-            className="h-11 w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none ring-[var(--accent)] placeholder:text-[var(--muted)] focus:ring-2"
+            className="interactive-control touch-target h-11 w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)]"
             aria-describedby="explore-search-hint"
           />
           <span id="explore-search-hint" className="sr-only">
@@ -108,8 +108,8 @@ export function ExploreToolbar({ filter, query }: ExploreToolbarProps) {
               }}
               className={
                 selected
-                  ? "h-10 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)]"
-                  : "h-10 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-elevated)] disabled:opacity-60"
+                  ? "touch-target min-h-11 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] shadow-[inset_0_0_0_2px_var(--foreground)]"
+                  : "interactive-control touch-target min-h-11 rounded-lg border bg-[var(--surface)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-elevated)]"
               }
             >
               {item.label}

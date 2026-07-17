@@ -37,7 +37,7 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
         <button
           type="submit"
           disabled={pending}
-          className="flex h-12 items-center justify-center gap-3 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] transition enabled:hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex touch-target h-12 items-center justify-center gap-3 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)]"
         >
           <GoogleIcon />
           {googlePending ? "Connecting to Google…" : "Continue with Google"}
@@ -72,7 +72,7 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
             disabled={pending}
             aria-describedby={emailDescription}
             aria-invalid={error ? true : undefined}
-            className="h-12 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-base text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="interactive-control touch-target h-12 rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)]"
           />
         </label>
         {success ? (
@@ -83,7 +83,7 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
         <button
           type="submit"
           disabled={pending}
-          className="h-12 rounded-lg border border-[var(--border)] bg-transparent px-4 text-sm font-semibold text-[var(--foreground)] transition enabled:hover:bg-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
+          className="interactive-control touch-target h-12 rounded-lg border bg-transparent px-4 text-sm font-semibold text-[var(--foreground)] enabled:hover:bg-[var(--surface-elevated)]"
         >
           {magicPending ? "Sending link…" : "Email me a magic link"}
         </button>

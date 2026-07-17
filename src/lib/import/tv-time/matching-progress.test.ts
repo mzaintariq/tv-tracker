@@ -43,7 +43,7 @@ describe("automatic matching progress", () => {
     expect(markup).toContain('aria-valuemin="0"');
     expect(markup).toContain('aria-valuemax="100"');
     expect(markup).toContain('aria-valuenow="50"');
-    expect(markup).toContain('aria-valuetext="2 of 4 checked"');
+    expect(markup).toContain('aria-valuetext="2 of 4 checked, 50%"');
     expect(markup).toContain("2 remaining");
     expect(markup).toContain("need your review");
     expect(markup).toContain("all normalized media items");

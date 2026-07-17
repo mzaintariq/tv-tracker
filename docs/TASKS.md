@@ -312,16 +312,16 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Include tracking statuses in export
 * [x] Add PWA manifest
 * [x] Add application icons
-* [ ] Add installable mobile experience
-* [ ] Add missing-poster fallback
-* [ ] Add skeleton loading states
+* [x] Add installable mobile experience
+* [x] Add missing-poster fallback
+* [x] Add skeleton loading states
 * [x] Add error boundaries
 * [x] Add resilient import action feedback
 * [x] Sanitize user-visible mutation failures
-* [ ] Review keyboard navigation
-* [ ] Review focus states
-* [ ] Review colour contrast
-* [ ] Test mobile layouts
+* [x] Review keyboard navigation
+* [x] Review focus states
+* [x] Review colour contrast
+* [x] Test mobile layouts
 * [ ] Review application performance
 * [ ] Update README
 * [ ] Add local setup documentation
@@ -360,4 +360,16 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Bound detail posters and collapse import candidate layouts when needed
 * [x] Preserve Phase 9D.1 and 9D.2 accessibility behavior
 * [x] Add focused mobile layout contract tests
+* [x] Run validation commands
+
+### Phase 9D.4 — Contrast, touch targets, and visual accessibility
+
+* [x] Add a stronger interactive-boundary token for functional controls
+* [x] Improve focus-visible contrast with offset and backup ring
+* [x] Enlarge prioritized compact controls to approximately 44×44 CSS pixels
+* [x] Keep disabled controls legible without opacity-only cues
+* [x] Ensure status, warning, success, and destructive states are not colour-only
+* [x] Strengthen progress track/fill contrast with visible state text
+* [x] Complete reduced-motion coverage for progress interpolation
+* [x] Add focused contrast and visual-accessibility contract tests
 * [x] Run validation commands

@@ -24,7 +24,9 @@ describe("Phase 9D.1 shell contracts", () => {
 
     expect(css).toMatch(/\.skip-link\s*\{[\s\S]*position:\s*fixed/);
     expect(css).toMatch(/\.skip-link:focus-visible\s*\{[\s\S]*transform:\s*translateY\(0\)/);
-    expect(css).toMatch(/:focus-visible\s*\{[\s\S]*outline:\s*3px solid var\(--accent\)/);
+    expect(css).toMatch(/:focus-visible\s*\{[\s\S]*outline:\s*3px solid var\(--background\)/);
+    expect(css).toMatch(/:focus-visible\s*\{[\s\S]*box-shadow:\s*0 0 0 5px var\(--foreground\)/);
+    expect(css).toMatch(/outline-offset:\s*2px/);
     expect(css).not.toMatch(/:focus(?:-visible)?[^{}]*\{[^{}]*outline:\s*none/);
 
     for (const inset of ["bottom", "left", "right"]) {

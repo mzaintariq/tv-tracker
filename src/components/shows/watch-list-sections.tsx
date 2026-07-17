@@ -29,8 +29,8 @@ export function WatchNextGrid({ items }: { items: WatchNextItem[] }) {
   return <ul className="grid min-w-0 gap-4 lg:grid-cols-2">
     {items.map((item) => {
       return <li key={item.membership.id} className="min-w-0">
-        <article className="grid h-full min-w-0 grid-cols-[72px_minmax(0,1fr)] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] min-[360px]:grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]">
-          <Link href={`/shows/${item.media.tmdb_id}`} className="relative min-h-32 bg-[var(--surface-elevated)] sm:min-h-40">
+        <article className="grid h-full min-w-0 grid-cols-[72px_minmax(0,1fr)] rounded-xl border border-[var(--border)] bg-[var(--surface)] min-[360px]:grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]">
+          <Link href={`/shows/${item.media.tmdb_id}`} className="relative min-h-32 overflow-hidden rounded-l-xl bg-[var(--surface-elevated)] sm:min-h-40">
             <MediaPoster source={item.media.poster_path} title={item.media.title} alt={`${item.media.title} poster`} sizes="(max-width: 359px) 72px, (max-width: 639px) 88px, 120px" fallbackClassName="text-xl font-semibold text-[var(--muted)]" />
           </Link>
           <div className="flex min-w-0 flex-col justify-between gap-4 p-4">
@@ -67,7 +67,7 @@ export function NeedsEpisodeDataGrid({ shows }: { shows: DerivedShow[] }) {
     {shows.map((show) => <li key={show.membership.id} className="min-w-0 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5">
       <h3 className="break-words font-semibold">{show.media.title}</h3>
       <p className="mt-2 break-words text-sm text-[var(--muted)]">Episode data has not been synchronized yet.</p>
-      <Link href={`/shows/${show.media.tmdb_id}`} className="mt-4 inline-block max-w-full whitespace-normal rounded-lg border border-[var(--border)] px-3 py-2 text-sm font-semibold">Open and synchronize</Link>
+      <Link href={`/shows/${show.media.tmdb_id}`} className="interactive-control touch-target mt-4 inline-flex max-w-full items-center whitespace-normal rounded-lg border bg-[var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--foreground)]">Open and synchronize</Link>
     </li>)}
   </ul>;
 }

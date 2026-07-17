@@ -70,11 +70,11 @@ export default async function ProfilePage() {
         <p className="mt-2 max-w-3xl break-words text-sm text-[var(--muted)]">
           The export excludes your email, internal IDs, TV Time source files, and import diagnostics. It is generated on demand and is not retained by TrackTV.
         </p>
-        <a href="/api/export" aria-label="Download TrackTV data as JSON" className="mt-3 inline-block max-w-full whitespace-normal rounded-lg border border-[var(--border)] px-3 py-2 font-medium">
+        <a href="/api/export" aria-label="Download TrackTV data as JSON" className="interactive-control touch-target mt-3 inline-flex max-w-full items-center whitespace-normal rounded-lg border bg-[var(--surface)] px-3 py-2 font-medium text-[var(--foreground)]">
           Download your data
         </a>
       </section>
-      <div className="mt-8 min-w-0 rounded-xl border border-[var(--border)] p-4 sm:p-5"><h2 className="break-words text-xl font-semibold">Import from TV Time</h2><p className="mt-1 break-words text-[var(--muted)]">Privately analyze and import your TV Time GDPR export.</p><Link href="/profile/import" className="mt-3 inline-block max-w-full whitespace-normal rounded-lg border border-[var(--border)] px-3 py-2 font-medium">Open TV Time import</Link></div>
+      <div className="mt-8 min-w-0 rounded-xl border border-[var(--border)] p-4 sm:p-5"><h2 className="break-words text-xl font-semibold">Import from TV Time</h2><p className="mt-1 break-words text-[var(--muted)]">Privately analyze and import your TV Time GDPR export.</p><Link href="/profile/import" className="interactive-control touch-target mt-3 inline-flex max-w-full items-center whitespace-normal rounded-lg border bg-[var(--surface)] px-3 py-2 font-medium text-[var(--foreground)]">Open TV Time import</Link></div>
       <div className="mt-12 min-w-0"><StatisticsSummary statistics={pageData.statistics} shows={pageData.shows} movies={pageData.movies} /></div>
     </section>
   );

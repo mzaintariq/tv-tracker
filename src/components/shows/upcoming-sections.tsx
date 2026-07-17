@@ -21,7 +21,7 @@ function UpcomingCard({ item, airDate }: { item: UpcomingItem; airDate: string }
         <p className="mt-1 text-sm font-medium">{episodeNumber(item.episode.season_number, item.episode.episode_number)}</p>
         <p className="break-words text-sm text-[var(--muted)]">{item.episode.title}</p>
       </> : <details className="mt-1">
-        <summary className="min-w-0 cursor-pointer break-words text-sm"><span className="font-medium">Season {item.seasonNumber}</span><span className="block break-words text-[var(--muted)]">{item.episodes.length} episodes releasing</span></summary>
+        <summary className="interactive-control touch-target min-w-0 cursor-pointer list-none break-words rounded-md border border-transparent px-1 text-sm marker:content-none"><span className="font-medium">Season {item.seasonNumber}</span><span className="block break-words text-[var(--muted)]">{item.episodes.length} episodes releasing</span></summary>
         <ol className="mt-3 space-y-2 border-t border-[var(--border)] pt-3">
           {item.episodes.map((episode) => <li key={episode.id} className="break-words text-sm"><span className="font-medium">{episodeNumber(episode.season_number, episode.episode_number)}</span><span className="text-[var(--muted)]"> — {episode.title}</span></li>)}
         </ol>
