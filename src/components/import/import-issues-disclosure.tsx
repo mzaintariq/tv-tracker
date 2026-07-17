@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import { MediaPoster } from "@/components/media/media-poster";
 
 import { buildImportIssueDisplayModel, issueStatusLabel, issueTypeLabel, type ImportIssueForDisplay } from "@/lib/import/tv-time/issues-ui";
-import { posterUrl } from "@/lib/media/types";
 import { IssueDecision } from "./import-controls";
 
 function DisclosureButton({ expanded, controls, children, onClick }: { expanded: boolean; controls: string; children: React.ReactNode; onClick: () => void }) {
@@ -17,13 +16,12 @@ function CoordinateText({ issue }: { issue: ImportIssueForDisplay }) {
 
 function IssueRow({ importId, issue }: { importId: string; issue: ImportIssueForDisplay }) {
   const active = issue.status === "open" && issue.is_blocking;
-  const image = posterUrl(issue.selectedCandidate?.posterPath ?? null, "w92");
   return <article className="space-y-2 rounded-lg border p-3">
     {issue.issue_type === "missing_episode_coordinate" ? <CoordinateText issue={issue} /> : <>
       <p className="font-medium">{issue.issue_type === "movie_favourites_confirmation" ? issueTypeLabel(issue.issue_type) : issue.sourceTitle ?? issueTypeLabel(issue.issue_type)}</p>
       <p className="text-sm text-[var(--muted)]">{issue.mediaType ? `${issue.mediaType === "tv" ? "TV show" : "Movie"} · ` : ""}{issueStatusLabel(issue.status)}</p>
       {issue.issue_type === "movie_favourites_confirmation" && issue.status === "open" ? <><p className="text-sm">TV Time’s export does not identify which cached movies were favourites. Choose whether to apply the importer’s possible movie-favourite records.</p><p className="text-sm text-[var(--muted)]">This decision must be made before the import can be applied.</p></> : null}
-      {issue.status === "resolved" && issue.selectedTmdbId ? <div className="flex items-center gap-3">{image ? <Image src={image} alt="" width={46} height={69} className="rounded object-cover" /> : null}<p className="text-sm">Matched to {issue.selectedCandidate?.title ?? "TMDB title"}{issue.selectedCandidate?.year ? ` (${issue.selectedCandidate.year})` : ""} · TMDB {issue.selectedTmdbId}</p></div> : null}
+      {issue.status === "resolved" && issue.selectedTmdbId ? <div className="flex items-center gap-3"><div className="relative h-[69px] w-[46px] shrink-0 overflow-hidden rounded bg-[var(--surface-elevated)]"><MediaPoster source={issue.selectedCandidate?.posterPath} title={issue.selectedCandidate?.title ?? issue.sourceTitle ?? ""} alt="" sizes="46px" tmdbSize="w92" fallbackLabel="No poster" fallbackClassName="px-1 text-center text-[10px] text-[var(--muted)]" /></div><p className="text-sm">Matched to {issue.selectedCandidate?.title ?? "TMDB title"}{issue.selectedCandidate?.year ? ` (${issue.selectedCandidate.year})` : ""} · TMDB {issue.selectedTmdbId}</p></div> : null}
       {issue.status === "skipped" && issue.mediaType ? <p className="text-sm">{issue.mediaType === "tv" ? "TV show" : "Movie"} · Skipped from this import</p> : null}
     </>}
     {active ? <span className="inline-block rounded-full border border-[var(--danger)] px-2 py-0.5 text-xs text-[var(--danger)]">Blocking</span> : null}
