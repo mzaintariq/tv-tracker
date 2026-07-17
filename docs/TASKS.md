@@ -312,19 +312,64 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Include tracking statuses in export
 * [x] Add PWA manifest
 * [x] Add application icons
-* [ ] Add installable mobile experience
-* [ ] Add missing-poster fallback
-* [ ] Add skeleton loading states
+* [x] Add installable mobile experience
+* [x] Add missing-poster fallback
+* [x] Add skeleton loading states
 * [x] Add error boundaries
 * [x] Add resilient import action feedback
 * [x] Sanitize user-visible mutation failures
-* [ ] Review keyboard navigation
-* [ ] Review focus states
-* [ ] Review colour contrast
-* [ ] Test mobile layouts
+* [x] Review keyboard navigation
+* [x] Review focus states
+* [x] Review colour contrast
+* [x] Test mobile layouts
 * [ ] Review application performance
 * [ ] Update README
 * [ ] Add local setup documentation
 * [ ] Add deployment documentation
 * [ ] Run final validation
 * [ ] Create final release
+
+### Phase 9D.1 — Global accessibility and mobile shell
+
+* [x] Use one shared authenticated main landmark
+* [x] Add a keyboard-visible skip-to-content link and stable main target
+* [x] Add a shared focus-visible baseline
+* [x] Coordinate viewport-fit, safe-area navigation padding, and content clearance
+* [x] Add a reduced-motion baseline for pulse and transition effects
+* [x] Preserve loading announcements and hide decorative skeletons
+* [x] Add focused landmark, skip-link, focus, safe-area, and motion tests
+
+### Phase 9D.2 — Forms, names, grouping, and feedback
+
+* [x] Associate login and profile errors with affected fields
+* [x] Group show setup modes and watched seasons with native fieldsets
+* [x] Add contextual names and validation hooks to watched-date controls
+* [x] Label import uploads, filters, search, manual IDs, and candidate actions
+* [x] Remove duplicate poster and favourite announcements from media cards
+* [x] Complete progressbar semantics and narrow polling live regions
+* [x] Keep route-error controls outside alert regions
+* [x] Add focused accessibility render and behavior tests
+* [ ] Existing gap: expose the stored profile timezone through a dedicated editor in its owning product scope
+
+### Phase 9D.3 — Mobile layout and zoom/reflow
+
+* [x] Prevent horizontal document overflow on core pages without global overflow clipping
+* [x] Add min-w-0 and wrapping for flex/grid titles, descriptions, and controls
+* [x] Use one-column media grids below very narrow widths
+* [x] Stack dense controls and fit datetime-local, file, select, search, and manual-ID inputs
+* [x] Bound detail posters and collapse import candidate layouts when needed
+* [x] Preserve Phase 9D.1 and 9D.2 accessibility behavior
+* [x] Add focused mobile layout contract tests
+* [x] Run validation commands
+
+### Phase 9D.4 — Contrast, touch targets, and visual accessibility
+
+* [x] Add a stronger interactive-boundary token for functional controls
+* [x] Improve focus-visible contrast with offset and backup ring
+* [x] Enlarge prioritized compact controls to approximately 44×44 CSS pixels
+* [x] Keep disabled controls legible without opacity-only cues
+* [x] Ensure status, warning, success, and destructive states are not colour-only
+* [x] Strengthen progress track/fill contrast with visible state text
+* [x] Complete reduced-motion coverage for progress interpolation
+* [x] Add focused contrast and visual-accessibility contract tests
+* [x] Run validation commands

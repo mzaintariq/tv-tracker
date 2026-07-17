@@ -28,6 +28,7 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
   const pending = googlePending || magicPending;
   const error = googleState.error ?? magicState.error ?? initialError;
   const success = magicState.success;
+  const emailDescription = error ? "login-error" : undefined;
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -36,7 +37,7 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
         <button
           type="submit"
           disabled={pending}
-          className="flex h-12 items-center justify-center gap-3 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] transition enabled:hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex touch-target h-12 items-center justify-center gap-3 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)]"
         >
           <GoogleIcon />
           {googlePending ? "Connecting to Google…" : "Continue with Google"}
@@ -44,7 +45,7 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
       </form>
 
       {error ? (
-        <p className="text-sm text-[var(--danger)]" role="alert">
+        <p id="login-error" className="text-sm text-[var(--danger)]" role="alert">
           {error}
         </p>
       ) : null}
@@ -59,16 +60,19 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
 
       <form action={magicAction} className="flex w-full flex-col gap-4">
         <input type="hidden" name="next" value={nextPath} />
-        <label className="flex flex-col gap-2 text-sm font-medium text-[var(--foreground)]">
+        <label htmlFor="login-email" className="flex flex-col gap-2 text-sm font-medium text-[var(--foreground)]">
           Email
           <input
+            id="login-email"
             type="email"
             name="email"
             required
             autoComplete="email"
             placeholder="you@example.com"
             disabled={pending}
-            className="h-12 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-base text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
+            aria-describedby={emailDescription}
+            aria-invalid={error ? true : undefined}
+            className="interactive-control touch-target h-12 rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)]"
           />
         </label>
         {success ? (
@@ -79,7 +83,7 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
         <button
           type="submit"
           disabled={pending}
-          className="h-12 rounded-lg border border-[var(--border)] bg-transparent px-4 text-sm font-semibold text-[var(--foreground)] transition enabled:hover:bg-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
+          className="interactive-control touch-target h-12 rounded-lg border bg-transparent px-4 text-sm font-semibold text-[var(--foreground)] enabled:hover:bg-[var(--surface-elevated)]"
         >
           {magicPending ? "Sending link…" : "Email me a magic link"}
         </button>

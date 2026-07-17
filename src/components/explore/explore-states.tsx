@@ -36,7 +36,7 @@ export function ExploreErrorState({ message }: ExploreErrorStateProps) {
         Could not load Explore
       </p>
       <p className="mt-2 text-sm text-[var(--danger)]">{message}</p>
-      <button type="button" onClick={() => router.refresh()} className="mt-4 rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]">Retry</button>
+      <button type="button" onClick={() => router.refresh()} className="touch-target mt-4 rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]">Retry</button>
     </div>
   );
 }
@@ -44,7 +44,7 @@ export function ExploreErrorState({ message }: ExploreErrorStateProps) {
 export function ExploreSkeletonGrid() {
   return (
     <ul
-      className="grid animate-pulse grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
+      className="grid animate-pulse grid-cols-1 gap-4 min-[360px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
       aria-hidden="true"
     >
       {Array.from({ length: 10 }).map((_, index) => (

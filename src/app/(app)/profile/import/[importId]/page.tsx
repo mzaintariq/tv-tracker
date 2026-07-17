@@ -25,14 +25,35 @@ export default async function ImportDetailPage({ params }: { params: Promise<{ i
     loadResolutionSnapshot(supabase, importId, user.id),
   ]);
   const progress = requireImportProgress(progressResult) as unknown as ImportApplyProgress | null;
-  return <main className="space-y-8">
-    <header><h1 className="text-3xl font-semibold">Import preview</h1><p>Status: {session.status}</p><p className="text-sm text-[var(--muted)]">Legacy Unix watch_date values are authoritative. Other timezone-less created_at values are interpreted as UTC; historical local timezone is not known. Existing TrackTV watched dates are preserved.</p></header>
-    <section className="grid gap-3 sm:grid-cols-4"><div className="rounded-xl border p-4">{session.total_items}<br />items</div><div className="rounded-xl border p-4">{session.matched_items}<br />matched</div><div className="rounded-xl border p-4">{session.applied_items}<br />applied</div><div className="rounded-xl border p-4">{session.skipped_items}<br />skipped</div></section>
-    {["matching", "awaiting_resolution"].includes(session.status) ? <MatchMoreButton importId={importId} autoStart={shouldAutoStartMatching(session.status, matchingProgress?.remaining ?? 0)} /> : null}
-    {matchingProgress ? <ImportMatchingProgress importId={importId} initialProgress={matchingProgress} /> : null}
-    {resolutionSnapshot ? <ImportResolutionWorkspace importId={importId} initialItems={resolutionSnapshot.items} initialIssues={resolutionSnapshot.issues} initialRevision={resolutionSnapshot.revision} /> : null}
-    {["ready", "applying", "paused"].includes(session.status) && progress ? <section className="rounded-xl border p-5"><h2 className="mb-3 text-xl font-semibold">Apply or resume</h2><ImportUploadForm mode="apply" importId={importId} initialProgress={progress} /></section> : null}
-    {["completed", "cancelled", "failed"].includes(session.status) && progress ? <section className="rounded-xl border p-5"><h2 className="mb-3 text-xl font-semibold">Apply progress</h2><ImportApplyProgressPanel importId={importId} initialProgress={progress} requestPending={false} /></section> : null}
-    <DeleteImportButton importId={importId} />
-  </main>;
+  return (
+    <div className="min-w-0 space-y-8">
+      <header className="min-w-0">
+        <h1 className="break-words text-3xl font-semibold">Import preview</h1>
+        <p className="break-words">Status: {session.status}</p>
+        <p className="break-words text-sm text-[var(--muted)]">Legacy Unix watch_date values are authoritative. Other timezone-less created_at values are interpreted as UTC; historical local timezone is not known. Existing TrackTV watched dates are preserved.</p>
+      </header>
+      <section className="grid min-w-0 grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:grid-cols-4">
+        <div className="min-w-0 rounded-xl border p-4"><span className="break-words">{session.total_items}</span><br />items</div>
+        <div className="min-w-0 rounded-xl border p-4"><span className="break-words">{session.matched_items}</span><br />matched</div>
+        <div className="min-w-0 rounded-xl border p-4"><span className="break-words">{session.applied_items}</span><br />applied</div>
+        <div className="min-w-0 rounded-xl border p-4"><span className="break-words">{session.skipped_items}</span><br />skipped</div>
+      </section>
+      {["matching", "awaiting_resolution"].includes(session.status) ? <MatchMoreButton importId={importId} autoStart={shouldAutoStartMatching(session.status, matchingProgress?.remaining ?? 0)} /> : null}
+      {matchingProgress ? <ImportMatchingProgress importId={importId} initialProgress={matchingProgress} /> : null}
+      {resolutionSnapshot ? <ImportResolutionWorkspace importId={importId} initialItems={resolutionSnapshot.items} initialIssues={resolutionSnapshot.issues} initialRevision={resolutionSnapshot.revision} /> : null}
+      {["ready", "applying", "paused"].includes(session.status) && progress ? (
+        <section className="min-w-0 rounded-xl border p-4 sm:p-5">
+          <h2 className="mb-3 break-words text-xl font-semibold">Apply or resume</h2>
+          <ImportUploadForm mode="apply" importId={importId} initialProgress={progress} />
+        </section>
+      ) : null}
+      {["completed", "cancelled", "failed"].includes(session.status) && progress ? (
+        <section className="min-w-0 rounded-xl border p-4 sm:p-5">
+          <h2 className="mb-3 break-words text-xl font-semibold">Apply progress</h2>
+          <ImportApplyProgressPanel importId={importId} initialProgress={progress} requestPending={false} />
+        </section>
+      ) : null}
+      <DeleteImportButton importId={importId} />
+    </div>
+  );
 }

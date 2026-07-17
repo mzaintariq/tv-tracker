@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { AuthenticatedAppShell } from "@/components/layout/authenticated-app-shell";
 import { DesktopNav } from "@/components/nav/desktop-nav";
 import { MobileBottomNav } from "@/components/nav/mobile-bottom-nav";
 import { ThemeSync } from "@/components/theme/theme-sync";
@@ -30,15 +31,12 @@ export default async function AppLayout({
     profile && isThemePreference(profile.theme) ? profile.theme : "system";
 
   return (
-    <div className="flex min-h-full flex-1">
-      <ThemeSync theme={profileTheme} />
-      <DesktopNav />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <main className="flex-1 px-4 pb-24 pt-6 md:px-8 md:pb-8 md:pt-8">
-          {children}
-        </main>
-        <MobileBottomNav />
-      </div>
-    </div>
+    <AuthenticatedAppShell
+      themeSync={<ThemeSync theme={profileTheme} />}
+      desktopNavigation={<DesktopNav />}
+      mobileNavigation={<MobileBottomNav />}
+    >
+      {children}
+    </AuthenticatedAppShell>
   );
 }

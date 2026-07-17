@@ -24,6 +24,6 @@ export function UpcomingRefreshCoordinator({ tmdbIds }: { tmdbIds: number[] }) {
   }, [router, tmdbIds]);
 
   if (updating) return <p role="status" className="text-sm text-[var(--muted)]">Updating episode data… Cached releases remain available.</p>;
-  if (result && (result.failed > 0 || result.partial > 0)) return <p role="status" className="text-sm text-yellow-700 dark:text-yellow-300">Some episode data could not be refreshed. Showing available cached releases.</p>;
+  if (result && (result.failed > 0 || result.partial > 0)) return <p role="status" className="text-sm text-[var(--warning)]"><span className="font-semibold">Warning:</span> Some episode data could not be refreshed. Showing available cached releases.</p>;
   return null;
 }

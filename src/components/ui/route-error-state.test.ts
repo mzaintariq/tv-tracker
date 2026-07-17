@@ -43,5 +43,8 @@ describe("safe route error states", () => {
     await act(() => mounted.root.findByType("button").props.onClick());
     expect(reset).toHaveBeenCalledOnce();
     expect(mounted.root.findByType("a").props.href).toBe("/shows");
+    const alert = mounted.root.findByProps({ role: "alert" });
+    expect(alert.findAllByType("button")).toHaveLength(0);
+    expect(alert.findAllByType("a")).toHaveLength(0);
   });
 });

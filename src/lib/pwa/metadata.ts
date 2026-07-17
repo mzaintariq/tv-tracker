@@ -16,6 +16,7 @@ export const TRACKTV_METADATA: Metadata = {
 export const TRACKTV_VIEWPORT: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   colorScheme: "light dark",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f3efe6" },
