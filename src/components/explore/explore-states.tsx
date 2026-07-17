@@ -1,3 +1,7 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
 type ExploreEmptyStateProps = {
   query: string | null;
 };
@@ -22,6 +26,7 @@ type ExploreErrorStateProps = {
 };
 
 export function ExploreErrorState({ message }: ExploreErrorStateProps) {
+  const router = useRouter();
   return (
     <div
       className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-8"
@@ -31,6 +36,7 @@ export function ExploreErrorState({ message }: ExploreErrorStateProps) {
         Could not load Explore
       </p>
       <p className="mt-2 text-sm text-[var(--danger)]">{message}</p>
+      <button type="button" onClick={() => router.refresh()} className="mt-4 rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]">Retry</button>
     </div>
   );
 }

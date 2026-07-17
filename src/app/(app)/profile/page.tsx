@@ -26,7 +26,7 @@ export default async function ProfilePage() {
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error("profile_read_failed");
   }
 
   const resolvedProfile: Profile =
