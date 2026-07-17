@@ -1,6 +1,16 @@
-# Personal TV and Movie Tracker
+# TrackTV
 
 Next.js app for private TV and movie tracking, backed by Supabase Auth and Postgres.
+
+## Install the app
+
+TrackTV can be installed from the production HTTPS site using the browser's native installation controls. Offline tracking is not supported, and authenticated profile, library, watch-history, import and export data is not intentionally cached for offline access.
+
+- Chromium desktop: open the browser's Install TrackTV action from the address bar or application menu.
+- Android Chrome: use Install app or Add to Home screen from the browser menu.
+- iPhone and iPad Safari: use Share, then Add to Home Screen.
+
+Installation behavior must be verified on the target browser and device. Local HTTP development is not a substitute for the production HTTPS installability check.
 
 ## Authentication
 

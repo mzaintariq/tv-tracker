@@ -310,8 +310,8 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Include provider IDs in export
 * [x] Include watched dates in export
 * [x] Include tracking statuses in export
-* [ ] Add PWA manifest
-* [ ] Add application icons
+* [x] Add PWA manifest
+* [x] Add application icons
 * [ ] Add installable mobile experience
 * [ ] Add missing-poster fallback
 * [ ] Add skeleton loading states

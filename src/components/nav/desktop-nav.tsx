@@ -12,7 +12,7 @@ export function DesktopNav() {
     <aside className="hidden w-56 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] md:flex md:flex-col">
       <div className="px-5 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
-          TV Tracker
+          TrackTV
         </p>
       </div>
       <nav aria-label="Primary" className="flex flex-1 flex-col gap-1 px-3 pb-6">
