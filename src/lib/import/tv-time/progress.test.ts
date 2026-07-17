@@ -91,7 +91,7 @@ describe("Apply progress presentation", () => {
 
   it("does not render a second generic lifecycle message from the upload response", () => {
     const source = readFileSync("src/components/import/import-upload-form.tsx", "utf8");
-    expect(source).toContain('result.code === "apply_failed" ? undefined');
+    expect(source).toContain('mode === "apply" && result?.code === "apply_failed"');
   });
 
   it("exposes only aggregate fields from the authenticated progress function", () => {

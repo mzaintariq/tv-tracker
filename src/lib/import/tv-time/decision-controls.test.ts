@@ -7,7 +7,7 @@ describe("movie favourites decision interaction", () => {
 
   it("refreshes only after a successful decision and displays its result", () => {
     const decision = controls.slice(controls.indexOf("export function IssueDecision"), controls.indexOf("export function SkipCoordinateButton"));
-    const actionResult = decision.indexOf("const result=await resolveImportIssue");
+    const actionResult = decision.search(/const result\s*=\s*await resolveImportIssue/);
     const errorCheck = decision.indexOf("if (result.error)");
     const successMessage = decision.indexOf('setMessage(result.success ?? "Decision saved.")');
     const refreshNotification = decision.indexOf("notifyResolutionRefresh(importId)");
