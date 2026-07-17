@@ -328,3 +328,13 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [ ] Add deployment documentation
 * [ ] Run final validation
 * [ ] Create final release
+
+### Phase 9D.1 — Global accessibility and mobile shell
+
+* [x] Use one shared authenticated main landmark
+* [x] Add a keyboard-visible skip-to-content link and stable main target
+* [x] Add a shared focus-visible baseline
+* [x] Coordinate viewport-fit, safe-area navigation padding, and content clearance
+* [x] Add a reduced-motion baseline for pulse and transition effects
+* [x] Preserve loading announcements and hide decorative skeletons
+* [x] Add focused landmark, skip-link, focus, safe-area, and motion tests

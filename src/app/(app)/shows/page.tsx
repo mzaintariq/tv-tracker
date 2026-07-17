@@ -9,7 +9,7 @@ export default async function ShowsPage() {
   if (!user) redirect("/login");
   const list = await loadWatchList(user.id);
 
-  return <main className="mx-auto w-full max-w-6xl space-y-10">
+  return <div className="mx-auto w-full max-w-6xl space-y-10">
     <div><h1 className="text-3xl font-semibold tracking-tight">TV Shows</h1><p className="mt-2 text-[var(--muted)]">Your watch list and television progress.</p></div>
     <ShowSubnav current="watch-list" />
     {!list.shows.length ? <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center"><h2 className="text-xl font-semibold">No shows yet</h2><p className="mt-2 text-[var(--muted)]">Find a show in Explore and set your starting progress.</p><Link href="/explore?type=tv" className="mt-4 inline-block rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]">Explore shows</Link></div> : <>
@@ -25,5 +25,5 @@ export default async function ShowsPage() {
       {list.dropped.length ? <WatchListSection title="Dropped"><ShowGrid shows={list.dropped} /></WatchListSection> : null}
       {list.needsEpisodeData.length ? <WatchListSection title="Needs Episode Data" description="Open these shows to synchronize their episodes before assigning a watch-list state."><NeedsEpisodeDataGrid shows={list.needsEpisodeData} /></WatchListSection> : null}
     </>}
-  </main>;
+  </div>;
 }

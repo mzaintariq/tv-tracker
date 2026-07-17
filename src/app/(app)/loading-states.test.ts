@@ -7,6 +7,10 @@ import ProfileLoading from "./profile/loading";
 import ImportLoading from "./profile/import/loading";
 import ImportDetailLoading from "./profile/import/[importId]/loading";
 import ShowDetailLoading from "./shows/[tmdbId]/loading";
+import AppLoading from "./loading";
+import ExploreLoading from "./explore/loading";
+import ShowsLoading from "./shows/loading";
+import UpcomingLoading from "./shows/upcoming/loading";
 
 type LoadingContract = {
   name: string;
@@ -29,6 +33,18 @@ function markup(component: ComponentType): string {
 }
 
 describe("core route loading states", () => {
+  it.each([
+    { component: AppLoading, announcement: "Loading page…" },
+    { component: ExploreLoading, announcement: "Loading Explore…" },
+    { component: ShowsLoading, announcement: "Loading shows…" },
+    { component: UpcomingLoading, announcement: "Loading upcoming episodes…" },
+  ])("announces and hides decorative legacy skeletons", ({ component, announcement }) => {
+    const html = markup(component);
+    expect(html).toContain('role="status"');
+    expect(html).toContain(announcement);
+    expect(html).toContain('aria-hidden="true"');
+  });
+
   it.each(routes)("renders an accessible, non-interactive $name state", ({ component, announcement, regions }) => {
     const html = markup(component);
     expect(html).toContain(`role="status"`);

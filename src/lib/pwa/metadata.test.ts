@@ -11,9 +11,9 @@ describe("TrackTV application metadata", () => {
     });
   });
 
-  it("provides static light and dark colors while preserving zoom and safe-area defaults", () => {
+  it("provides static theme colors and coordinated safe-area support without restricting zoom", () => {
     expect(TRACKTV_VIEWPORT).toEqual({
-      width: "device-width", initialScale: 1, colorScheme: "light dark",
+      width: "device-width", initialScale: 1, viewportFit: "cover", colorScheme: "light dark",
       themeColor: [
         { media: "(prefers-color-scheme: light)", color: "#f3efe6" },
         { media: "(prefers-color-scheme: dark)", color: "#12110f" },
@@ -21,6 +21,5 @@ describe("TrackTV application metadata", () => {
     });
     expect(TRACKTV_VIEWPORT).not.toHaveProperty("maximumScale");
     expect(TRACKTV_VIEWPORT).not.toHaveProperty("userScalable");
-    expect(TRACKTV_VIEWPORT).not.toHaveProperty("viewportFit");
   });
 });
