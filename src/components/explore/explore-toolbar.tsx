@@ -66,7 +66,7 @@ export function ExploreToolbar({ filter, query }: ExploreToolbarProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
         <label className="flex min-w-0 flex-1 flex-col gap-2">
           <span className="text-sm font-medium text-[var(--foreground)]">
             Search shows and movies
@@ -79,7 +79,7 @@ export function ExploreToolbar({ filter, query }: ExploreToolbarProps) {
             placeholder="Search TMDB…"
             autoComplete="off"
             onChange={(event) => setSearchValue(event.target.value)}
-            className="h-11 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none ring-[var(--accent)] placeholder:text-[var(--muted)] focus:ring-2"
+            className="h-11 w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none ring-[var(--accent)] placeholder:text-[var(--muted)] focus:ring-2"
             aria-describedby="explore-search-hint"
           />
           <span id="explore-search-hint" className="sr-only">

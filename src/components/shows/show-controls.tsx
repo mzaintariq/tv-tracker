@@ -20,35 +20,35 @@ import type { Episode, ShowTrackingStatus, UserShow, WatchedEpisode } from "@/ty
 
 function ActionMessage({ id, result }: { id?: string; result: ShowActionResult | null }) {
   if (!result) return null;
-  return <div className="space-y-1 text-sm">
+  return <div className="min-w-0 space-y-1 break-words text-sm">
     {result.error ? <p id={id} className="text-[var(--danger)]" role="alert">{result.error}</p> : null}
     {result.success ? <p className="text-[var(--success)]" role="status">{result.success}</p> : null}
     {result.warning ? <p className="text-yellow-700 dark:text-yellow-300">{result.warning}</p> : null}
   </div>;
 }
 
-const button = "rounded-lg border border-[var(--border)] px-3 py-2 text-sm font-semibold disabled:opacity-50";
+const button = "max-w-full whitespace-normal rounded-lg border border-[var(--border)] px-3 py-2 text-sm font-semibold disabled:opacity-50";
 
 export function MetadataButton({ tmdbId, setup = false, missingEpisodes = false }: { tmdbId: number; setup?: boolean; missingEpisodes?: boolean }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ShowActionResult | null>(null);
   const label = setup ? missingEpisodes ? "Retry episode sync" : "Load episode information" : "Refresh Metadata";
-  return <div><button className={button} disabled={pending} onClick={() => start(async () => { const response = await syncShowMetadata(tmdbId); setResult(response); if (!response.error) router.refresh(); })}>{pending ? "Synchronizing…" : label}</button><ActionMessage result={result} /></div>;
+  return <div className="min-w-0"><button className={button} disabled={pending} onClick={() => start(async () => { const response = await syncShowMetadata(tmdbId); setResult(response); if (!response.error) router.refresh(); })}>{pending ? "Synchronizing…" : label}</button><ActionMessage result={result} /></div>;
 }
 
 export function RemoveShowButton({ tmdbId }: { tmdbId: number }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ShowActionResult | null>(null);
-  return <div><button className={`${button} text-[var(--danger)]`} disabled={pending} onClick={() => start(async () => { const response = await removeFromLibrary("tv", tmdbId); setResult(response); if (!response.error) router.push("/shows"); })}>{pending ? "Removing…" : "Remove from library"}</button><p className="mt-1 text-xs text-[var(--muted)]">Watch history will be preserved.</p><ActionMessage result={result} /></div>;
+  return <div className="min-w-0"><button className={`${button} text-[var(--danger)]`} disabled={pending} onClick={() => start(async () => { const response = await removeFromLibrary("tv", tmdbId); setResult(response); if (!response.error) router.push("/shows"); })}>{pending ? "Removing…" : "Remove from library"}</button><p className="mt-1 break-words text-xs text-[var(--muted)]">Watch history will be preserved.</p><ActionMessage result={result} /></div>;
 }
 
 export function SettingsControls({ tmdbId, mediaId, membership }: { tmdbId: number; mediaId: string; membership: UserShow }) {
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ShowActionResult | null>(null);
   const run = (values: { status?: ShowTrackingStatus; isFavourite?: boolean }) => start(async () => setResult(await updateShowSettings(tmdbId, mediaId, values)));
-  return <div className="flex flex-wrap items-center gap-3"><button className={button} disabled={pending} onClick={() => run({ isFavourite: !membership.is_favourite })}><span aria-hidden="true">{membership.is_favourite ? "★" : "☆"}</span> {membership.is_favourite ? "Favourite" : "Add favourite"}</button><label htmlFor={`show-status-${mediaId}`} className="text-sm">Status</label><select id={`show-status-${mediaId}`} className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2" value={membership.status} disabled={pending} onChange={(event) => run({ status: event.target.value as ShowTrackingStatus })}><option value="active">Active</option><option value="paused">Paused</option><option value="dropped">Dropped</option></select><RemoveShowButton tmdbId={tmdbId} /><ActionMessage result={result} /></div>;
+  return <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"><button className={button} disabled={pending} onClick={() => run({ isFavourite: !membership.is_favourite })}><span aria-hidden="true">{membership.is_favourite ? "★" : "☆"}</span> {membership.is_favourite ? "Favourite" : "Add favourite"}</button><div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center"><label htmlFor={`show-status-${mediaId}`} className="text-sm">Status</label><select id={`show-status-${mediaId}`} className="w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2 sm:w-auto" value={membership.status} disabled={pending} onChange={(event) => run({ status: event.target.value as ShowTrackingStatus })}><option value="active">Active</option><option value="paused">Paused</option><option value="dropped">Dropped</option></select></div><RemoveShowButton tmdbId={tmdbId} /><ActionMessage result={result} /></div>;
 }
 
 export function InitialProgressForm({ tmdbId, episodes }: { tmdbId: number; episodes: Episode[] }) {
@@ -76,19 +76,19 @@ export function InitialProgressForm({ tmdbId, episodes }: { tmdbId: number; epis
     start(async () => setResult(await initializeShow(tmdbId, selection)));
   }
 
-  return <section className="space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
-    <h2 className="text-xl font-semibold">Add show and set progress</h2>
-    <p id={helpId} className="text-sm text-[var(--muted)]">Choose where your regular-episode progress should begin. Specials in Season 0 are excluded.</p>
-    {!hasEpisodeOptions ? <><p id={unavailableId} className="text-sm text-yellow-700 dark:text-yellow-300">Episode information could not be loaded. Retry to use episode- and season-based progress options.</p><MetadataButton tmdbId={tmdbId} setup missingEpisodes /></> : null}
-    <form onSubmit={(event) => { event.preventDefault(); if (!selectionInvalid) submit(); }}>
-      <fieldset aria-describedby={[helpId, !hasEpisodeOptions ? unavailableId : null, result?.error ? errorId : null].filter(Boolean).join(" ")} aria-invalid={selectionInvalid || undefined} className="space-y-4">
-        <legend className="font-semibold">Starting progress</legend>
-        <div><input id={`progress-start-${tmdbId}`} name={`progress-mode-${tmdbId}`} type="radio" checked={mode === "start"} onChange={() => setMode("start")} /><label htmlFor={`progress-start-${tmdbId}`} className="ml-2">Start from Season 1, Episode 1</label></div>
-        <div><input id={`progress-before-${tmdbId}`} name={`progress-mode-${tmdbId}`} type="radio" checked={mode === "before_episode"} disabled={!hasEpisodeOptions} onChange={() => setMode("before_episode")} /><label htmlFor={`progress-before-${tmdbId}`} className="ml-2">Mark everything before a selected episode</label></div>
-        {mode === "before_episode" && hasEpisodeOptions ? <div className="space-y-2"><label htmlFor={`first-unwatched-${tmdbId}`} className="block text-sm font-medium">Select the first unwatched episode</label><select id={`first-unwatched-${tmdbId}`} aria-describedby={helpId} aria-invalid={!effectiveTarget || undefined} className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2" value={effectiveTarget} onChange={(event) => setTarget(event.target.value)}>{regular.map((episode) => <option key={episode.id} value={`${episode.season_number}:${episode.episode_number}`}>Season {episode.season_number}, Episode {episode.episode_number} — {episode.title}</option>)}</select></div> : null}
-        <div><input id={`progress-seasons-${tmdbId}`} name={`progress-mode-${tmdbId}`} type="radio" checked={mode === "seasons"} disabled={!hasEpisodeOptions} onChange={() => setMode("seasons")} /><label htmlFor={`progress-seasons-${tmdbId}`} className="ml-2">Select complete watched seasons</label></div>
-        {mode === "seasons" && hasEpisodeOptions ? <fieldset aria-describedby={helpId} aria-invalid={selected.length === 0 || undefined} className="space-y-2"><legend className="text-sm font-medium">Watched regular seasons</legend><div className="flex flex-wrap gap-3">{seasons.map(({ seasonNumber, episodeCount }) => { const id = `watched-season-${tmdbId}-${seasonNumber}`; return <div key={seasonNumber}><input id={id} type="checkbox" checked={selected.includes(seasonNumber)} onChange={() => setSelected((current) => current.includes(seasonNumber) ? current.filter((item) => item !== seasonNumber) : [...current, seasonNumber])} /><label htmlFor={id} className="ml-2">Season {seasonNumber} ({episodeCount} episode{episodeCount === 1 ? "" : "s"})</label></div>; })}</div></fieldset> : null}
-        <button type="submit" className="rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)] disabled:opacity-50" disabled={pending || selectionInvalid}>{pending ? "Synchronizing and adding…" : "Add to library"}</button>
+  return <section className="min-w-0 space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5">
+    <h2 className="break-words text-xl font-semibold">Add show and set progress</h2>
+    <p id={helpId} className="break-words text-sm text-[var(--muted)]">Choose where your regular-episode progress should begin. Specials in Season 0 are excluded.</p>
+    {!hasEpisodeOptions ? <><p id={unavailableId} className="break-words text-sm text-yellow-700 dark:text-yellow-300">Episode information could not be loaded. Retry to use episode- and season-based progress options.</p><MetadataButton tmdbId={tmdbId} setup missingEpisodes /></> : null}
+    <form className="min-w-0" onSubmit={(event) => { event.preventDefault(); if (!selectionInvalid) submit(); }}>
+      <fieldset aria-describedby={[helpId, !hasEpisodeOptions ? unavailableId : null, result?.error ? errorId : null].filter(Boolean).join(" ")} aria-invalid={selectionInvalid || undefined} className="min-w-0 space-y-4">
+        <legend className="break-words font-semibold">Starting progress</legend>
+        <div className="min-w-0"><input id={`progress-start-${tmdbId}`} name={`progress-mode-${tmdbId}`} type="radio" checked={mode === "start"} onChange={() => setMode("start")} /><label htmlFor={`progress-start-${tmdbId}`} className="ml-2 break-words">Start from Season 1, Episode 1</label></div>
+        <div className="min-w-0"><input id={`progress-before-${tmdbId}`} name={`progress-mode-${tmdbId}`} type="radio" checked={mode === "before_episode"} disabled={!hasEpisodeOptions} onChange={() => setMode("before_episode")} /><label htmlFor={`progress-before-${tmdbId}`} className="ml-2 break-words">Mark everything before a selected episode</label></div>
+        {mode === "before_episode" && hasEpisodeOptions ? <div className="min-w-0 space-y-2"><label htmlFor={`first-unwatched-${tmdbId}`} className="block break-words text-sm font-medium">Select the first unwatched episode</label><select id={`first-unwatched-${tmdbId}`} aria-describedby={helpId} aria-invalid={!effectiveTarget || undefined} className="w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2" value={effectiveTarget} onChange={(event) => setTarget(event.target.value)}>{regular.map((episode) => <option key={episode.id} value={`${episode.season_number}:${episode.episode_number}`}>Season {episode.season_number}, Episode {episode.episode_number} — {episode.title}</option>)}</select></div> : null}
+        <div className="min-w-0"><input id={`progress-seasons-${tmdbId}`} name={`progress-mode-${tmdbId}`} type="radio" checked={mode === "seasons"} disabled={!hasEpisodeOptions} onChange={() => setMode("seasons")} /><label htmlFor={`progress-seasons-${tmdbId}`} className="ml-2 break-words">Select complete watched seasons</label></div>
+        {mode === "seasons" && hasEpisodeOptions ? <fieldset aria-describedby={helpId} aria-invalid={selected.length === 0 || undefined} className="min-w-0 space-y-2"><legend className="break-words text-sm font-medium">Watched regular seasons</legend><div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap">{seasons.map(({ seasonNumber, episodeCount }) => { const id = `watched-season-${tmdbId}-${seasonNumber}`; return <div key={seasonNumber} className="min-w-0"><input id={id} type="checkbox" checked={selected.includes(seasonNumber)} onChange={() => setSelected((current) => current.includes(seasonNumber) ? current.filter((item) => item !== seasonNumber) : [...current, seasonNumber])} /><label htmlFor={id} className="ml-2 break-words">Season {seasonNumber} ({episodeCount} episode{episodeCount === 1 ? "" : "s"})</label></div>; })}</div></fieldset> : null}
+        <button type="submit" className="max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)] disabled:opacity-50" disabled={pending || selectionInvalid}>{pending ? "Synchronizing and adding…" : "Add to library"}</button>
       </fieldset>
     </form>
     <ActionMessage id={errorId} result={result} />
@@ -104,12 +104,20 @@ export function EpisodeControls({ tmdbId, mediaId, episode, watched }: { tmdbId:
   const coordinate = `S${String(episode.season_number).padStart(2, "0")}E${String(episode.episode_number).padStart(2, "0")}`;
   const dateId = `date-${episode.id}`;
   const errorId = `date-error-${episode.id}`;
-  return <div className="flex flex-wrap items-center gap-2"><button className={button} disabled={pending || (!watched && !released)} onClick={() => start(async () => { setDateResult(null); setActionResult(await setEpisodeWatched(tmdbId, mediaId, episode.id, !watched)); })}>{pending ? "Saving…" : watched ? "Mark unwatched" : released ? "Mark watched" : "Unreleased"}</button>{watched ? <><label htmlFor={dateId} className="text-sm">Watched date for {coordinate}</label><input type="datetime-local" defaultValue={dateValue} max={new Date().toISOString().slice(0, 16)} className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2 text-sm" id={dateId} aria-describedby={dateResult?.error ? errorId : undefined} aria-invalid={dateResult?.error ? true : undefined} /><button aria-label={`Save watched date for ${coordinate}: ${episode.title}`} className={button} disabled={pending} onClick={() => { const input = document.getElementById(dateId); if (input instanceof HTMLInputElement) start(async () => { setActionResult(null); setDateResult(await updateWatchedDate(tmdbId, mediaId, episode.id, input.value)); }); }}>Save date</button></> : null}<button className={button} disabled={pending || episode.season_number === 0} onClick={() => start(async () => { setDateResult(null); setActionResult(await markPreviousEpisodes(tmdbId, mediaId, episode.season_number, episode.episode_number)); })}>Mark previous watched</button><ActionMessage id={errorId} result={dateResult} /><ActionMessage result={actionResult} /></div>;
+  return <div className="flex min-w-0 flex-col gap-2">
+    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+      <button className={button} disabled={pending || (!watched && !released)} onClick={() => start(async () => { setDateResult(null); setActionResult(await setEpisodeWatched(tmdbId, mediaId, episode.id, !watched)); })}>{pending ? "Saving…" : watched ? "Mark unwatched" : released ? "Mark watched" : "Unreleased"}</button>
+      <button className={button} disabled={pending || episode.season_number === 0} onClick={() => start(async () => { setDateResult(null); setActionResult(await markPreviousEpisodes(tmdbId, mediaId, episode.season_number, episode.episode_number)); })}>Mark previous watched</button>
+    </div>
+    {watched ? <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"><label htmlFor={dateId} className="break-words text-sm">Watched date for {coordinate}</label><input type="datetime-local" defaultValue={dateValue} max={new Date().toISOString().slice(0, 16)} className="w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2 text-sm" id={dateId} aria-describedby={dateResult?.error ? errorId : undefined} aria-invalid={dateResult?.error ? true : undefined} /><button aria-label={`Save watched date for ${coordinate}: ${episode.title}`} className={button} disabled={pending} onClick={() => { const input = document.getElementById(dateId); if (input instanceof HTMLInputElement) start(async () => { setActionResult(null); setDateResult(await updateWatchedDate(tmdbId, mediaId, episode.id, input.value)); }); }}>Save date</button></div> : null}
+    <ActionMessage id={errorId} result={dateResult} />
+    <ActionMessage result={actionResult} />
+  </div>;
 }
 
 export function SeasonControls({ tmdbId, mediaId, season }: { tmdbId: number; mediaId: string; season: number }) {
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ShowActionResult | null>(null);
   const run = (watched: boolean) => start(async () => setResult(await setSeasonWatched(tmdbId, mediaId, season, watched)));
-  return <div className="flex flex-wrap gap-2"><button className={button} disabled={pending} onClick={() => run(true)}>Mark season watched</button><button className={button} disabled={pending} onClick={() => run(false)}>Mark season unwatched</button><ActionMessage result={result} /></div>;
+  return <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap"><button className={button} disabled={pending} onClick={() => run(true)}>Mark season watched</button><button className={button} disabled={pending} onClick={() => run(false)}>Mark season unwatched</button><ActionMessage result={result} /></div>;
 }

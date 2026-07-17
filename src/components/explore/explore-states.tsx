@@ -44,7 +44,7 @@ export function ExploreErrorState({ message }: ExploreErrorStateProps) {
 export function ExploreSkeletonGrid() {
   return (
     <ul
-      className="grid animate-pulse grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
+      className="grid animate-pulse grid-cols-1 gap-4 min-[360px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
       aria-hidden="true"
     >
       {Array.from({ length: 10 }).map((_, index) => (

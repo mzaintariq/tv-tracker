@@ -350,3 +350,14 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Keep route-error controls outside alert regions
 * [x] Add focused accessibility render and behavior tests
 * [ ] Existing gap: expose the stored profile timezone through a dedicated editor in its owning product scope
+
+### Phase 9D.3 — Mobile layout and zoom/reflow
+
+* [x] Prevent horizontal document overflow on core pages without global overflow clipping
+* [x] Add min-w-0 and wrapping for flex/grid titles, descriptions, and controls
+* [x] Use one-column media grids below very narrow widths
+* [x] Stack dense controls and fit datetime-local, file, select, search, and manual-ID inputs
+* [x] Bound detail posters and collapse import candidate layouts when needed
+* [x] Preserve Phase 9D.1 and 9D.2 accessibility behavior
+* [x] Add focused mobile layout contract tests
+* [x] Run validation commands

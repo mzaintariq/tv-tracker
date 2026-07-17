@@ -18,16 +18,16 @@ export function QuickEpisodeAction({
   const [result, setResult] = useState<ShowActionResult | null>(null);
   const label = watched ? "Undo" : "Mark Watched";
 
-  return <div className="space-y-1">
+  return <div className="min-w-0 space-y-1">
     <button
       type="button"
       disabled={pending}
-      className="rounded-lg bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-50"
+      className="max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-50"
       onClick={() => startTransition(async () => setResult(await setEpisodeWatched(tmdbId, mediaId, episodeId, !watched)))}
     >
       {pending ? "Saving…" : label}
     </button>
-    {result?.error ? <p role="alert" className="text-xs text-[var(--danger)]">{result.error}</p> : null}
-    {result?.success ? <p role="status" className="text-xs text-[var(--success)]">{result.success}</p> : null}
+    {result?.error ? <p role="alert" className="break-words text-xs text-[var(--danger)]">{result.error}</p> : null}
+    {result?.success ? <p role="status" className="break-words text-xs text-[var(--success)]">{result.success}</p> : null}
   </div>;
 }

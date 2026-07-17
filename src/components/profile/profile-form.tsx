@@ -36,7 +36,7 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
   }, [state.success, setTheme]);
 
   return (
-    <form action={formAction} className="flex max-w-lg flex-col gap-5">
+    <form action={formAction} className="flex w-full min-w-0 max-w-lg flex-col gap-5">
       <div className="flex flex-col gap-2">
         <label
           htmlFor="email"
@@ -49,7 +49,7 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
           type="email"
           value={email}
           disabled
-          className="h-12 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 text-[var(--muted)]"
+          className="h-12 w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 text-[var(--muted)]"
         />
       </div>
 
@@ -69,7 +69,7 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
           defaultValue={profile.display_name ?? ""}
           aria-describedby={state.error ? "profile-error" : undefined}
           aria-invalid={state.error ? true : undefined}
-          className="h-12 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2"
+          className="h-12 w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2"
         />
       </div>
 
@@ -84,7 +84,7 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
           id="theme"
           name="theme"
           defaultValue={profile.theme}
-          className="h-12 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2"
+          className="h-12 w-full min-w-0 max-w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-[var(--foreground)] outline-none ring-[var(--accent)] focus:ring-2"
         >
           {THEME_VALUES.map((value) => (
             <option key={value} value={value}>

@@ -65,16 +65,16 @@ export function MediaCard({ item }: MediaCardProps) {
   }
 
   return (
-    <article className="flex flex-col gap-3">
+    <article className="flex min-w-0 flex-col gap-3">
       <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-[var(--surface-elevated)]">
-        <MediaPoster source={item.posterPath} title={item.title} alt="" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw" fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]" />
+        <MediaPoster source={item.posterPath} title={item.title} alt="" sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw" fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]" />
       </div>
 
       <div className="min-w-0 space-y-1">
-        <h2 className="truncate text-base font-semibold text-[var(--foreground)]">
+        <h2 className="break-words text-base font-semibold text-[var(--foreground)]">
           {item.title}
         </h2>
-        <p className="text-sm text-[var(--muted)]">
+        <p className="break-words text-sm text-[var(--muted)]">
           {mediaLabel}
           {item.year ? ` · ${item.year}` : null}
         </p>
@@ -85,7 +85,7 @@ export function MediaCard({ item }: MediaCardProps) {
           type="button"
           onClick={handleSetProgress}
           disabled={isPending}
-          className="flex h-10 items-center justify-center rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)]"
+          className="flex h-10 max-w-full items-center justify-center whitespace-normal rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)]"
         >
           {isPending ? "Preparing…" : "Set progress"}
         </button>
@@ -97,8 +97,8 @@ export function MediaCard({ item }: MediaCardProps) {
         aria-label={`${actionLabel}: ${item.title}`}
         className={
           inLibrary
-            ? "h-10 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-elevated)] disabled:opacity-60"
-            : "h-10 rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-60"
+            ? "h-10 max-w-full whitespace-normal rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-elevated)] disabled:opacity-60"
+            : "h-10 max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-60"
         }
       >
         {isPending ? "Saving…" : inLibrary ? "Remove" : "Add"}

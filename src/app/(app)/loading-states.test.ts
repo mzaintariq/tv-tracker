@@ -60,7 +60,8 @@ describe("core route loading states", () => {
       const html = markup(component);
       expect(html).toContain('data-skeleton-region="poster-header"');
       expect(html).toContain("aspect-[2/3]");
-      expect(html).toContain("sm:grid-cols-[180px_1fr]");
+      expect(html).toContain("sm:grid-cols-[180px_minmax(0,1fr)]");
+      expect(html).toContain("max-w-[180px]");
     }
   });
 
