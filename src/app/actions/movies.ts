@@ -37,7 +37,7 @@ export async function setMovieWatched(tmdbIdRaw: unknown, mediaIdRaw: unknown, w
   const watchedAt = watchedAtRaw === undefined ? new Date().toISOString() : parseManualWatchedAt(watchedAtRaw);
   if (watched && !watchedAt) return { error: "Choose a valid watched date that is not in the future." };
   const { data, error } = await owned.supabase.from("user_movies").update({ watched_at: watched ? watchedAt : null }).eq("id", owned.membership.id).eq("user_id", owned.user.id).select("id").maybeSingle();
-  if (error) return { error: error.message };
+  if (error) return { error: "The movie could not be updated. Please try again." };
   if (!data) return { error: "This movie is no longer in your library." };
   refresh(owned.tmdbId);
   return { success: watched ? "Movie marked watched." : "Movie marked unwatched." };
@@ -50,7 +50,7 @@ export async function updateMovieWatchedAt(tmdbIdRaw: unknown, mediaIdRaw: unkno
   if ("error" in owned) return { error: owned.error };
   if (!owned.membership.watched_at) return { error: "Mark this movie watched before editing its watched date." };
   const { data, error } = await owned.supabase.from("user_movies").update({ watched_at: watchedAt }).eq("id", owned.membership.id).eq("user_id", owned.user.id).select("id").maybeSingle();
-  if (error) return { error: error.message };
+  if (error) return { error: "The movie could not be updated. Please try again." };
   if (!data) return { error: "This movie is no longer in your library." };
   refresh(owned.tmdbId);
   return { success: "Watched date updated." };
@@ -61,7 +61,7 @@ export async function toggleMovieFavourite(tmdbIdRaw: unknown, mediaIdRaw: unkno
   const owned = await ownedMovie(tmdbIdRaw, mediaIdRaw);
   if ("error" in owned) return { error: owned.error };
   const { data, error } = await owned.supabase.from("user_movies").update({ is_favourite: isFavouriteRaw }).eq("id", owned.membership.id).eq("user_id", owned.user.id).select("id").maybeSingle();
-  if (error) return { error: error.message };
+  if (error) return { error: "The movie could not be updated. Please try again." };
   if (!data) return { error: "This movie is no longer in your library." };
   refresh(owned.tmdbId);
   return { success: isFavouriteRaw ? "Added to favourites." : "Removed from favourites." };
@@ -71,7 +71,7 @@ export async function removeMovie(tmdbIdRaw: unknown, mediaIdRaw: unknown): Prom
   const owned = await ownedMovie(tmdbIdRaw, mediaIdRaw);
   if ("error" in owned) return { error: owned.error };
   const { data, error } = await owned.supabase.from("user_movies").delete().eq("id", owned.membership.id).eq("user_id", owned.user.id).select("id").maybeSingle();
-  if (error) return { error: error.message };
+  if (error) return { error: "The movie could not be updated. Please try again." };
   if (!data) return { error: "This movie is no longer in your library." };
   refresh(owned.tmdbId);
   return { success: "Movie removed from your library." };

@@ -1,9 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
+import { MediaPoster } from "@/components/media/media-poster";
 import { ProgressBar } from "@/components/shows/progress-bar";
 import { QuickEpisodeAction } from "@/components/shows/quick-episode-action";
 import { ShowCard } from "@/components/shows/show-card";
-import { posterUrl, titleInitials } from "@/lib/media/types";
 import type { DerivedShow, RecentlyWatchedItem, WatchNextItem } from "@/lib/shows/watch-list";
 
 function episodeNumber(season: number, episode: number) {
@@ -29,11 +28,10 @@ export function ShowGrid({ shows }: { shows: DerivedShow[] }) {
 export function WatchNextGrid({ items }: { items: WatchNextItem[] }) {
   return <ul className="grid gap-4 lg:grid-cols-2">
     {items.map((item) => {
-      const image = posterUrl(item.media.poster_path);
       return <li key={item.membership.id}>
         <article className="grid h-full grid-cols-[96px_1fr] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] sm:grid-cols-[120px_1fr]">
           <Link href={`/shows/${item.media.tmdb_id}`} className="relative min-h-40 bg-[var(--surface-elevated)]">
-            {image ? <Image src={image} alt={`${item.media.title} poster`} fill className="object-cover" sizes="120px" /> : <span className="flex h-full items-center justify-center text-xl font-semibold text-[var(--muted)]">{titleInitials(item.media.title)}</span>}
+            <MediaPoster source={item.media.poster_path} title={item.media.title} alt={`${item.media.title} poster`} sizes="120px" fallbackClassName="text-xl font-semibold text-[var(--muted)]" />
           </Link>
           <div className="flex min-w-0 flex-col justify-between gap-4 p-4">
             <div>

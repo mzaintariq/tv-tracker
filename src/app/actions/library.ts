@@ -112,7 +112,7 @@ export async function addToLibrary(
         return { error: "This movie is already in your watchlist." };
       }
 
-      return { error: error.message };
+      return { error: "Your library could not be updated. Please try again." };
     }
 
     revalidatePath("/explore");
@@ -161,7 +161,7 @@ export async function removeFromLibrary(
     .maybeSingle();
 
   if (mediaError) {
-    return { error: mediaError.message };
+    return { error: "Your library could not be updated. Please try again." };
   }
 
   if (!mediaItem) {
@@ -176,7 +176,7 @@ export async function removeFromLibrary(
       .eq("media_item_id", mediaItem.id);
 
     if (error) {
-      return { error: error.message };
+      return { error: "Your library could not be updated. Please try again." };
     }
   } else {
     const { data, error } = await supabase
@@ -188,7 +188,7 @@ export async function removeFromLibrary(
       .maybeSingle();
 
     if (error) {
-      return { error: error.message };
+      return { error: "Your library could not be updated. Please try again." };
     }
 
     if (!data) {

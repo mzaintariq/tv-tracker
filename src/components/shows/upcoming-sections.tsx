@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { posterUrl, titleInitials } from "@/lib/media/types";
+import { MediaPoster } from "@/components/media/media-poster";
 import { upcomingDateLabel, type UpcomingDateGroup, type UpcomingItem } from "@/lib/shows/upcoming";
 
 function episodeNumber(season: number, episode: number) {
@@ -8,9 +7,8 @@ function episodeNumber(season: number, episode: number) {
 }
 
 function Artwork({ item }: { item: UpcomingItem }) {
-  const image = posterUrl(item.media.poster_path, "w185");
   return <Link href={`/shows/${item.media.tmdb_id}`} className="relative block min-h-28 bg-[var(--surface-elevated)]">
-    {image ? <Image src={image} alt={`${item.media.title} poster`} fill className="object-cover" sizes="80px" /> : <span className="flex h-full items-center justify-center text-lg font-semibold text-[var(--muted)]">{titleInitials(item.media.title)}</span>}
+    <MediaPoster source={item.media.poster_path} title={item.media.title} alt={`${item.media.title} poster`} sizes="80px" tmdbSize="w185" fallbackClassName="text-lg font-semibold text-[var(--muted)]" />
   </Link>;
 }
 

@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function ImportNotFound() { return <section className="mx-auto max-w-xl text-center"><h1 className="text-3xl font-semibold">Import not found</h1><p className="mt-3 text-[var(--muted)]">This import may have been deleted or is no longer available.</p><Link href="/profile/import" className="mt-5 inline-block rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]">Back to Imports</Link></section>; }

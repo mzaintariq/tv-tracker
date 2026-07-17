@@ -315,7 +315,9 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [ ] Add installable mobile experience
 * [ ] Add missing-poster fallback
 * [ ] Add skeleton loading states
-* [ ] Add error boundaries
+* [x] Add error boundaries
+* [x] Add resilient import action feedback
+* [x] Sanitize user-visible mutation failures
 * [ ] Review keyboard navigation
 * [ ] Review focus states
 * [ ] Review colour contrast

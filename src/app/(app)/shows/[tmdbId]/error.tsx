@@ -1,2 +1,3 @@
 "use client";
-export default function ShowDetailError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) { return <section><h1 className="text-3xl font-semibold">Could not load this show</h1><p className="mt-3 text-[var(--muted)]">{error.message}</p><button className="mt-5 rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]" onClick={reset}>Try again</button></section>; }
+import { RouteErrorState } from "@/components/ui/route-error-state";
+export default function ShowDetailError({ reset }: { error: Error & { digest?: string }; reset: () => void }) { return <RouteErrorState title="This show could not be loaded" description="Show information is temporarily unavailable. Please try again." reset={reset} backHref="/shows" backLabel="Back to TV Shows" />; }
