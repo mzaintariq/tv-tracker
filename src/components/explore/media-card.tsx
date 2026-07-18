@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { addToLibrary, prepareShowProgress, removeFromLibrary } from "@/app/actions/library";
 import type { ExploreMediaItem } from "@/lib/media/types";
 import { MediaPoster } from "@/components/media/media-poster";
+import { PosterCardTitle } from "@/components/media/poster-card-title";
 
 type MediaCardProps = {
   item: ExploreMediaItem;
@@ -71,9 +72,7 @@ export function MediaCard({ item }: MediaCardProps) {
       </div>
 
       <div className="min-w-0 space-y-1">
-        <h2 className="break-words text-base font-semibold text-[var(--foreground)]">
-          {item.title}
-        </h2>
+        <PosterCardTitle title={item.title} />
         <p className="break-words text-sm text-[var(--muted)]">
           {mediaLabel}
           {item.year ? ` · ${item.year}` : null}

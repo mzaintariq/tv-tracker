@@ -41,8 +41,12 @@ describe("MediaPoster consumers", () => {
     }
     for (const path of ["src/components/shows/show-card.tsx", "src/components/movies/movie-card.tsx"]) {
       const source = readFileSync(path, "utf8");
-      expect(source).toContain('aria-hidden="true"');
-      expect(source).toContain('className="sr-only"');
+      expect(source).toContain("<PosterCardTitle");
+      expect(source).toContain("aria-label=");
     }
+    const titlePrimitive = readFileSync("src/components/media/poster-card-title.tsx", "utf8");
+    expect(titlePrimitive).toContain('aria-hidden="true"');
+    expect(titlePrimitive).toContain('className="sr-only"');
+    expect(titlePrimitive).toContain('className="truncate font-semibold"');
   });
 });

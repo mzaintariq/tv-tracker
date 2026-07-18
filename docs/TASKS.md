@@ -396,3 +396,15 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Keep Watch Next fully visible and preserve section sort order
 * [x] Add focused classification, section-control, and movie quick-action tests
 * [x] Run validation commands
+
+### Phase 9E.3 — Card consistency, season disclosures, mobile fields, and Explore loading
+
+* [x] Keep date-time controls and their wrappers within narrow mobile containers
+* [x] Prevent iOS Safari zoom on Explore search and frequently used watched-date fields
+* [x] Use single-line accessible titles on shared compact poster cards
+* [x] Make show seasons native accessible disclosures with visible progress
+* [x] Collapse Season 0 and deterministically select one regular default season
+* [x] Replace stale Explore results with a localized pending skeleton and status
+* [x] Preserve server-rendered Explore results through serializable children
+* [x] Run validation commands
+* [x] Limit Movies Watch Next and Watched to 10 items initially with shared Show all / Show less controls
