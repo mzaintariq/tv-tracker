@@ -7,6 +7,7 @@ import { loadShowPageData } from "@/lib/shows/detail-loader";
 import { calculateShowProgress } from "@/lib/shows/progress";
 import { parseTmdbId } from "@/lib/shows/validation";
 import { createClient } from "@/lib/supabase/server";
+import { defaultOpenRegularSeason } from "@/lib/shows/season-disclosures";
 import type { Episode } from "@/types/database";
 
 export default async function ShowDetailPage({ params }: { params: Promise<{ tmdbId: string }> }) {
@@ -28,6 +29,8 @@ export default async function ShowDetailPage({ params }: { params: Promise<{ tmd
     list.push(episode);
     seasons.set(episode.season_number, list);
   }
+  const today = new Date().toISOString().slice(0, 10);
+  const defaultOpenSeason = defaultOpenRegularSeason(seasons, watchedIds, today);
   return (
     <article className="mx-auto w-full min-w-0 max-w-5xl space-y-8">
       <header className="grid min-w-0 gap-6 sm:grid-cols-[180px_minmax(0,1fr)]">
@@ -55,16 +58,20 @@ export default async function ShowDetailPage({ params }: { params: Promise<{ tmd
         <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center text-[var(--muted)]">No episode metadata is available yet.</div>
       ) : (
         <div className="min-w-0 space-y-6">
-          {[...seasons.entries()].map(([season, episodes]) => (
-            <section key={season} className="min-w-0 space-y-3">
-              <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          {[...seasons.entries()].map(([season, episodes]) => {
+            const watchedCount = episodes.filter((episode) => watchedIds.has(episode.id)).length;
+            return (
+            <details key={season} open={season === defaultOpenSeason} className="group min-w-0 rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+              <summary className="interactive-control touch-target flex min-w-0 cursor-pointer list-none flex-col gap-3 rounded-xl px-4 py-3 marker:content-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-between [&::-webkit-details-marker]:hidden">
                 <div className="min-w-0">
                   <h2 className="break-words text-2xl font-semibold">{season === 0 ? "Specials (Season 0)" : `Season ${season}`}</h2>
-                  {season === 0 ? <p className="break-words text-sm text-[var(--muted)]">Excluded from normal progress</p> : null}
+                  <p className="break-words text-sm text-[var(--muted)]">{watchedCount} of {episodes.length} watched{season === 0 ? " · Excluded from normal progress" : ""}</p>
                 </div>
-                {detail.membership ? <SeasonControls tmdbId={tmdbId} mediaId={detail.media.id} season={season} /> : null}
-              </div>
-              <ol className="min-w-0 divide-y divide-[var(--border)] rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+                <span aria-hidden="true" className="shrink-0 text-xl group-open:rotate-90">›</span>
+              </summary>
+              <div className="min-w-0 space-y-3 border-t border-[var(--border)] p-4">
+              {detail.membership ? <SeasonControls tmdbId={tmdbId} mediaId={detail.media.id} season={season} /> : null}
+              <ol className="min-w-0 divide-y divide-[var(--border)] rounded-xl border border-[var(--border)]">
                 {episodes.map((episode) => (
                   <li key={episode.id} className="min-w-0 space-y-3 p-4">
                     <div className="min-w-0">
@@ -75,8 +82,9 @@ export default async function ShowDetailPage({ params }: { params: Promise<{ tmd
                   </li>
                 ))}
               </ol>
-            </section>
-          ))}
+              </div>
+            </details>
+          );})}
         </div>
       )}
     </article>

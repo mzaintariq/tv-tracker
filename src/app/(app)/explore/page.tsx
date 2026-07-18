@@ -59,24 +59,24 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
           key={`${data.filter}:${data.query ?? ""}`}
           filter={data.filter}
           query={data.query}
-        />
+        >
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-[var(--foreground)]">
+              {heading}
+            </h2>
+
+            {data.error ? <ExploreErrorState message={data.error} /> : null}
+
+            {!data.error && data.items.length === 0 ? (
+              <ExploreEmptyState query={data.query} />
+            ) : null}
+
+            {!data.error && data.items.length > 0 ? (
+              <MediaGrid items={data.items} />
+            ) : null}
+          </div>
+        </ExploreToolbar>
       </Suspense>
-
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[var(--foreground)]">
-          {heading}
-        </h2>
-
-        {data.error ? <ExploreErrorState message={data.error} /> : null}
-
-        {!data.error && data.items.length === 0 ? (
-          <ExploreEmptyState query={data.query} />
-        ) : null}
-
-        {!data.error && data.items.length > 0 ? (
-          <MediaGrid items={data.items} />
-        ) : null}
-      </div>
 
       <TmdbAttribution />
     </section>

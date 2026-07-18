@@ -10,6 +10,9 @@ const neutralizedRoutes = [
   "src/app/(app)/profile/import/loading.tsx",
   "src/app/(app)/profile/import/[importId]/page.tsx",
   "src/app/(app)/profile/import/[importId]/loading.tsx",
+  "src/app/(app)/profile/page.tsx",
+  "src/app/(app)/profile/settings/page.tsx",
+  "src/app/(app)/profile/settings/loading.tsx",
 ];
 
 describe("Phase 9D.1 shell contracts", () => {

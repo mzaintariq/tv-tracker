@@ -15,6 +15,7 @@ const interactiveSources = [
   "src/components/import/import-controls.tsx",
   "src/components/import/import-upload-form.tsx",
   "src/components/profile/profile-form.tsx",
+  "src/components/profile/theme-selector.tsx",
   "src/components/auth/login-form.tsx",
 ] as const;
 
@@ -24,6 +25,8 @@ const touchTargetSources = [
   "src/components/shows/quick-episode-action.tsx",
   "src/components/shows/show-subnav.tsx",
   "src/components/shows/show-controls.tsx",
+  "src/components/shows/limited-watch-list-section.tsx",
+  "src/components/movies/quick-mark-movie-watched.tsx",
   "src/components/import/candidate-card.tsx",
   "src/components/import/import-controls.tsx",
   "src/components/ui/route-error-state.tsx",

@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import MoviesLoading from "./movies/loading";
 import MovieDetailLoading from "./movies/[tmdbId]/loading";
 import ProfileLoading from "./profile/loading";
+import ProfileSettingsLoading from "./profile/settings/loading";
 import ImportLoading from "./profile/import/loading";
 import ImportDetailLoading from "./profile/import/[importId]/loading";
 import ShowDetailLoading from "./shows/[tmdbId]/loading";
@@ -21,7 +22,8 @@ type LoadingContract = {
 
 const routes: LoadingContract[] = [
   { name: "Movies", component: MoviesLoading, announcement: "Loading movies…", regions: ["heading", "movie-grid"] },
-  { name: "Profile", component: ProfileLoading, announcement: "Loading profile…", regions: ["heading", "preferences", "account-tools", "statistics"] },
+  { name: "Profile", component: ProfileLoading, announcement: "Loading profile…", regions: ["heading", "overview", "statistics"] },
+  { name: "Settings", component: ProfileSettingsLoading, announcement: "Loading settings…", regions: ["heading", "preferences", "theme", "account-tools"] },
   { name: "Import list", component: ImportLoading, announcement: "Loading import…", regions: ["heading", "upload", "sessions", "cleanup"] },
   { name: "Import detail", component: ImportDetailLoading, announcement: "Loading import details…", regions: ["heading", "summary", "progress", "resolution"] },
   { name: "Show detail", component: ShowDetailLoading, announcement: "Loading show…", regions: ["poster-header", "tracking-setup", "episodes"] },

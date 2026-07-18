@@ -6,8 +6,14 @@ export type WatchListMedia = Pick<MediaItem, "id" | "tmdb_id" | "title" | "poste
 export type WatchListEpisode = { id: string; media_item_id: string; season_number: number; episode_number: number; title: string; air_date: string | null };
 export type WatchListWatchedEpisode = { id: string; episode_id: string; watched_at: string };
 
+/** Inclusive rolling window for Watch Next recency and inactivity. Exactly N days ago still counts as recent. */
 export const INACTIVITY_THRESHOLD_DAYS = 30;
 export const RECENTLY_WATCHED_LIMIT = 10;
+export const SECONDARY_SECTION_INITIAL_LIMIT = 10;
+
+export function formatSectionHeading(title: string, totalCount: number): string {
+  return `${title} · ${totalCount}`;
+}
 
 export type PrimaryShowState =
   | "dropped"
@@ -84,20 +90,54 @@ function deriveShow(snapshot: TrackedShowSnapshot, today: string): DerivedShow {
   return { ...snapshot, primaryState, progress, latestRegularWatchedAt: latestTimestamp(regularWatchedRows) };
 }
 
+function unwatchedReleasedRegularEpisodes(
+  show: DerivedShow,
+  today: string,
+): WatchListEpisode[] {
+  const watchedIds = new Set(show.watched.map((row) => row.episode_id));
+  return show.episodes
+    .filter((candidate) => isReleasedRegularEpisode(candidate, today) && !watchedIds.has(candidate.id))
+    .sort((left, right) => left.season_number - right.season_number || left.episode_number - right.episode_number);
+}
+
+/**
+ * Watch Next eligibility for active incomplete shows:
+ * - at least one unwatched released regular episode (Season 0 never qualifies); and
+ * - either a regular episode was watched within the inclusive last 30 days, or
+ * - an unwatched released regular episode aired within the inclusive last 30 days.
+ * Future air dates never qualify until aired (`air_date <= today`).
+ */
+export function isWatchNextEligible(
+  show: DerivedShow,
+  today: string,
+  cutoffIso: string,
+  cutoffDate: string,
+): boolean {
+  if (show.primaryState !== "active_incomplete") return false;
+  const unwatched = unwatchedReleasedRegularEpisodes(show, today);
+  if (unwatched.length === 0) return false;
+
+  const recentlyWatched =
+    show.latestRegularWatchedAt !== null && show.latestRegularWatchedAt >= cutoffIso;
+  const recentlyAired = unwatched.some(
+    (episode) => episode.air_date !== null && episode.air_date >= cutoffDate,
+  );
+  return recentlyWatched || recentlyAired;
+}
+
 export function deriveWatchList(
   snapshots: readonly TrackedShowSnapshot[],
   today: string,
   now: string,
 ): WatchListCategories {
   const shows = snapshots.map((snapshot) => deriveShow(snapshot, today));
-  const cutoff = new Date(new Date(now).getTime() - INACTIVITY_THRESHOLD_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  const cutoffMs = new Date(now).getTime() - INACTIVITY_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
+  const cutoffIso = new Date(cutoffMs).toISOString();
+  const cutoffDate = cutoffIso.slice(0, 10);
 
   const watchNext = shows.flatMap((show) => {
-    if (show.primaryState !== "active_incomplete") return [];
-    const watchedIds = new Set(show.watched.map((row) => row.episode_id));
-    const episode = show.episodes
-      .filter((candidate) => isReleasedRegularEpisode(candidate, today) && !watchedIds.has(candidate.id))
-      .sort((left, right) => left.season_number - right.season_number || left.episode_number - right.episode_number)[0];
+    if (!isWatchNextEligible(show, today, cutoffIso, cutoffDate)) return [];
+    const episode = unwatchedReleasedRegularEpisodes(show, today)[0];
     return episode ? [{ ...show, episode }] : [];
   }).sort((left, right) => {
     if (left.latestRegularWatchedAt !== right.latestRegularWatchedAt) {
@@ -108,8 +148,10 @@ export function deriveWatchList(
     return titleCompare(left, right);
   });
 
+  const watchNextIds = new Set(watchNext.map((item) => item.membership.id));
+  // Deterministic: every active incomplete show is either Watch Next or Haven't watched for a while, never both.
   const inactive = shows
-    .filter((show) => show.primaryState === "active_incomplete" && show.latestRegularWatchedAt !== null && show.latestRegularWatchedAt < cutoff)
+    .filter((show) => show.primaryState === "active_incomplete" && !watchNextIds.has(show.membership.id))
     .sort((left, right) =>
       (left.latestRegularWatchedAt ?? "").localeCompare(right.latestRegularWatchedAt ?? "") || titleCompare(left, right));
 

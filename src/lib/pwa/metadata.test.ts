@@ -6,7 +6,13 @@ describe("TrackTV application metadata", () => {
     expect(TRACKTV_METADATA).toMatchObject({
       applicationName: "TrackTV", title: "TrackTV",
       description: "Private TV show and movie tracking for your household.",
-      icons: { apple: [{ url: "/icons/apple-touch-icon-180.png", sizes: "180x180", type: "image/png" }] },
+      icons: {
+        icon: [
+          { url: "/icons/tracktv-192.png", sizes: "192x192", type: "image/png" },
+          { url: "/icons/tracktv-512.png", sizes: "512x512", type: "image/png" },
+        ],
+        apple: [{ url: "/icons/apple-touch-icon-180.png", sizes: "180x180", type: "image/png" }],
+      },
       appleWebApp: { capable: true, title: "TrackTV", statusBarStyle: "default" },
     });
   });

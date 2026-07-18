@@ -1,7 +1,8 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
+import { ExploreSkeletonGrid } from "@/components/explore/explore-states";
 
 import type { ExploreMediaFilter } from "@/lib/media/types";
 import { MAX_SEARCH_QUERY_LENGTH } from "@/lib/media/types";
@@ -15,9 +16,10 @@ const FILTERS: { value: ExploreMediaFilter; label: string }[] = [
 type ExploreToolbarProps = {
   filter: ExploreMediaFilter;
   query: string | null;
+  children: ReactNode;
 };
 
-export function ExploreToolbar({ filter, query }: ExploreToolbarProps) {
+export function ExploreToolbar({ filter, query, children }: ExploreToolbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -65,7 +67,8 @@ export function ExploreToolbar({ filter, query }: ExploreToolbarProps) {
   }, [searchValue]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
+      <div className="space-y-4">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
         <label className="flex min-w-0 flex-1 flex-col gap-2">
           <span className="text-sm font-medium text-[var(--foreground)]">
@@ -79,7 +82,7 @@ export function ExploreToolbar({ filter, query }: ExploreToolbarProps) {
             placeholder="Search TMDB…"
             autoComplete="off"
             onChange={(event) => setSearchValue(event.target.value)}
-            className="interactive-control touch-target h-11 w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)]"
+            className="interactive-control touch-target h-11 w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)] placeholder:text-[var(--muted)] sm:text-sm"
             aria-describedby="explore-search-hint"
           />
           <span id="explore-search-hint" className="sr-only">
@@ -118,11 +121,16 @@ export function ExploreToolbar({ filter, query }: ExploreToolbarProps) {
         })}
       </div>
 
-      {isPending ? (
-        <p className="text-sm text-[var(--muted)]" aria-live="polite">
-          Updating results…
-        </p>
-      ) : null}
+      </div>
+
+      <div aria-busy={isPending} className="min-w-0">
+        {isPending ? (
+          <div className="space-y-4">
+            <p className="text-sm text-[var(--muted)]" role="status">Loading results…</p>
+            <div aria-hidden="true"><ExploreSkeletonGrid /></div>
+          </div>
+        ) : children}
+      </div>
     </div>
   );
 }

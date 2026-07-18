@@ -373,3 +373,38 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Complete reduced-motion coverage for progress interpolation
 * [x] Add focused contrast and visual-accessibility contract tests
 * [x] Run validation commands
+
+### Phase 9E.1 — Profile overhaul and settings separation
+
+* [x] Split `/profile` into overview/dashboard and `/profile/settings`
+* [x] Keep statistics, favourites, and profile overview on Profile
+* [x] Move display name, theme, import, export, and account actions to Settings
+* [x] Replace theme select with System / Light / Dark radios
+* [x] Apply theme immediately and persist asynchronously with rollback on failure
+* [x] Stream statistics behind a Suspense boundary for perceived performance
+* [x] Correct browser favicon/metadata branding to TrackTV
+* [x] Add focused profile/settings and theme tests
+* [x] Run validation commands
+
+### Phase 9E.2 — Watch List prioritization and section controls
+
+* [x] Restrict TV Watch Next to recent watches or newly aired unwatched regular episodes (inclusive 30-day window)
+* [x] Prevent Watch Next / Haven’t watched for a while duplication
+* [x] Add movie Watch Next quick Mark watched with pending, duplicate-guard, and error feedback
+* [x] Show full section counts in Watch List headings
+* [x] Limit secondary Watch List sections to 10 items with Show all / Show less
+* [x] Keep Watch Next fully visible and preserve section sort order
+* [x] Add focused classification, section-control, and movie quick-action tests
+* [x] Run validation commands
+
+### Phase 9E.3 — Card consistency, season disclosures, mobile fields, and Explore loading
+
+* [x] Keep date-time controls and their wrappers within narrow mobile containers
+* [x] Prevent iOS Safari zoom on Explore search and frequently used watched-date fields
+* [x] Use single-line accessible titles on shared compact poster cards
+* [x] Make show seasons native accessible disclosures with visible progress
+* [x] Collapse Season 0 and deterministically select one regular default season
+* [x] Replace stale Explore results with a localized pending skeleton and status
+* [x] Preserve server-rendered Explore results through serializable children
+* [x] Run validation commands
+* [x] Limit Movies Watch Next and Watched to 10 items initially with shared Show all / Show less controls
