@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { deriveWatchList, INACTIVITY_THRESHOLD_DAYS, RECENTLY_WATCHED_LIMIT, type TrackedShowSnapshot } from "@/lib/shows/watch-list";
+import {
+  deriveWatchList,
+  INACTIVITY_THRESHOLD_DAYS,
+  RECENTLY_WATCHED_LIMIT,
+  type TrackedShowSnapshot,
+} from "@/lib/shows/watch-list";
 import type { Episode, MediaItem, UserShow, WatchedEpisode } from "@/types/database";
 
 const TODAY = "2026-07-15";
 const NOW = "2026-07-15T12:00:00.000Z";
+const CUTOFF = new Date(new Date(NOW).getTime() - INACTIVITY_THRESHOLD_DAYS * 86_400_000);
 
 function snapshot(options: {
   title?: string;
@@ -24,6 +30,17 @@ function snapshot(options: {
     episodes: episodes.map((episode) => ({ ...episode, media_item_id: mediaId, title: episode.id, runtime_minutes: null, tmdb_episode_id: episode.episode_number, last_synced_at: NOW, created_at: NOW, updated_at: NOW })) as Episode[],
     watched: (options.watched ?? []).map((row, index) => ({ id: `watched-${title}-${index}`, user_id: "user", episode_id: row.episodeId, watched_at: row.watchedAt, created_at: row.watchedAt, updated_at: row.watchedAt })) as WatchedEpisode[],
   };
+}
+
+function partial(title: string, watchedAt: string, secondAirDate = "2020-01-02") {
+  return snapshot({
+    title,
+    episodes: [
+      { id: `${title}-one`, season_number: 1, episode_number: 1, air_date: "2020-01-01" },
+      { id: `${title}-two`, season_number: 1, episode_number: 2, air_date: secondAirDate },
+    ],
+    watched: [{ episodeId: `${title}-one`, watchedAt }],
+  });
 }
 
 describe("watch list derivation", () => {
@@ -75,26 +92,84 @@ describe("watch list derivation", () => {
     expect(result.watchNext).toHaveLength(0);
   });
 
-  it("puts a stale active incomplete show in both reminder overlays", () => {
-    const watchedAt = new Date(new Date(NOW).getTime() - (INACTIVITY_THRESHOLD_DAYS + 1) * 86_400_000).toISOString();
-    const show = snapshot({ episodes: [
-      { id: "one", season_number: 1, episode_number: 1, air_date: "2020-01-01" },
-      { id: "two", season_number: 1, episode_number: 2, air_date: "2020-01-02" },
-    ], watched: [{ episodeId: "one", watchedAt }] });
-    const result = deriveWatchList([show], TODAY, NOW);
-    expect(result.watchNext).toHaveLength(1);
-    expect(result.inactive).toHaveLength(1);
+  it("puts a recently watched unfinished show only in Watch Next", () => {
+    const result = deriveWatchList([partial("Recent", "2026-07-10T00:00:00Z")], TODAY, NOW);
+    expect(result.watchNext.map((item) => item.media.title)).toEqual(["Recent"]);
+    expect(result.inactive).toHaveLength(0);
   });
 
-  it("uses a strict more-than-30-days inactivity boundary", () => {
-    const cutoff = new Date(new Date(NOW).getTime() - INACTIVITY_THRESHOLD_DAYS * 86_400_000);
-    const make = (watchedAt: string) => snapshot({ episodes: [
-      { id: "one", season_number: 1, episode_number: 1, air_date: "2020-01-01" },
-      { id: "two", season_number: 1, episode_number: 2, air_date: "2020-01-02" },
-    ], watched: [{ episodeId: "one", watchedAt }] });
-    expect(deriveWatchList([make(cutoff.toISOString())], TODAY, NOW).inactive).toHaveLength(0);
-    expect(deriveWatchList([make(new Date(cutoff.getTime() - 1).toISOString())], TODAY, NOW).inactive).toHaveLength(1);
-    expect(deriveWatchList([make(new Date(cutoff.getTime() + 1).toISOString())], TODAY, NOW).inactive).toHaveLength(0);
+  it("puts a stale unfinished show only in Haven't watched for a while", () => {
+    const watchedAt = new Date(CUTOFF.getTime() - 1).toISOString();
+    const result = deriveWatchList([partial("Stale", watchedAt)], TODAY, NOW);
+    expect(result.watchNext).toHaveLength(0);
+    expect(result.inactive.map((item) => item.media.title)).toEqual(["Stale"]);
+  });
+
+  it("promotes a stale show with a newly aired unwatched episode into Watch Next only", () => {
+    const watchedAt = new Date(CUTOFF.getTime() - 86_400_000).toISOString();
+    const result = deriveWatchList([partial("Renewed", watchedAt, "2026-07-10")], TODAY, NOW);
+    expect(result.watchNext.map((item) => item.media.title)).toEqual(["Renewed"]);
+    expect(result.inactive).toHaveLength(0);
+  });
+
+  it("keeps a stale show with only a future unwatched episode out of Watch Next", () => {
+    const watchedAt = new Date(CUTOFF.getTime() - 86_400_000).toISOString();
+    const show = snapshot({
+      title: "Future only",
+      episodes: [
+        { id: "one", season_number: 1, episode_number: 1, air_date: "2020-01-01" },
+        { id: "future", season_number: 1, episode_number: 2, air_date: "2030-01-01" },
+      ],
+      watched: [{ episodeId: "one", watchedAt }],
+    });
+    const result = deriveWatchList([show], TODAY, NOW);
+    expect(result.watchNext).toHaveLength(0);
+    expect(result.caughtUp).toHaveLength(1);
+    expect(result.inactive).toHaveLength(0);
+  });
+
+  it("ignores Season 0 watching and air dates for Watch Next eligibility", () => {
+    const watchedAt = new Date(CUTOFF.getTime() - 86_400_000).toISOString();
+    const show = snapshot({
+      title: "Specials",
+      episodes: [
+        { id: "special", season_number: 0, episode_number: 1, air_date: "2026-07-10" },
+        { id: "one", season_number: 1, episode_number: 1, air_date: "2020-01-01" },
+        { id: "two", season_number: 1, episode_number: 2, air_date: "2020-01-02" },
+      ],
+      watched: [
+        { episodeId: "special", watchedAt: "2026-07-14T00:00:00Z" },
+        { episodeId: "one", watchedAt },
+      ],
+    });
+    const result = deriveWatchList([show], TODAY, NOW);
+    expect(result.watchNext).toHaveLength(0);
+    expect(result.inactive.map((item) => item.media.title)).toEqual(["Specials"]);
+  });
+
+  it("treats exactly 30 days ago as recent for Watch Next", () => {
+    const atCutoff = CUTOFF.toISOString();
+    const older = new Date(CUTOFF.getTime() - 1).toISOString();
+    const newer = new Date(CUTOFF.getTime() + 1).toISOString();
+    expect(deriveWatchList([partial("Exact", atCutoff)], TODAY, NOW).watchNext).toHaveLength(1);
+    expect(deriveWatchList([partial("Exact", atCutoff)], TODAY, NOW).inactive).toHaveLength(0);
+    expect(deriveWatchList([partial("Older", older)], TODAY, NOW).watchNext).toHaveLength(0);
+    expect(deriveWatchList([partial("Older", older)], TODAY, NOW).inactive).toHaveLength(1);
+    expect(deriveWatchList([partial("Newer", newer)], TODAY, NOW).watchNext).toHaveLength(1);
+    expect(deriveWatchList([partial("Newer", newer)], TODAY, NOW).inactive).toHaveLength(0);
+  });
+
+  it("never duplicates memberships across Watch Next and Haven't watched for a while", () => {
+    const result = deriveWatchList([
+      partial("Recent", "2026-07-10T00:00:00Z"),
+      partial("Stale", new Date(CUTOFF.getTime() - 1).toISOString()),
+      partial("Aired", new Date(CUTOFF.getTime() - 1).toISOString(), "2026-07-01"),
+    ], TODAY, NOW);
+    const watchNextIds = new Set(result.watchNext.map((item) => item.membership.id));
+    const inactiveIds = new Set(result.inactive.map((item) => item.membership.id));
+    for (const id of watchNextIds) expect(inactiveIds.has(id)).toBe(false);
+    expect(result.watchNext.map((item) => item.media.title).sort()).toEqual(["Aired", "Recent"]);
+    expect(result.inactive.map((item) => item.media.title)).toEqual(["Stale"]);
   });
 
   it("derives caught up, completed, and ended-incomplete correctly", () => {
@@ -104,11 +179,21 @@ describe("watch list derivation", () => {
     const incomplete = deriveWatchList([snapshot({ tmdbStatus: "Ended", episodes: [
       { id: "one", season_number: 1, episode_number: 1, air_date: "2020-01-01" },
       { id: "two", season_number: 1, episode_number: 2, air_date: "2020-01-02" },
-    ], watched: [{ episodeId: "one", watchedAt: "2026-01-01T00:00:00Z" }] })], TODAY, NOW);
+    ], watched: [{ episodeId: "one", watchedAt: "2026-07-01T00:00:00Z" }] })], TODAY, NOW);
     expect(caught.caughtUp).toHaveLength(1);
     expect(completed.completed).toHaveLength(1);
     expect(incomplete.watchNext).toHaveLength(1);
     expect(incomplete.shows[0].progress.state).toBe("partial");
+  });
+
+  it("keeps caught-up and completed shows out of Watch Next and inactive", () => {
+    const watched = [{ episodeId: "Example-e1", watchedAt: "2026-07-10T00:00:00Z" }];
+    const caught = deriveWatchList([snapshot({ watched })], TODAY, NOW);
+    const completed = deriveWatchList([snapshot({ watched, tmdbStatus: "Ended" })], TODAY, NOW);
+    expect(caught.watchNext).toHaveLength(0);
+    expect(caught.inactive).toHaveLength(0);
+    expect(completed.watchNext).toHaveLength(0);
+    expect(completed.inactive).toHaveLength(0);
   });
 
   it("makes paused and dropped primary and excludes them from overlays", () => {
@@ -144,10 +229,6 @@ describe("watch list derivation", () => {
   });
 
   it("sorts every section deterministically", () => {
-    const partial = (title: string, watchedAt: string) => snapshot({ title, episodes: [
-      { id: `${title}-one`, season_number: 1, episode_number: 1, air_date: "2020-01-01" },
-      { id: `${title}-two`, season_number: 1, episode_number: 2, air_date: "2020-01-02" },
-    ], watched: [{ episodeId: `${title}-one`, watchedAt }] });
     const result = deriveWatchList([
       partial("Beta", "2026-07-01T00:00:00Z"),
       partial("Alpha", "2026-07-01T00:00:00Z"),
@@ -161,10 +242,6 @@ describe("watch list derivation", () => {
   });
 
   it("sorts inactivity oldest-first and title-sorts primary sections", () => {
-    const partial = (title: string, watchedAt: string) => snapshot({ title, episodes: [
-      { id: `${title}-one`, season_number: 1, episode_number: 1, air_date: "2020-01-01" },
-      { id: `${title}-two`, season_number: 1, episode_number: 2, air_date: "2020-01-02" },
-    ], watched: [{ episodeId: `${title}-one`, watchedAt }] });
     const result = deriveWatchList([
       partial("Newer stale", "2026-05-15T00:00:00Z"),
       partial("Older stale", "2026-04-15T00:00:00Z"),

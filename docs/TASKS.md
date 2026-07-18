@@ -385,3 +385,14 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Correct browser favicon/metadata branding to TrackTV
 * [x] Add focused profile/settings and theme tests
 * [x] Run validation commands
+
+### Phase 9E.2 — Watch List prioritization and section controls
+
+* [x] Restrict TV Watch Next to recent watches or newly aired unwatched regular episodes (inclusive 30-day window)
+* [x] Prevent Watch Next / Haven’t watched for a while duplication
+* [x] Add movie Watch Next quick Mark watched with pending, duplicate-guard, and error feedback
+* [x] Show full section counts in Watch List headings
+* [x] Limit secondary Watch List sections to 10 items with Show all / Show less
+* [x] Keep Watch Next fully visible and preserve section sort order
+* [x] Add focused classification, section-control, and movie quick-action tests
+* [x] Run validation commands
