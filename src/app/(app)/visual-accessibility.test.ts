@@ -15,6 +15,7 @@ const interactiveSources = [
   "src/components/import/import-controls.tsx",
   "src/components/import/import-upload-form.tsx",
   "src/components/profile/profile-form.tsx",
+  "src/components/profile/theme-selector.tsx",
   "src/components/auth/login-form.tsx",
 ] as const;
 

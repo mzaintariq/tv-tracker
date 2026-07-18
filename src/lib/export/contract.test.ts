@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 describe("user export implementation contract", () => {
   const loader = readFileSync("src/lib/export/data.ts", "utf8");
   const route = readFileSync("src/app/api/export/route.ts", "utf8");
-  const profile = readFileSync("src/app/(app)/profile/page.tsx", "utf8");
+  const settings = readFileSync("src/app/(app)/profile/settings/page.tsx", "utf8");
 
   it("uses only the normal owner-authenticated server client", () => {
     expect(loader).toContain('from "@/lib/supabase/server"');
@@ -24,9 +24,9 @@ describe("user export implementation contract", () => {
     expect(loader).not.toContain('select("*")');
   });
 
-  it("exposes a native Profile download with the required privacy explanation", () => {
-    expect(profile).toContain('href="/api/export"');
-    expect(profile).toContain("Download your data");
-    for (const phrase of ["email", "internal IDs", "TV Time source files", "import diagnostics", "generated on demand", "not retained"]) expect(profile).toContain(phrase);
+  it("exposes a native Settings download with the required privacy explanation", () => {
+    expect(settings).toContain('href="/api/export"');
+    expect(settings).toContain("Download your data");
+    for (const phrase of ["email", "internal IDs", "TV Time source files", "import diagnostics", "generated on demand", "not retained"]) expect(settings).toContain(phrase);
   });
 });

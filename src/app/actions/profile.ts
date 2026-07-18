@@ -15,25 +15,29 @@ export type ProfileActionState = {
   success?: string;
 };
 
+export type ThemeActionResult = {
+  error?: string;
+};
+
+function revalidateProfileRoutes() {
+  revalidatePath("/profile");
+  revalidatePath("/profile/settings");
+  revalidatePath("/", "layout");
+}
+
 export async function updateProfile(
   _prevState: ProfileActionState,
   formData: FormData,
 ): Promise<ProfileActionState> {
   const displayNameRaw = String(formData.get("display_name") ?? "");
-  const themeRaw = String(formData.get("theme") ?? "");
-
   const displayName = normalizeDisplayName(displayNameRaw);
+
   if (!displayName) {
     return {
       error: "Display name must be between 1 and 80 characters.",
     };
   }
 
-  if (!isThemePreference(themeRaw)) {
-    return { error: "Choose a valid theme preference." };
-  }
-
-  const theme: ThemePreference = themeRaw;
   const supabase = await createClient();
   const {
     data: { user },
@@ -48,12 +52,42 @@ export async function updateProfile(
     .from("profiles")
     .update({
       display_name: displayName,
-      theme,
     })
     .eq("id", user.id);
 
   if (error) {
-    return { error: error.message };
+    return { error: "Display name could not be saved. Please try again." };
+  }
+
+  revalidateProfileRoutes();
+  return { success: "Display name updated." };
+}
+
+export async function updateThemePreference(
+  themeRaw: string,
+): Promise<ThemeActionResult> {
+  if (!isThemePreference(themeRaw)) {
+    return { error: "Choose a valid theme preference." };
+  }
+
+  const theme: ThemePreference = themeRaw;
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { error: "You must be signed in to update your theme." };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ theme })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: "Theme could not be saved. Your previous selection was restored." };
   }
 
   const { cookies } = await import("next/headers");
@@ -64,8 +98,6 @@ export async function updateProfile(
     sameSite: "lax",
   });
 
-  revalidatePath("/profile");
-  revalidatePath("/", "layout");
-
-  return { success: "Profile updated." };
+  revalidateProfileRoutes();
+  return {};
 }

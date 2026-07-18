@@ -373,3 +373,15 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Complete reduced-motion coverage for progress interpolation
 * [x] Add focused contrast and visual-accessibility contract tests
 * [x] Run validation commands
+
+### Phase 9E.1 — Profile overhaul and settings separation
+
+* [x] Split `/profile` into overview/dashboard and `/profile/settings`
+* [x] Keep statistics, favourites, and profile overview on Profile
+* [x] Move display name, theme, import, export, and account actions to Settings
+* [x] Replace theme select with System / Light / Dark radios
+* [x] Apply theme immediately and persist asynchronously with rollback on failure
+* [x] Stream statistics behind a Suspense boundary for perceived performance
+* [x] Correct browser favicon/metadata branding to TrackTV
+* [x] Add focused profile/settings and theme tests
+* [x] Run validation commands

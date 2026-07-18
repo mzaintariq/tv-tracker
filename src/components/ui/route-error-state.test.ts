@@ -7,6 +7,7 @@ vi.mock("next/link", () => ({ default: (props: Record<string, unknown>) => creat
 import AppError from "@/app/(app)/error";
 import MoviesError from "@/app/(app)/movies/error";
 import ProfileError from "@/app/(app)/profile/error";
+import ProfileSettingsError from "@/app/(app)/profile/settings/error";
 import ImportError from "@/app/(app)/profile/import/error";
 import ImportDetailError from "@/app/(app)/profile/import/[importId]/error";
 import ShowDetailError from "@/app/(app)/shows/[tmdbId]/error";
@@ -18,6 +19,7 @@ const boundaries = [
   [AppError, "Something went wrong"],
   [MoviesError, "Movies could not be loaded"],
   [ProfileError, "Profile could not be loaded"],
+  [ProfileSettingsError, "Settings could not be loaded"],
   [ImportError, "Import data could not be loaded"],
   [ImportDetailError, "Import data could not be loaded"],
   [ShowDetailError, "This show could not be loaded"],
