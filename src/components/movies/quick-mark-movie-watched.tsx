@@ -37,23 +37,24 @@ export function QuickMarkMovieWatched({
   };
 
   return (
-    <div className="min-w-0 space-y-1">
+    <div className="min-w-0">
       <button
         type="button"
         disabled={pending}
-        aria-label={`Mark ${title} watched`}
-        className="touch-target max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--accent-foreground)]"
+        aria-label={`Mark ${title} as watched`}
+        aria-busy={pending}
+        className="poster-overlay-action touch-target grid h-11 w-11 cursor-pointer place-items-center rounded-lg border text-xl font-semibold"
         onClick={onMarkWatched}
       >
-        {pending ? "Saving…" : "Mark watched"}
+        <span aria-hidden="true">{pending ? "…" : "✓"}</span>
       </button>
       {result?.error ? (
-        <p role="alert" className="break-words text-xs text-[var(--danger)]">
+        <p role="alert" className="sr-only">
           {result.error}
         </p>
       ) : null}
       {result?.success ? (
-        <p role="status" className="break-words text-xs text-[var(--success)]">
+        <p role="status" className="sr-only">
           {result.success}
         </p>
       ) : null}

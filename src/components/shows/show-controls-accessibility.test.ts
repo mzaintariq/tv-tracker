@@ -52,6 +52,9 @@ describe("show control accessibility", () => {
   it("gives repeated episode date controls contextual names and error hooks", async () => {
     const watched = { watched_at: "2026-01-02T03:04:00Z" } as WatchedEpisode;
     const renderer = await mount(createElement(EpisodeControls, { tmdbId: 42, mediaId: "media", episode: episode(2, 4), watched }));
+    const trigger = renderer.root.findByProps({ "aria-controls": "date-editor-2-4" });
+    expect(trigger.props["aria-expanded"]).toBe(false);
+    await act(() => trigger.props.onClick());
     const input = renderer.root.findByProps({ type: "datetime-local" });
     expect(renderer.root.findByProps({ htmlFor: input.props.id }).children.join("")).toContain("S02E04");
     expect(renderer.root.findByProps({ "aria-label": "Save watched date for S02E04: Episode 4" })).toBeDefined();

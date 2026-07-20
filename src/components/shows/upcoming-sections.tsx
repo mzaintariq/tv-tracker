@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { MediaPoster } from "@/components/media/media-poster";
 import { upcomingDateLabel, type UpcomingDateGroup, type UpcomingItem } from "@/lib/shows/upcoming";
+import { TodayScrollAnchor } from "@/components/shows/today-scroll-anchor";
 
 function episodeNumber(season: number, episode: number) {
   return `S${String(season).padStart(2, "0")} | E${String(episode).padStart(2, "0")}`;
 }
 
 function Artwork({ item }: { item: UpcomingItem }) {
-  return <Link href={`/shows/${item.media.tmdb_id}`} className="relative block min-h-24 bg-[var(--surface-elevated)] min-[360px]:min-h-28">
+  return <Link href={`/shows/${item.media.tmdb_id}`} className="poster-interactive-surface relative block min-h-24 overflow-hidden rounded-l-xl border border-transparent bg-[var(--surface-elevated)] min-[360px]:min-h-28">
     <MediaPoster source={item.media.poster_path} title={item.media.title} alt={`${item.media.title} poster`} sizes="(max-width: 359px) 64px, 80px" tmdbSize="w185" fallbackClassName="text-lg font-semibold text-[var(--muted)]" />
   </Link>;
 }
@@ -32,7 +33,7 @@ function UpcomingCard({ item, airDate }: { item: UpcomingItem; airDate: string }
 }
 
 export function UpcomingSections({ groups, today }: { groups: UpcomingDateGroup[]; today: string }) {
-  return <div className="min-w-0 space-y-8">{groups.map((group) => <section key={group.airDate} className="min-w-0 space-y-3">
+  return <div className="min-w-0 space-y-8"><TodayScrollAnchor />{groups.map((group) => <section key={group.airDate} id={group.airDate === today ? "today" : undefined} className="min-w-0 scroll-mt-6 space-y-3">
     <h2 className="break-words text-2xl font-semibold tracking-tight">{upcomingDateLabel(group.airDate, today)}</h2>
     <ul className="grid min-w-0 gap-4 lg:grid-cols-2">{group.items.map((item) => <li key={item.key} className="min-w-0"><UpcomingCard item={item} airDate={group.airDate} /></li>)}</ul>
   </section>)}</div>;

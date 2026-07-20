@@ -26,7 +26,8 @@ describe("Phase 9E.3 UI contracts", () => {
     expect(toolbar).toContain("text-base");
     for (const path of ["src/components/shows/show-controls.tsx", "src/components/movies/movie-controls.tsx"]) {
       const controls = readFileSync(path, "utf8");
-      expect(controls).toContain("w-full min-w-0 max-w-full sm:w-auto");
+      expect(controls).toContain("w-full min-w-0 max-w-full");
+      expect(controls).toContain("sm:w-auto");
       expect(controls).toContain('type="datetime-local"');
     }
   });

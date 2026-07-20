@@ -56,6 +56,7 @@ export function addCalendarDays(date: string, days: number): string {
 }
 
 export function upcomingDateLabel(airDate: string, today: string): string {
+  if (airDate === addCalendarDays(today, -1)) return "Yesterday";
   if (airDate === today) return "Today";
   if (airDate === addCalendarDays(today, 1)) return "Tomorrow";
   const [year, month, day] = airDate.split("-").map(Number);
@@ -86,12 +87,13 @@ export function deriveUpcoming(
   snapshots: readonly UpcomingSnapshot[],
   today: string,
 ): UpcomingDateGroup[] {
+  const earliestDate = addCalendarDays(today, -2);
   const releases = new Map<string, { airDate: string; media: UpcomingMedia; seasonNumber: number; episodes: UpcomingEpisode[] }>();
 
   for (const snapshot of snapshots) {
     if (snapshot.membership.status !== "active") continue;
     for (const episode of snapshot.episodes) {
-      if (episode.season_number === 0 || episode.air_date === null || episode.air_date < today) continue;
+      if (episode.season_number === 0 || episode.air_date === null || episode.air_date < earliestDate) continue;
       const key = `${episode.air_date}:${snapshot.media.id}:${episode.season_number}`;
       const release = releases.get(key) ?? {
         airDate: episode.air_date,
@@ -117,6 +119,7 @@ export function deriveUpcoming(
     items.push(item);
     byDate.set(release.airDate, items);
   }
+  if (!byDate.has(today)) byDate.set(today, []);
 
   return [...byDate.entries()]
     .sort(([left], [right]) => left.localeCompare(right))

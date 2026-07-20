@@ -3,7 +3,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { act, create } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
 
+const refresh = vi.fn();
 vi.mock("next/link", () => ({ default: (props: Record<string, unknown>) => createElement("a", props) }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh }) }));
 import AppError from "@/app/(app)/error";
 import MoviesError from "@/app/(app)/movies/error";
 import ProfileError from "@/app/(app)/profile/error";
@@ -35,7 +37,7 @@ describe("safe route error states", () => {
     expect(html).not.toMatch(/Supabase|PostgreSQL|TMDB|stack trace|token/i);
   });
 
-  it("invokes reset and renders the optional back link", async () => {
+  it("invokes reset and a real route refresh, then renders the optional back link", async () => {
     globalThis.IS_REACT_ACT_ENVIRONMENT = true;
     const reset = vi.fn();
     let renderer: ReturnType<typeof create> | undefined;
@@ -44,6 +46,7 @@ describe("safe route error states", () => {
     const mounted = renderer;
     await act(() => mounted.root.findByType("button").props.onClick());
     expect(reset).toHaveBeenCalledOnce();
+    expect(refresh).toHaveBeenCalledOnce();
     expect(mounted.root.findByType("a").props.href).toBe("/shows");
     const alert = mounted.root.findByProps({ role: "alert" });
     expect(alert.findAllByType("button")).toHaveLength(0);

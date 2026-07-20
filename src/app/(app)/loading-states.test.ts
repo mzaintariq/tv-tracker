@@ -38,7 +38,7 @@ describe("core route loading states", () => {
   it.each([
     { component: AppLoading, announcement: "Loading page…" },
     { component: ExploreLoading, announcement: "Loading Explore…" },
-    { component: ShowsLoading, announcement: "Loading shows…" },
+    { component: ShowsLoading, announcement: "Loading watch list…" },
     { component: UpcomingLoading, announcement: "Loading upcoming episodes…" },
   ])("announces and hides decorative legacy skeletons", ({ component, announcement }) => {
     const html = markup(component);

@@ -41,8 +41,8 @@ describe("QuickMarkMovieWatched", () => {
     if (!renderer) throw new Error("missing renderer");
 
     const button = renderer.root.findByType("button");
-    expect(button.props["aria-label"]).toBe("Mark Arrival watched");
-    expect(button.children).toContain("Mark watched");
+    expect(button.props["aria-label"]).toBe("Mark Arrival as watched");
+    expect(button.props["aria-busy"]).toBe(false);
 
     await act(async () => {
       button.props.onClick();
@@ -84,7 +84,7 @@ describe("QuickMarkMovieWatched", () => {
       button.props.onClick();
     });
     expect(button.props.disabled).toBe(true);
-    expect(button.children).toContain("Saving…");
+    expect(button.props["aria-busy"]).toBe(true);
 
     await act(() => {
       button.props.onClick();

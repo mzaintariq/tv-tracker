@@ -27,7 +27,7 @@ function snapshot(title: string, status: UserShow["status"], episodeRows: Array<
 }
 
 describe("Upcoming derivation", () => {
-  it("includes today and future regular episodes while excluding past, unknown, and Season 0", () => {
+  it("includes the previous two days, today, and future regular episodes", () => {
     const result = deriveUpcoming([snapshot("Active", "active", [
       { id: "past", season_number: 1, episode_number: 1, air_date: "2026-07-14" },
       { id: "today", season_number: 1, episode_number: 2, air_date: TODAY },
@@ -35,13 +35,13 @@ describe("Upcoming derivation", () => {
       { id: "unknown", season_number: 1, episode_number: 4, air_date: null },
       { id: "special", season_number: 0, episode_number: 1, air_date: TODAY },
     ])], TODAY);
-    expect(result.map((group) => group.airDate)).toEqual([TODAY, "2026-07-16"]);
-    expect(result.flatMap((group) => group.items).map((item) => item.kind === "episode" ? item.episode.id : "group")).toEqual(["today", "future"]);
+    expect(result.map((group) => group.airDate)).toEqual(["2026-07-14", TODAY, "2026-07-16"]);
+    expect(result.flatMap((group) => group.items).map((item) => item.kind === "episode" ? item.episode.id : "group")).toEqual(["past", "today", "future"]);
   });
 
   it("excludes paused and dropped shows", () => {
     const episode = [{ id: "episode", season_number: 1, episode_number: 1, air_date: TODAY }];
-    expect(deriveUpcoming([snapshot("Paused", "paused", episode), snapshot("Dropped", "dropped", episode)], TODAY)).toEqual([]);
+    expect(deriveUpcoming([snapshot("Paused", "paused", episode), snapshot("Dropped", "dropped", episode)], TODAY)).toEqual([{ airDate: TODAY, items: [] }]);
   });
 
   it("groups only multiple episodes from the same show, season, and date", () => {
@@ -68,6 +68,10 @@ describe("Upcoming derivation", () => {
     expect(result.map((group) => group.airDate)).toEqual([TODAY, "2026-07-20"]);
     expect(result[0].items[0].media.title).toBe("Alpha");
   });
+
+  it("always emits a Today section so initial positioning has a stable target", () => {
+    expect(deriveUpcoming([], TODAY)).toEqual([{ airDate: TODAY, items: [] }]);
+  });
 });
 
 describe("Upcoming calendar helpers", () => {
@@ -77,7 +81,8 @@ describe("Upcoming calendar helpers", () => {
     expect(dateInTimeZone(NOW, "invalid/timezone")).toBe("2026-07-15");
   });
 
-  it("labels Today, Tomorrow, and later calendar dates without timezone shifts", () => {
+  it("labels Yesterday, Today, Tomorrow, and later dates", () => {
+    expect(upcomingDateLabel(addCalendarDays(TODAY, -1), TODAY)).toBe("Yesterday");
     expect(upcomingDateLabel(TODAY, TODAY)).toBe("Today");
     expect(upcomingDateLabel(addCalendarDays(TODAY, 1), TODAY)).toBe("Tomorrow");
     expect(upcomingDateLabel("2026-07-25", TODAY)).toBe("July 25");
