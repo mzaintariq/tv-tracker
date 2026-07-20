@@ -63,9 +63,9 @@ export function MediaCard({ item }: MediaCardProps) {
 
   return (
     <article className="flex min-w-0 flex-col gap-3">
-      <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-[var(--surface-elevated)]">
-        <Link href={`/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`} aria-label={`Open ${item.title}`} className="block h-full"><MediaPoster source={item.posterPath} title={item.title} alt="" sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw" fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]" /></Link>
-        <button type="button" onClick={handleToggle} disabled={isPending} aria-busy={isPending} aria-label={`${actionLabel}: ${item.title}`} className="interactive-control touch-target absolute right-2 top-2 z-10 grid h-11 w-11 cursor-pointer place-items-center rounded-lg border bg-[color-mix(in_srgb,var(--surface)_90%,transparent)] text-2xl font-semibold text-[var(--foreground)] shadow-md backdrop-blur-sm transition-colors hover:bg-[var(--surface-elevated)]"><span aria-hidden="true">{isPending ? "…" : inLibrary ? "−" : "+"}</span></button>
+      <div className="relative aspect-[2/3]">
+        <Link href={`/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`} aria-label={`Open ${item.title}`} className="poster-interactive-surface block h-full overflow-hidden rounded-lg border bg-[var(--surface-elevated)]"><MediaPoster source={item.posterPath} title={item.title} alt="" sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw" fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]" /></Link>
+        <button type="button" onClick={handleToggle} disabled={isPending} aria-busy={isPending} aria-label={`${actionLabel}: ${item.title}`} className="poster-overlay-action touch-target absolute right-2 top-2 z-10 grid h-11 w-11 cursor-pointer place-items-center rounded-lg border text-2xl font-semibold"><span aria-hidden="true">{isPending ? "…" : inLibrary ? "−" : "+"}</span></button>
       </div>
 
       <div className="min-w-0 space-y-1">

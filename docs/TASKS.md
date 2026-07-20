@@ -421,3 +421,12 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Render Profile favourites as single-row poster-only rails
 * [x] Collapse Recently Watched by default while preserving the item limiter
 * [x] Run lint, type checking, unit tests, and production build
+
+### Phase 9F.2 — Poster interaction polish
+
+* [x] Add shared poster hover, press, focus, and reduced-motion styling
+* [x] Apply poster interaction styling to Movies, Explore, Shows, Upcoming, and Profile favourites
+* [x] Polish Movie and Explore poster overlay controls with shared styling
+* [x] Preserve overlay/link separation, poster sizing, grids, and Profile favourite rails
+* [x] Add focused poster interaction and layout regression tests
+* [x] Run lint, type checking, unit tests, production build, and diff check

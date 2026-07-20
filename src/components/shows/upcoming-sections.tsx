@@ -8,7 +8,7 @@ function episodeNumber(season: number, episode: number) {
 }
 
 function Artwork({ item }: { item: UpcomingItem }) {
-  return <Link href={`/shows/${item.media.tmdb_id}`} className="relative block min-h-24 bg-[var(--surface-elevated)] min-[360px]:min-h-28">
+  return <Link href={`/shows/${item.media.tmdb_id}`} className="poster-interactive-surface relative block min-h-24 overflow-hidden rounded-l-xl border border-transparent bg-[var(--surface-elevated)] min-[360px]:min-h-28">
     <MediaPoster source={item.media.poster_path} title={item.media.title} alt={`${item.media.title} poster`} sizes="(max-width: 359px) 64px, 80px" tmdbSize="w185" fallbackClassName="text-lg font-semibold text-[var(--muted)]" />
   </Link>;
 }

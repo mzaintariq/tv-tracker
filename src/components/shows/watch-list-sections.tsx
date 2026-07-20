@@ -37,7 +37,7 @@ export function WatchNextGrid({ items }: { items: WatchNextItem[] }) {
           <article className="grid h-full min-w-0 grid-cols-[72px_minmax(0,1fr)] rounded-xl border border-[var(--border)] bg-[var(--surface)] min-[360px]:grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]">
             <Link
               href={`/shows/${item.media.tmdb_id}`}
-              className="relative min-h-32 overflow-hidden rounded-l-xl bg-[var(--surface-elevated)] sm:min-h-40"
+              className="poster-interactive-surface relative min-h-32 overflow-hidden rounded-l-xl border border-transparent bg-[var(--surface-elevated)] sm:min-h-40"
             >
               <MediaPoster
                 source={item.media.poster_path}

@@ -121,6 +121,75 @@ body {
   min-width: 2.75rem;
 }
 
+.poster-interactive-surface {
+  position: relative;
+  border-color: var(--border);
+  transform: translateZ(0) scale(1);
+  transform-origin: center;
+  transition:
+    transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 170ms ease,
+    box-shadow 170ms ease;
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .poster-interactive-surface:hover {
+    z-index: 1;
+    border-color: var(--control-border);
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--foreground) 18%, transparent);
+    transform: translateZ(0) scale(1.02);
+  }
+}
+
+.poster-interactive-surface:active {
+  border-color: var(--control-border);
+  transform: translateZ(0) scale(0.98);
+  transition-duration: 80ms;
+}
+
+.poster-interactive-surface:focus-visible {
+  z-index: 1;
+  border-color: var(--control-border);
+  box-shadow:
+    0 0 0 5px var(--foreground),
+    0 10px 24px color-mix(in srgb, var(--foreground) 18%, transparent);
+}
+
+.poster-overlay-action {
+  border-color: color-mix(in srgb, white 50%, transparent);
+  background: color-mix(in srgb, #111 78%, transparent);
+  color: white;
+  box-shadow: 0 3px 10px color-mix(in srgb, black 38%, transparent);
+  backdrop-filter: blur(8px);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 100ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .poster-overlay-action:hover:not(:disabled) {
+    border-color: color-mix(in srgb, white 78%, transparent);
+    background: color-mix(in srgb, #111 90%, transparent);
+    box-shadow: 0 5px 14px color-mix(in srgb, black 48%, transparent);
+  }
+}
+
+.poster-overlay-action:active:not(:disabled) {
+  background: #111;
+  transform: scale(0.94);
+}
+
+.poster-overlay-action:disabled,
+.poster-overlay-action[aria-busy="true"] {
+  border-color: color-mix(in srgb, white 32%, transparent);
+  background: color-mix(in srgb, #333 86%, transparent);
+  color: #d7d7d7;
+  cursor: not-allowed;
+}
+
 :where(
   button.interactive-control,
   a.interactive-control,
@@ -180,5 +249,20 @@ body {
 
   .progress-fill {
     transition: none !important;
+  }
+
+  .poster-interactive-surface,
+  .poster-interactive-surface:hover,
+  .poster-interactive-surface:active,
+  .poster-overlay-action,
+  .poster-overlay-action:active:not(:disabled) {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .poster-interactive-surface:hover,
+  .poster-interactive-surface:active {
+    border-color: var(--control-border);
+    box-shadow: 0 0 0 1px var(--control-border);
   }
 }

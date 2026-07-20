@@ -43,7 +43,7 @@ export function QuickMarkMovieWatched({
         disabled={pending}
         aria-label={`Mark ${title} as watched`}
         aria-busy={pending}
-        className="interactive-control touch-target grid h-11 w-11 cursor-pointer place-items-center rounded-lg border bg-[color-mix(in_srgb,var(--surface)_90%,transparent)] text-xl font-semibold text-[var(--foreground)] shadow-md backdrop-blur-sm transition-colors hover:bg-[var(--surface-elevated)]"
+        className="poster-overlay-action touch-target grid h-11 w-11 cursor-pointer place-items-center rounded-lg border text-xl font-semibold"
         onClick={onMarkWatched}
       >
         <span aria-hidden="true">{pending ? "…" : "✓"}</span>
