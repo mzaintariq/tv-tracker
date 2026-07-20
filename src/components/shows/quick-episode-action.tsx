@@ -22,7 +22,7 @@ export function QuickEpisodeAction({
     <button
       type="button"
       disabled={pending}
-      className="touch-target max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--accent-foreground)]"
+      className="touch-target max-w-full cursor-pointer whitespace-normal rounded-lg bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_88%,var(--foreground))]"
       onClick={() => startTransition(async () => setResult(await setEpisodeWatched(tmdbId, mediaId, episodeId, !watched)))}
     >
       {pending ? "Saving…" : label}

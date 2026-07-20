@@ -20,15 +20,14 @@ export function MovieSection({
 }) {
   if (!movies.length) return null;
   const items = movies.map((movie) => (
-    <li key={movie.membership.id} className="min-w-0 space-y-2">
-      <MovieCard movie={movie} />
-      {quickMarkWatched ? (
+    <li key={movie.membership.id} className="min-w-0">
+      <MovieCard movie={movie} action={quickMarkWatched ? (
         <QuickMarkMovieWatched
           title={movie.media.title}
           tmdbId={movie.media.tmdb_id}
           mediaId={movie.media.id}
         />
-      ) : null}
+      ) : undefined} />
     </li>
   ));
 

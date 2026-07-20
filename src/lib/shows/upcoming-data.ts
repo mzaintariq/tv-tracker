@@ -1,7 +1,7 @@
 import "server-only";
 
 import { shouldAutomaticallyRefreshEpisodes } from "@/lib/shows/freshness";
-import { dateInTimeZone, deriveUpcoming, type UpcomingDateGroup, type UpcomingSnapshot } from "@/lib/shows/upcoming";
+import { addCalendarDays, dateInTimeZone, deriveUpcoming, type UpcomingDateGroup, type UpcomingSnapshot } from "@/lib/shows/upcoming";
 import { createClient } from "@/lib/supabase/server";
 import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
 
@@ -22,7 +22,7 @@ export async function loadUpcoming(userId: string, now = new Date()): Promise<Up
   }
   const timeZone = profileResult.data?.timezone ?? "UTC";
   const today = dateInTimeZone(now, timeZone);
-  const upcomingResult = await supabase.rpc("load_upcoming_data", { p_today: today });
+  const upcomingResult = await supabase.rpc("load_upcoming_data", { p_today: addCalendarDays(today, -2) });
   if (upcomingResult.error) {
     const code = logSafeReadFailure("shows", "load_upcoming_data", upcomingResult.error, upcomingResult.status);
     throw new Error(`Could not load upcoming episodes. [${code}]`);

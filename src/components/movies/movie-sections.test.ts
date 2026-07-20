@@ -6,7 +6,7 @@ import type { MovieSnapshot } from "@/lib/movies/movies";
 import type { MediaItem, UserMovie } from "@/types/database";
 
 vi.mock("@/components/movies/movie-card", () => ({
-  MovieCard: ({ movie }: { movie: MovieSnapshot }) => createElement("span", { "data-movie-title": movie.media.title }, movie.media.title),
+  MovieCard: ({ movie, action }: { movie: MovieSnapshot; action?: React.ReactNode }) => createElement("span", { "data-movie-title": movie.media.title }, movie.media.title, action),
 }));
 
 vi.mock("@/components/movies/quick-mark-movie-watched", () => ({
@@ -43,7 +43,7 @@ describe("limited movie sections", () => {
   it.each(["Watch Next", "Watched"] as const)("limits Movie %s to 10, expands, and restores order on collapse", async (title) => {
     const renderer = await renderLimitedSection(title, 12);
     const expected = Array.from({ length: 12 }, (_, index) => `Movie ${String(index + 1).padStart(2, "0")}`);
-    const visibleTitles = () => renderer.root.findAll((node) => typeof node.props["data-movie-title"] === "string").map((node) => node.children.join(""));
+    const visibleTitles = () => renderer.root.findAll((node) => typeof node.props["data-movie-title"] === "string").map((node) => node.props["data-movie-title"] as string);
 
     expect(JSON.stringify(renderer.toJSON())).toContain(`${title} · 12`);
     expect(visibleTitles()).toEqual(expected.slice(0, 10));

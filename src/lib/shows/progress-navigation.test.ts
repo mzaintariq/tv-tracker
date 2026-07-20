@@ -6,9 +6,8 @@ const action = readFileSync("src/app/actions/library.ts", "utf8");
 const page = readFileSync("src/app/(app)/shows/[tmdbId]/page.tsx", "utf8");
 
 describe("show progress navigation contract", () => {
-  it("awaits metadata preparation before navigating", () => {
-    expect(card.indexOf("await prepareShowProgress(item.tmdbId)")).toBeGreaterThan(-1);
-    expect(card.indexOf("await prepareShowProgress(item.tmdbId)")).toBeLessThan(card.indexOf("router.push(`/shows/${item.tmdbId}`)"));
+  it("links the poster and title to the detail/setup flow", () => {
+    expect(card).toContain('href={`/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`}');
   });
 
   it("shows write errors, prevents navigation after failure, and blocks duplicate clicks", () => {
@@ -17,9 +16,10 @@ describe("show progress navigation contract", () => {
     expect(card).toContain('role="alert"');
   });
 
-  it("does not prefetch a mutation-dependent show route", () => {
-    expect(card).not.toContain('from "next/link"');
-    expect(card).not.toContain("<Link");
+  it("prepares metadata before overlay navigation to the setup flow", () => {
+    expect(card).toContain('from "next/link"');
+    expect(card.indexOf("await prepareShowProgress(item.tmdbId)")).toBeGreaterThan(-1);
+    expect(card.indexOf("await prepareShowProgress(item.tmdbId)")).toBeLessThan(card.indexOf("router.push(`/shows/${item.tmdbId}`)"));
   });
 
   it("revalidates the concrete show route after metadata insertion", () => {

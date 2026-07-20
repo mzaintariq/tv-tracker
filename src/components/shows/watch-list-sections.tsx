@@ -199,13 +199,16 @@ export function SecondaryRecentlyWatchedSection({
     timeZone: "UTC",
   });
   return (
-    <LimitedWatchListSection
+    <details className="group min-w-0 rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+      <summary className="interactive-control touch-target flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-4 py-3 marker:content-none [&::-webkit-details-marker]:hidden"><span className="text-2xl font-semibold">Recently Watched · {items.length}</span><span aria-hidden="true" className="text-xl group-open:rotate-90">›</span></summary>
+      <div className="border-t border-[var(--border)] p-4"><LimitedWatchListSection
       sectionId="recently-watched"
-      title="Recently Watched"
+      title="Recently Watched episodes"
       description="Your latest watched episodes from currently tracked shows."
       totalCount={items.length}
       listAs="ol"
       listClassName={RECENT_LIST_CLASS}
+      showHeading={false}
     >
       {items.map((item) => (
         <li
@@ -231,7 +234,7 @@ export function SecondaryRecentlyWatchedSection({
           />
         </li>
       ))}
-    </LimitedWatchListSection>
+    </LimitedWatchListSection></div></details>
   );
 }
 

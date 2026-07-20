@@ -62,7 +62,7 @@ export default async function ShowDetailPage({ params }: { params: Promise<{ tmd
             const watchedCount = episodes.filter((episode) => watchedIds.has(episode.id)).length;
             return (
             <details key={season} open={season === defaultOpenSeason} className="group min-w-0 rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-              <summary className="interactive-control touch-target flex min-w-0 cursor-pointer list-none flex-col gap-3 rounded-xl px-4 py-3 marker:content-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-between [&::-webkit-details-marker]:hidden">
+              <summary className="interactive-control touch-target grid min-w-0 cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl px-4 py-3 marker:content-none [&::-webkit-details-marker]:hidden">
                 <div className="min-w-0">
                   <h2 className="break-words text-2xl font-semibold">{season === 0 ? "Specials (Season 0)" : `Season ${season}`}</h2>
                   <p className="break-words text-sm text-[var(--muted)]">{watchedCount} of {episodes.length} watched{season === 0 ? " · Excluded from normal progress" : ""}</p>
@@ -72,15 +72,15 @@ export default async function ShowDetailPage({ params }: { params: Promise<{ tmd
               <div className="min-w-0 space-y-3 border-t border-[var(--border)] p-4">
               {detail.membership ? <SeasonControls tmdbId={tmdbId} mediaId={detail.media.id} season={season} /> : null}
               <ol className="min-w-0 divide-y divide-[var(--border)] rounded-xl border border-[var(--border)]">
-                {episodes.map((episode) => (
-                  <li key={episode.id} className="min-w-0 space-y-3 p-4">
+                {episodes.map((episode) => { const isWatched = watchedIds.has(episode.id); return (
+                  <li key={episode.id} className={`min-w-0 space-y-3 border-l-4 p-4 ${isWatched ? "border-l-[var(--success)] bg-[color-mix(in_srgb,var(--success)_9%,var(--surface))]" : "border-l-transparent"}`}>
                     <div className="min-w-0">
-                      <h3 className="break-words font-semibold">S{String(episode.season_number).padStart(2, "0")} | E{String(episode.episode_number).padStart(2, "0")} — {episode.title}</h3>
+                      <h3 className="break-words font-semibold">{isWatched ? <span className="mr-2 inline-flex rounded-full border border-[var(--success)] px-2 py-0.5 text-xs text-[var(--success)]"><span aria-hidden="true">✓&nbsp;</span>Watched</span> : null}S{String(episode.season_number).padStart(2, "0")} | E{String(episode.episode_number).padStart(2, "0")} — {episode.title}</h3>
                       <p className="break-words text-sm text-[var(--muted)]">{episode.air_date ?? "Air date unknown"}{episode.runtime_minutes ? ` · ${episode.runtime_minutes} min` : ""}</p>
                     </div>
                     {detail.membership ? <EpisodeControls tmdbId={tmdbId} mediaId={detail.media.id} episode={episode} watched={watchedMap.get(episode.id)} /> : null}
                   </li>
-                ))}
+                );})}
               </ol>
               </div>
             </details>

@@ -408,3 +408,16 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Preserve server-rendered Explore results through serializable children
 * [x] Run validation commands
 * [x] Limit Movies Watch Next and Watched to 10 items initially with shared Show all / Show less controls
+
+### Phase 9F.1 — Final UX polish and perceived performance
+
+* [x] Correct Movies card sizing and move Watch Next watched actions onto posters
+* [x] Move Explore add/remove actions onto posters and keep detail/setup links
+* [x] Correct browser, Apple, and manifest icon metadata and remove the Vercel asset
+* [x] Strengthen watched episode rows and disclose watched-date editors on demand
+* [x] Keep Shows title and tabs visible in tab loading states
+* [x] Include two prior calendar days in Upcoming and initially anchor at Today
+* [x] Make route error retry invoke the active boundary reset with pending protection
+* [x] Render Profile favourites as single-row poster-only rails
+* [x] Collapse Recently Watched by default while preserving the item limiter
+* [x] Run lint, type checking, unit tests, and production build
