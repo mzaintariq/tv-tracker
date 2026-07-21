@@ -28,6 +28,10 @@ export function normalizeTitle(value: string): string {
   return value.normalize("NFKC").trim().toLocaleLowerCase("en-US").replace(/[’']/g, "'").replace(/[^\p{L}\p{N}']+/gu, " ").replace(/\s+/g, " ").trim();
 }
 
+function isTvTimeTrue(value: string): boolean {
+  return value === "1" || value.toLocaleLowerCase("en-US") === "true";
+}
+
 export function sourceKey(mediaType: "tv" | "movie", identity: string): string {
   return `v${TV_TIME_SOURCE_KEY_VERSION}:${mediaType}:${identity}`;
 }
@@ -63,7 +67,18 @@ export function normalizeTvTimeExport(files: Partial<Record<AllowedTvTimeFile, s
   const special = rows(files, "user_show_special_status.csv");
   const lists = rows(files, "lists-prod-lists.csv");
   const titles = new Map(showData.map((row) => [normalizeNumericSourceId(row.tv_show_id), row.tv_show_name.trim()]));
-  const active = new Set(followed.filter((row) => row.active === "1" && row.archived === "0").map((row) => normalizeNumericSourceId(row.tv_show_id)));
+  const v2ShowStates = new Map(v2
+    .filter((row) => row.s_id && row.key.startsWith("user-series-"))
+    .map((row) => [normalizeNumericSourceId(row.s_id), { followed: isTvTimeTrue(row.is_followed), archived: isTvTimeTrue(row.is_archived) }]));
+  const active = new Set([
+    ...followed.filter((row) => isTvTimeTrue(row.active) && !isTvTimeTrue(row.archived)).map((row) => normalizeNumericSourceId(row.tv_show_id)),
+    ...showData.filter((row) => {
+      if (!isTvTimeTrue(row.is_followed)) return false;
+      const v2State = v2ShowStates.get(normalizeNumericSourceId(row.tv_show_id));
+      return !v2State || (v2State.followed && !v2State.archived);
+    }).map((row) => normalizeNumericSourceId(row.tv_show_id)),
+    ...[...v2ShowStates].filter(([, state]) => state.followed && !state.archived).map(([showId]) => showId),
+  ]);
   const favourites = new Set([
     ...showData.filter((row) => row.is_favorited === "1").map((row) => normalizeNumericSourceId(row.tv_show_id)),
     ...special.filter((row) => row.status === "favorite").map((row) => normalizeNumericSourceId(row.tv_show_id)),

@@ -29,6 +29,27 @@ describe("TV Time normalization", () => {
     expect(result.movies[0]).toMatchObject({ state: "watched", sourceRecordCount: 2 });
     expect(itemDigest(result.shows[0])).toBe(itemDigest(result.shows[0]));
   });
+
+  it("uses current show sources when followed_tv_show.csv is absent", () => {
+    const result = normalizeTvTimeExport({
+      "tracking-prod-records-v2.csv": csv("tracking-prod-records-v2.csv", [
+        { key: "user-series-current", s_id: "10", is_followed: "true", is_archived: "false", series_name: "Current" },
+        { key: "user-series-archived", s_id: "20", is_followed: "true", is_archived: "true", series_name: "Archived" },
+        { key: "watch-episode-archived", s_id: "20", s_no: "1", ep_id: "200", ep_no: "1", created_at: "2024-01-01 00:00:00", series_name: "Archived" },
+      ]),
+      "user_tv_show_data.csv": csv("user_tv_show_data.csv", [
+        { tv_show_id: "10", tv_show_name: "Current", is_followed: "1" },
+        { tv_show_id: "20", tv_show_name: "Archived", is_followed: "1" },
+        { tv_show_id: "30", tv_show_name: "Show data only", is_followed: "1" },
+      ]),
+    });
+
+    expect(result.shows.map((show) => [show.tvTimeShowId, show.importMode])).toEqual([
+      ["10", "active_membership"],
+      ["20", "history_only"],
+      ["30", "active_membership"],
+    ]);
+  });
 });
 
 describe("canonical source identity", () => {

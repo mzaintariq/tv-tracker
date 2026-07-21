@@ -22,6 +22,11 @@ CSV columns may be reordered or omitted between exports. The importer accepts a
 unique subset of the known columns, fills omitted known fields as empty, and rejects
 unknown or duplicate columns.
 
+Active show membership is resolved from `followed_tv_show.csv` when present and
+from the current follow/archive fields in `user_tv_show_data.csv` and
+`tracking-prod-records-v2.csv` when that dataset is absent. Archived shows remain
+history-only.
+
 The export supplies internal TV Time show and episode IDs, show/movie titles, movie release dates, season numbers, and episode numbers. It does not supply usable TMDB, IMDb, or TVDB IDs, original titles, or episode titles.
 
 ## Observed scale
