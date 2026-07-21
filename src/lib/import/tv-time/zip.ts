@@ -142,7 +142,7 @@ export function readAllowedTvTimeZip(bytes: Uint8Array): Partial<Record<AllowedT
     const decoded = new TextDecoder("utf-8", { fatal: true }).decode(content).replace(/^\uFEFF/, "");
     result[entry.name as AllowedTvTimeFile] = decoded;
   }
-  const required: AllowedTvTimeFile[] = ["tracking-prod-records.csv", "tracking-prod-records-v2.csv", "user_tv_show_data.csv", "followed_tv_show.csv"];
-  if (required.some((name) => result[name] === undefined)) fail("zip_missing_required", "The ZIP is missing required TV Time CSV files.");
+  const identifyingFiles: AllowedTvTimeFile[] = ["tracking-prod-records.csv", "tracking-prod-records-v2.csv", "user_tv_show_data.csv", "followed_tv_show.csv"];
+  if (identifyingFiles.every((name) => result[name] === undefined)) fail("zip_missing_required", "The ZIP is missing required TV Time CSV files.");
   return result;
 }

@@ -26,11 +26,13 @@ export function parseCsv(input: string, expectedHeaders: readonly string[]): Csv
   if (quoted) throw new TvTimeImportError("csv_unclosed_quote", "A CSV contains an unclosed quoted field.");
   if (field || row.length) { row.push(field.replace(/\r$/, "")); records.push(row); }
   const [headers, ...values] = records;
-  if (!headers || headers.join("\0") !== expectedHeaders.join("\0")) {
+  const expected = new Set(expectedHeaders);
+  if (!headers || headers.length === 0 || new Set(headers).size !== headers.length || headers.some((header) => !expected.has(header))) {
     throw new TvTimeImportError("csv_schema_mismatch", "A TV Time CSV has an unsupported schema.");
   }
   return values.filter((value) => value.some(Boolean)).map((value) => {
     if (value.length !== headers.length) throw new TvTimeImportError("csv_column_mismatch", "A CSV row has the wrong number of columns.");
-    return Object.fromEntries(headers.map((header, index) => [header, value[index] ?? ""]));
+    const supplied = Object.fromEntries(headers.map((header, index) => [header, value[index] ?? ""]));
+    return Object.fromEntries(expectedHeaders.map((header) => [header, supplied[header] ?? ""]));
   });
 }

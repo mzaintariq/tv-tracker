@@ -14,6 +14,14 @@ Primary import sources:
 * `lists-prod-lists.csv`: possible movie-favourites list requiring confirmation
 * `stats-prod-cache.csv`: aggregate discrepancy reporting only
 
+TV Time may omit datasets that have no rows for an account. The importer therefore
+accepts an export when at least one primary tracking or show dataset is present and
+treats other absent allowlisted datasets as empty.
+
+CSV columns may be reordered or omitted between exports. The importer accepts a
+unique subset of the known columns, fills omitted known fields as empty, and rejects
+unknown or duplicate columns.
+
 The export supplies internal TV Time show and episode IDs, show/movie titles, movie release dates, season numbers, and episode numbers. It does not supply usable TMDB, IMDb, or TVDB IDs, original titles, or episode titles.
 
 ## Observed scale

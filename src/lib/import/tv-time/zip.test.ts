@@ -23,6 +23,12 @@ describe("TV Time ZIP security", () => {
     const result = readAllowedTvTimeZip(storedZip([...required, { name: "access_token.csv", value: "secret-token" }]));
     expect(Object.keys(result)).toHaveLength(4); expect(JSON.stringify(result)).not.toContain("secret-token");
   });
+  it.each(required)("accepts a valid export when only the %s dataset is present", ({ name, value }) => {
+    expect(readAllowedTvTimeZip(storedZip([{ name, value }]))).toEqual({ [name]: value });
+  });
+  it("rejects an archive with no identifying TV Time dataset", () => {
+    expect(() => readAllowedTvTimeZip(storedZip([{ name: "stats-prod-cache.csv", value: "stats\n" }]))).toThrow("missing required TV Time CSV files");
+  });
   it("rejects traversal paths", () => expect(() => readAllowedTvTimeZip(storedZip([{ name: "../tracking-prod-records.csv", value: "x" }]))).toThrow("path traversal"));
   it("rejects duplicate case-insensitive names", () => expect(() => readAllowedTvTimeZip(storedZip([...required, { name: "FOLLOWED_TV_SHOW.CSV", value: "x" }]))).toThrow("duplicate filenames"));
   it("rejects nested archive extensions case-insensitively", () => expect(() => readAllowedTvTimeZip(storedZip([{ name: "payload.ZIP", value: "x" }]))).toThrow("Nested paths and archives"));
