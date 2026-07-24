@@ -1,5 +1,6 @@
 import { parseTmdbId } from "@/lib/media/types";
 import type { ShowTrackingStatus } from "@/types/database";
+import { dateTimeLocalToTimestamp } from "@/lib/date-time";
 
 export const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export function parseUuid(value: unknown): string | null { return typeof value === "string" && UUID_PATTERN.test(value) ? value : null; }
@@ -8,9 +9,13 @@ export function parseNonNegativeInteger(value: unknown): number | null {
   return Number.isInteger(result) && result >= 0 ? result : null;
 }
 export function parsePositiveInteger(value: unknown): number | null { const parsed = parseNonNegativeInteger(value); return parsed !== null && parsed > 0 ? parsed : null; }
-export function parseManualWatchedAt(value: unknown, now = new Date()): string | null {
+export function parseManualWatchedAt(value: unknown, now = new Date(), timeZone?: string): string | null {
   if (typeof value !== "string" || !value.trim()) return null;
-  const date = new Date(value); return Number.isNaN(date.getTime()) || date > now ? null : date.toISOString();
+  const timestamp = timeZone && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)
+    ? dateTimeLocalToTimestamp(value, timeZone)
+    : value;
+  if (!timestamp) return null;
+  const date = new Date(timestamp); return Number.isNaN(date.getTime()) || date > now ? null : date.toISOString();
 }
 export function isShowStatus(value: unknown): value is ShowTrackingStatus { return value === "active" || value === "paused" || value === "dropped"; }
 

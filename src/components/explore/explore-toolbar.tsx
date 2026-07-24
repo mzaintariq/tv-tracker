@@ -16,7 +16,7 @@ const FILTERS: { value: ExploreMediaFilter; label: string }[] = [
 type ExploreToolbarProps = {
   filter: ExploreMediaFilter;
   query: string | null;
-  children: ReactNode;
+  children?: ReactNode;
 };
 
 export function ExploreToolbar({ filter, query, children }: ExploreToolbarProps) {
@@ -25,13 +25,21 @@ export function ExploreToolbar({ filter, query, children }: ExploreToolbarProps)
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [searchValue, setSearchValue] = useState(query ?? "");
+  const [requestedQuery, setRequestedQuery] = useState((query ?? "").trim());
+  const [requestedFilter, setRequestedFilter] = useState(filter);
   const skipDebounceRef = useRef(false);
+  const acceptExternalNavigationRef = useRef(false);
+
+  const renderedQuery = (query ?? "").trim();
+  const responseIsCurrent = renderedQuery === requestedQuery && filter === requestedFilter;
 
   function updateUrl(nextFilter: ExploreMediaFilter, nextQuery: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("type", nextFilter);
 
     const trimmed = nextQuery.trim().slice(0, MAX_SEARCH_QUERY_LENGTH);
+    setRequestedQuery(trimmed);
+    setRequestedFilter(nextFilter);
     if (trimmed.length === 0) {
       params.delete("q");
     } else {
@@ -43,6 +51,23 @@ export function ExploreToolbar({ filter, query, children }: ExploreToolbarProps)
       router.replace(queryString ? `${pathname}?${queryString}` : pathname);
     });
   }
+
+  useEffect(() => {
+    const acceptBackOrForward = () => {
+      acceptExternalNavigationRef.current = true;
+    };
+    window.addEventListener("popstate", acceptBackOrForward);
+    return () => window.removeEventListener("popstate", acceptBackOrForward);
+  }, []);
+
+  useEffect(() => {
+    if (renderedQuery === requestedQuery) return;
+    if (!acceptExternalNavigationRef.current) return;
+    acceptExternalNavigationRef.current = false;
+    setRequestedQuery(renderedQuery);
+    setRequestedFilter(filter);
+    setSearchValue(query ?? "");
+  }, [filter, query, renderedQuery, requestedQuery]);
 
   useEffect(() => {
     if (skipDebounceRef.current) {
@@ -123,8 +148,8 @@ export function ExploreToolbar({ filter, query, children }: ExploreToolbarProps)
 
       </div>
 
-      <div aria-busy={isPending} className="min-w-0">
-        {isPending ? (
+      <div aria-busy={isPending || !responseIsCurrent} className="min-w-0">
+        {isPending || !responseIsCurrent ? (
           <div className="space-y-4">
             <p className="text-sm text-[var(--muted)]" role="status">Loading results…</p>
             <div aria-hidden="true"><ExploreSkeletonGrid /></div>

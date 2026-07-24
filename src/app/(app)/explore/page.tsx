@@ -56,7 +56,6 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
 
       <Suspense fallback={null}>
         <ExploreToolbar
-          key={`${data.filter}:${data.query ?? ""}`}
           filter={data.filter}
           query={data.query}
         >

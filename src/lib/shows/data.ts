@@ -5,6 +5,7 @@ import { deriveWatchList, type TrackedShowSnapshot, type WatchListCategories, ty
 import { createClient } from "@/lib/supabase/server";
 import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
 import type { Episode, MediaItem, UserShow, WatchedEpisode } from "@/types/database";
+import { dateInTimeZone } from "@/lib/date-time";
 
 export type ShowCardData = { membership: UserShow; media: WatchListMedia; progress: ShowProgress };
 export type ShowDetailData = { membership: UserShow | null; media: MediaItem; episodes: Episode[]; watched: WatchedEpisode[] };
@@ -24,16 +25,25 @@ export async function loadShows(userId: string): Promise<ShowCardData[]> {
   return memberships.flatMap((membership) => { const media = mediaMap.get(membership.media_item_id); return media ? [{ membership, media, progress: calculateShowProgress(episodeMap.get(media.id) ?? [], watchedIds, media.tmdb_status, today()) }] : []; });
 }
 
-export async function loadWatchList(_userId: string, now = new Date()): Promise<WatchListCategories> {
-  void _userId;
+export type WatchListPageData = WatchListCategories & { timeZone: string };
+
+export async function loadWatchList(userId: string, now = new Date()): Promise<WatchListPageData> {
   const supabase = await createClient();
   const timestamp = now.toISOString();
-  const currentDate = timestamp.slice(0, 10);
-  const episodeDataResult = await supabase.rpc("load_watch_list_episode_data");
+  const [episodeDataResult, profileResult] = await Promise.all([
+    supabase.rpc("load_watch_list_episode_data"),
+    supabase.from("profiles").select("timezone").eq("id", userId).maybeSingle(),
+  ]);
   if (episodeDataResult.error) {
     const code = logSafeReadFailure("shows", "load_watch_list_episode_data", episodeDataResult.error, episodeDataResult.status);
     throw new Error(`Could not load show metadata. [${code}]`);
   }
+  if (profileResult.error) {
+    const code = logSafeReadFailure("shows", "watch_list_profile_timezone", profileResult.error, profileResult.status);
+    throw new Error(`Could not load your timezone. [${code}]`);
+  }
+  const timeZone = profileResult.data?.timezone ?? "UTC";
+  const currentDate = dateInTimeZone(now, timeZone);
 
   const episodeData = episodeDataResult.data as { memberships?: UserShow[]; media?: WatchListMedia[]; episodes?: WatchListEpisode[]; watched?: WatchListWatchedEpisode[] } | null;
   const memberships = Array.isArray(episodeData?.memberships) ? episodeData.memberships : [];
@@ -67,7 +77,7 @@ export async function loadWatchList(_userId: string, now = new Date()): Promise<
       watched: watchedByMediaId.get(media.id) ?? [],
     }] : [];
   });
-  return deriveWatchList(snapshots, currentDate, timestamp);
+  return { ...deriveWatchList(snapshots, currentDate, timestamp), timeZone };
 }
 
 export async function loadShowDetail(userId: string, tmdbId: number): Promise<ShowDetailData | null> {

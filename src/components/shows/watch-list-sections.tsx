@@ -6,6 +6,7 @@ import { ProgressBar } from "@/components/shows/progress-bar";
 import { QuickEpisodeAction } from "@/components/shows/quick-episode-action";
 import { ShowCard } from "@/components/shows/show-card";
 import type { DerivedShow, RecentlyWatchedItem, WatchNextItem } from "@/lib/shows/watch-list";
+import { formatTimestamp } from "@/lib/date-time";
 
 function episodeNumber(season: number, episode: number) {
   return `S${String(season).padStart(2, "0")} | E${String(episode).padStart(2, "0")}`;
@@ -72,12 +73,7 @@ export function WatchNextGrid({ items }: { items: WatchNextItem[] }) {
   );
 }
 
-export function RecentlyWatchedList({ items }: { items: RecentlyWatchedItem[] }) {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "UTC",
-  });
+export function RecentlyWatchedList({ items, timeZone }: { items: RecentlyWatchedItem[]; timeZone: string }) {
   return (
     <ol className={RECENT_LIST_CLASS}>
       {items.map((item) => (
@@ -93,7 +89,7 @@ export function RecentlyWatchedList({ items }: { items: RecentlyWatchedItem[] })
               {episodeNumber(item.episode.season_number, item.episode.episode_number)} — {item.episode.title}
             </p>
             <time dateTime={item.watched.watched_at} className="break-words text-sm text-[var(--muted)]">
-              {formatter.format(new Date(item.watched.watched_at))} UTC
+              {formatTimestamp(item.watched.watched_at, timeZone)}
             </time>
           </div>
           <QuickEpisodeAction
@@ -189,15 +185,12 @@ export function SecondaryShowSection({
 
 export function SecondaryRecentlyWatchedSection({
   items,
+  timeZone,
 }: {
   items: RecentlyWatchedItem[];
+  timeZone: string;
 }) {
   if (!items.length) return null;
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "UTC",
-  });
   return (
     <details className="group min-w-0 rounded-xl border border-[var(--border)] bg-[var(--surface)]">
       <summary className="interactive-control touch-target flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-4 py-3 marker:content-none [&::-webkit-details-marker]:hidden"><span className="text-2xl font-semibold">Recently Watched · {items.length}</span><span aria-hidden="true" className="text-xl group-open:rotate-90">›</span></summary>
@@ -223,7 +216,7 @@ export function SecondaryRecentlyWatchedSection({
               {episodeNumber(item.episode.season_number, item.episode.episode_number)} — {item.episode.title}
             </p>
             <time dateTime={item.watched.watched_at} className="break-words text-sm text-[var(--muted)]">
-              {formatter.format(new Date(item.watched.watched_at))} UTC
+              {formatTimestamp(item.watched.watched_at, timeZone)}
             </time>
           </div>
           <QuickEpisodeAction

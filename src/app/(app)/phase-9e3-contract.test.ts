@@ -7,8 +7,8 @@ describe("Phase 9E.3 UI contracts", () => {
     const toolbar = readFileSync("src/components/explore/explore-toolbar.tsx", "utf8");
     expect(page).toContain("<ExploreToolbar");
     expect(page).toContain("<MediaGrid items={data.items} />");
-    expect(toolbar).toContain("children: ReactNode");
-    expect(toolbar).toContain("aria-busy={isPending}");
+    expect(toolbar).toContain("children?: ReactNode");
+    expect(toolbar).toContain("aria-busy={isPending || !responseIsCurrent}");
     expect(toolbar).toContain("Loading results…");
     expect(toolbar).not.toMatch(/renderItems|ComponentType/);
   });

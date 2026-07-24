@@ -4,6 +4,7 @@ import {
   displayNameFromEmail,
   isThemePreference,
   normalizeDisplayName,
+  normalizeTimeZone,
 } from "@/lib/profile";
 import {
   isAuthPath,
@@ -43,6 +44,15 @@ describe("displayNameFromEmail", () => {
 
   it("falls back when email is missing", () => {
     expect(displayNameFromEmail(null)).toBe("Viewer");
+  });
+});
+
+describe("normalizeTimeZone", () => {
+  it("accepts IANA timezones and rejects invalid values", () => {
+    expect(normalizeTimeZone("Asia/Karachi")).toBe("Asia/Karachi");
+    expect(normalizeTimeZone("America/Los_Angeles")).toBe("America/Los_Angeles");
+    expect(normalizeTimeZone("not/a-timezone")).toBeNull();
+    expect(normalizeTimeZone("")).toBeNull();
   });
 });
 
