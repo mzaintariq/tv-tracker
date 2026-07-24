@@ -21,10 +21,6 @@ export default async function ShowsPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-10">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">TV Shows</h1>
-        <p className="mt-2 text-[var(--muted)]">Your watch list and television progress.</p>
-      </div>
       <ShowSubnav current="watch-list" />
       {!list.shows.length ? (
         <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center">
@@ -42,7 +38,7 @@ export default async function ShowsPage() {
       ) : (
         <>
           <WatchNextWatchListSection items={list.watchNext} />
-          <SecondaryRecentlyWatchedSection items={list.recentlyWatched} />
+          <SecondaryRecentlyWatchedSection items={list.recentlyWatched} timeZone={list.timeZone} />
           <SecondaryShowSection
             sectionId="inactive"
             title="Haven't Watched for a While"

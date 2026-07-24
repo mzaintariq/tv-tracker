@@ -1,4 +1,7 @@
 import type { Episode, MediaItem, UserShow } from "@/types/database";
+import { addCalendarDays, dateInTimeZone, formatDateOnly } from "@/lib/date-time";
+
+export { addCalendarDays, dateInTimeZone };
 
 export type UpcomingMembership = Pick<UserShow, "media_item_id" | "status">;
 export type UpcomingMedia = Pick<MediaItem, "id" | "tmdb_id" | "title" | "poster_path" | "tmdb_status" | "episodes_synced_at">;
@@ -28,44 +31,15 @@ export type UpcomingSeasonItem = {
 export type UpcomingItem = UpcomingSingleItem | UpcomingSeasonItem;
 export type UpcomingDateGroup = { airDate: string; items: UpcomingItem[] };
 
-function validTimeZone(timeZone: string): string {
-  try {
-    new Intl.DateTimeFormat("en-US", { timeZone }).format(new Date(0));
-    return timeZone;
-  } catch {
-    return "UTC";
-  }
-}
-
-export function dateInTimeZone(now: Date, timeZone: string): string {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: validTimeZone(timeZone),
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(now);
-  const part = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((candidate) => candidate.type === type)?.value ?? "";
-  return `${part("year")}-${part("month")}-${part("day")}`;
-}
-
-export function addCalendarDays(date: string, days: number): string {
-  const [year, month, day] = date.split("-").map(Number);
-  const value = new Date(Date.UTC(year, month - 1, day + days));
-  return value.toISOString().slice(0, 10);
-}
-
 export function upcomingDateLabel(airDate: string, today: string): string {
   if (airDate === addCalendarDays(today, -1)) return "Yesterday";
   if (airDate === today) return "Today";
   if (airDate === addCalendarDays(today, 1)) return "Tomorrow";
-  const [year, month, day] = airDate.split("-").map(Number);
-  return new Intl.DateTimeFormat("en-US", {
+  return formatDateOnly(airDate, {
     month: "long",
     day: "numeric",
-    year: year === Number(today.slice(0, 4)) ? undefined : "numeric",
-    timeZone: "UTC",
-  }).format(new Date(Date.UTC(year, month - 1, day)));
+    year: airDate.slice(0, 4) === today.slice(0, 4) ? undefined : "numeric",
+  });
 }
 
 const titleCompare = (left: UpcomingMedia, right: UpcomingMedia) =>

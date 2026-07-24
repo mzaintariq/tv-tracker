@@ -21,7 +21,7 @@ type LoadingContract = {
 };
 
 const routes: LoadingContract[] = [
-  { name: "Movies", component: MoviesLoading, announcement: "Loading movies…", regions: ["heading", "movie-grid"] },
+  { name: "Movies", component: MoviesLoading, announcement: "Loading movies…", regions: ["movie-grid"] },
   { name: "Profile", component: ProfileLoading, announcement: "Loading profile…", regions: ["heading", "overview", "statistics"] },
   { name: "Settings", component: ProfileSettingsLoading, announcement: "Loading settings…", regions: ["heading", "preferences", "theme", "account-tools"] },
   { name: "Import list", component: ImportLoading, announcement: "Loading import…", regions: ["heading", "upload", "sessions", "cleanup"] },

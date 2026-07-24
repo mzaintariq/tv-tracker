@@ -6,6 +6,7 @@ import {
   isThemePreference,
   normalizeDisplayName,
   THEME_COOKIE_NAME,
+  normalizeTimeZone,
   type ThemePreference,
 } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -17,6 +18,11 @@ export type ProfileActionState = {
 
 export type ThemeActionResult = {
   error?: string;
+};
+
+export type TimeZoneActionResult = {
+  error?: string;
+  success?: string;
 };
 
 function revalidateProfileRoutes() {
@@ -100,4 +106,31 @@ export async function updateThemePreference(
 
   revalidateProfileRoutes();
   return {};
+}
+
+export async function updateTimeZonePreference(
+  timeZoneRaw: unknown,
+): Promise<TimeZoneActionResult> {
+  const timeZone = normalizeTimeZone(timeZoneRaw);
+  if (!timeZone) return { error: "Choose a valid timezone." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError || !user) return { error: "You must be signed in to update your timezone." };
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ timezone: timeZone })
+    .eq("id", user.id)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) return { error: "Timezone could not be saved. Please try again." };
+
+  revalidateProfileRoutes();
+  revalidatePath("/shows");
+  revalidatePath("/shows/upcoming");
+  return { success: "Timezone updated." };
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState, useSyncExternalStore, useTransition } from "react";
 
 import { removeFromLibrary } from "@/app/actions/library";
 import {
@@ -16,6 +16,7 @@ import {
   type ShowActionResult,
 } from "@/app/actions/shows";
 import { deriveInitialProgressOptions } from "@/lib/shows/initial-progress-options";
+import { timestampToDateTimeLocal } from "@/lib/date-time";
 import type { Episode, ShowTrackingStatus, UserShow, WatchedEpisode } from "@/types/database";
 
 function ActionMessage({ id, result }: { id?: string; result: ShowActionResult | null }) {
@@ -96,15 +97,21 @@ export function InitialProgressForm({ tmdbId, episodes }: { tmdbId: number; epis
   </section>;
 }
 
-export function EpisodeControls({ tmdbId, mediaId, episode, watched }: { tmdbId: number; mediaId: string; episode: Episode; watched: WatchedEpisode | undefined }) {
+export function EpisodeControls({ tmdbId, mediaId, episode, watched, today, timeZone }: { tmdbId: number; mediaId: string; episode: Episode; watched: WatchedEpisode | undefined; today: string; timeZone: string }) {
+  const displayTimeZone = useSyncExternalStore(
+    () => () => undefined,
+    () => Intl.DateTimeFormat().resolvedOptions().timeZone || timeZone,
+    () => timeZone,
+  );
   const [pending, start] = useTransition();
   const [actionResult, setActionResult] = useState<ShowActionResult | null>(null);
   const [dateResult, setDateResult] = useState<ShowActionResult | null>(null);
   const [editingDate, setEditingDate] = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
   const dateTriggerRef = useRef<HTMLButtonElement>(null);
-  const released = episode.air_date !== null && episode.air_date <= new Date().toISOString().slice(0, 10);
-  const dateValue = watched?.watched_at.slice(0, 16) ?? "";
+  const released = episode.air_date !== null && episode.air_date <= today;
+  const dateValue = watched ? timestampToDateTimeLocal(watched.watched_at, displayTimeZone) : "";
+  const maximumDateValue = timestampToDateTimeLocal(new Date().toISOString(), displayTimeZone);
   const coordinate = `S${String(episode.season_number).padStart(2, "0")}E${String(episode.episode_number).padStart(2, "0")}`;
   const dateId = `date-${episode.id}`;
   const errorId = `date-error-${episode.id}`;
@@ -113,7 +120,7 @@ export function EpisodeControls({ tmdbId, mediaId, episode, watched }: { tmdbId:
       <button className={button} disabled={pending || (!watched && !released)} onClick={() => start(async () => { setDateResult(null); setActionResult(await setEpisodeWatched(tmdbId, mediaId, episode.id, !watched)); })}>{pending ? "Saving…" : watched ? "Mark unwatched" : released ? "Mark watched" : "Unreleased"}</button>
       <button className={button} disabled={pending || episode.season_number === 0} onClick={() => start(async () => { setDateResult(null); setActionResult(await markPreviousEpisodes(tmdbId, mediaId, episode.season_number, episode.episode_number)); })}>Mark previous watched</button>
     </div>
-    {watched ? <div className="min-w-0 space-y-2"><div className="flex min-w-0 items-center gap-3"><p className="min-w-0 break-words text-sm"><span className="font-semibold">Watched</span> · <time dateTime={watched.watched_at}>{new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(watched.watched_at))}</time></p><button ref={dateTriggerRef} type="button" className="interactive-control touch-target shrink-0 cursor-pointer rounded px-2 text-sm font-medium no-underline underline-offset-4 hover:underline focus-visible:underline" aria-label={`${editingDate ? "Cancel editing" : "Edit"} watched date for ${coordinate}: ${episode.title}`} aria-expanded={editingDate} aria-controls={`date-editor-${episode.id}`} onClick={() => { if (editingDate) { setDateResult(null); setEditingDate(false); return; } setEditingDate(true); queueMicrotask(() => dateInputRef.current?.focus()); }}>{editingDate ? "Cancel" : "Edit"}</button></div>{editingDate ? <div id={`date-editor-${episode.id}`} className="flex w-full min-w-0 max-w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"><label htmlFor={dateId} className="break-words text-sm">Watched date for {coordinate}</label><input ref={dateInputRef} type="datetime-local" defaultValue={dateValue} max={new Date().toISOString().slice(0, 16)} className="interactive-control touch-target block w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)] sm:w-auto sm:text-sm" id={dateId} aria-describedby={dateResult?.error ? errorId : undefined} aria-invalid={dateResult?.error ? true : undefined} /><button aria-label={`Save watched date for ${coordinate}: ${episode.title}`} className={button} disabled={pending} onClick={() => { const value = dateInputRef.current?.value; if (value) start(async () => { setActionResult(null); const response = await updateWatchedDate(tmdbId, mediaId, episode.id, value); setDateResult(response); if (!response.error) { setEditingDate(false); queueMicrotask(() => dateTriggerRef.current?.focus()); } }); }}>Save</button></div> : null}</div> : null}
+    {watched ? <div className="min-w-0 space-y-2"><div className="flex min-w-0 items-center gap-3"><p className="min-w-0 break-words text-sm"><span className="font-semibold">Watched</span> · <time dateTime={watched.watched_at}>{new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: displayTimeZone }).format(new Date(watched.watched_at))}</time></p><button ref={dateTriggerRef} type="button" className="interactive-control touch-target shrink-0 cursor-pointer rounded px-2 text-sm font-medium no-underline underline-offset-4 hover:underline focus-visible:underline" aria-label={`${editingDate ? "Cancel editing" : "Edit"} watched date for ${coordinate}: ${episode.title}`} aria-expanded={editingDate} aria-controls={`date-editor-${episode.id}`} onClick={() => { if (editingDate) { setDateResult(null); setEditingDate(false); return; } setEditingDate(true); queueMicrotask(() => dateInputRef.current?.focus()); }}>{editingDate ? "Cancel" : "Edit"}</button></div>{editingDate ? <div id={`date-editor-${episode.id}`} className="flex w-full min-w-0 max-w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"><label htmlFor={dateId} className="break-words text-sm">Watched date for {coordinate}</label><input ref={dateInputRef} type="datetime-local" defaultValue={dateValue} max={maximumDateValue} className="interactive-control touch-target block w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)] sm:w-auto sm:text-sm" id={dateId} aria-describedby={dateResult?.error ? errorId : undefined} aria-invalid={dateResult?.error ? true : undefined} /><button aria-label={`Save watched date for ${coordinate}: ${episode.title}`} className={button} disabled={pending} onClick={() => { const value = dateInputRef.current?.value; if (value) start(async () => { setActionResult(null); const response = await updateWatchedDate(tmdbId, mediaId, episode.id, value, displayTimeZone); setDateResult(response); if (!response.error) { setEditingDate(false); queueMicrotask(() => dateTriggerRef.current?.focus()); } }); }}>Save</button></div> : null}</div> : null}
     <ActionMessage id={errorId} result={dateResult} />
     <ActionMessage result={actionResult} />
   </div>;

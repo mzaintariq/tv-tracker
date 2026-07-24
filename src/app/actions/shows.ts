@@ -83,9 +83,23 @@ export async function setEpisodeWatched(tmdbIdRaw: unknown, mediaIdRaw: unknown,
   if (result.error) return { error: "The show could not be updated. Please try again." }; refresh(tmdbId); return { success: watched ? "Episode marked watched." : "Episode marked unwatched." };
 }
 
-export async function updateWatchedDate(tmdbIdRaw: unknown, mediaIdRaw: unknown, episodeIdRaw: unknown, watchedAtRaw: unknown): Promise<ShowActionResult> {
-  const tmdbId = parseTmdbId(tmdbIdRaw), mediaId = parseUuid(mediaIdRaw), episodeId = parseUuid(episodeIdRaw), watchedAt = parseManualWatchedAt(watchedAtRaw); if (tmdbId === null || !mediaId || !episodeId || !watchedAt) return { error: "Choose a valid historical watched date." };
-  const { supabase, user } = await authenticated(); if (!user) return { error: "You must be signed in." }; const { error } = await supabase.rpc("update_episode_watched_at", { p_media_item_id: mediaId, p_episode_id: episodeId, p_watched_at: watchedAt }); if (error) return { error: "The show could not be updated. Please try again." }; refresh(tmdbId); return { success: "Watched date updated." };
+export async function updateWatchedDate(tmdbIdRaw: unknown, mediaIdRaw: unknown, episodeIdRaw: unknown, watchedAtRaw: unknown, timeZoneRaw?: unknown): Promise<ShowActionResult> {
+  const tmdbId = parseTmdbId(tmdbIdRaw), mediaId = parseUuid(mediaIdRaw), episodeId = parseUuid(episodeIdRaw);
+  if (tmdbId === null || !mediaId || !episodeId) return { error: "Choose a valid historical watched date." };
+  const { supabase, user } = await authenticated();
+  if (!user) return { error: "You must be signed in." };
+  const timeZone = typeof timeZoneRaw === "string" ? timeZoneRaw : "UTC";
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone }).format(new Date());
+  } catch {
+    return { error: "Choose a valid historical watched date." };
+  }
+  const watchedAt = parseManualWatchedAt(watchedAtRaw, new Date(), timeZone);
+  if (!watchedAt) return { error: "Choose a valid historical watched date." };
+  const { error } = await supabase.rpc("update_episode_watched_at", { p_media_item_id: mediaId, p_episode_id: episodeId, p_watched_at: watchedAt });
+  if (error) return { error: "The show could not be updated. Please try again." };
+  refresh(tmdbId);
+  return { success: "Watched date updated." };
 }
 
 export async function setSeasonWatched(tmdbIdRaw: unknown, mediaIdRaw: unknown, seasonRaw: unknown, watched: boolean): Promise<ShowActionResult> {

@@ -7,7 +7,9 @@ const page = readFileSync("src/app/(app)/shows/[tmdbId]/page.tsx", "utf8");
 
 describe("show progress navigation contract", () => {
   it("links the poster and title to the detail/setup flow", () => {
-    expect(card).toContain('href={`/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`}');
+    expect(card).toContain('const detailHref = `/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`');
+    expect(card).toContain("inLibrary ? (");
+    expect(card).toContain("<Link href={detailHref}");
   });
 
   it("shows write errors, prevents navigation after failure, and blocks duplicate clicks", () => {

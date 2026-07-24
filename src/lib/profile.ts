@@ -32,3 +32,13 @@ export function displayNameFromEmail(email: string | null | undefined): string {
   const localPart = email.split("@")[0]?.trim();
   return localPart && localPart.length > 0 ? localPart : "Viewer";
 }
+
+export function normalizeTimeZone(value: unknown): string | null {
+  if (typeof value !== "string" || !value.trim() || value.length > 100) return null;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: value }).format(new Date(0));
+    return value;
+  } catch {
+    return null;
+  }
+}

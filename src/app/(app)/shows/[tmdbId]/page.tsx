@@ -9,6 +9,7 @@ import { parseTmdbId } from "@/lib/shows/validation";
 import { createClient } from "@/lib/supabase/server";
 import { defaultOpenRegularSeason } from "@/lib/shows/season-disclosures";
 import type { Episode } from "@/types/database";
+import { dateInTimeZone } from "@/lib/date-time";
 
 export default async function ShowDetailPage({ params }: { params: Promise<{ tmdbId: string }> }) {
   const { tmdbId: raw } = await params;
@@ -17,19 +18,24 @@ export default async function ShowDetailPage({ params }: { params: Promise<{ tmd
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  const loaded = await loadShowPageData(user.id, tmdbId);
+  const [loaded, profileResult] = await Promise.all([
+    loadShowPageData(user.id, tmdbId),
+    supabase.from("profiles").select("timezone").eq("id", user.id).maybeSingle(),
+  ]);
+  if (profileResult.error) throw new Error("profile_timezone_read_failed");
+  const timeZone = profileResult.data?.timezone ?? "UTC";
   const detail = loaded.detail;
   if (!detail) notFound();
   const watchedMap = new Map(detail.watched.map((row) => [row.episode_id, row]));
   const watchedIds = new Set(watchedMap.keys());
-  const progress = calculateShowProgress(detail.episodes, watchedIds, detail.media.tmdb_status, new Date().toISOString().slice(0, 10));
+  const today = dateInTimeZone(new Date(), timeZone);
+  const progress = calculateShowProgress(detail.episodes, watchedIds, detail.media.tmdb_status, today);
   const seasons = new Map<number, Episode[]>();
   for (const episode of detail.episodes) {
     const list = seasons.get(episode.season_number) ?? [];
     list.push(episode);
     seasons.set(episode.season_number, list);
   }
-  const today = new Date().toISOString().slice(0, 10);
   const defaultOpenSeason = defaultOpenRegularSeason(seasons, watchedIds, today);
   return (
     <article className="mx-auto w-full min-w-0 max-w-5xl space-y-8">
@@ -78,7 +84,7 @@ export default async function ShowDetailPage({ params }: { params: Promise<{ tmd
                       <h3 className="break-words font-semibold">{isWatched ? <span className="mr-2 inline-flex rounded-full border border-[var(--success)] px-2 py-0.5 text-xs text-[var(--success)]"><span aria-hidden="true">✓&nbsp;</span>Watched</span> : null}S{String(episode.season_number).padStart(2, "0")} | E{String(episode.episode_number).padStart(2, "0")} — {episode.title}</h3>
                       <p className="break-words text-sm text-[var(--muted)]">{episode.air_date ?? "Air date unknown"}{episode.runtime_minutes ? ` · ${episode.runtime_minutes} min` : ""}</p>
                     </div>
-                    {detail.membership ? <EpisodeControls tmdbId={tmdbId} mediaId={detail.media.id} episode={episode} watched={watchedMap.get(episode.id)} /> : null}
+                    {detail.membership ? <EpisodeControls tmdbId={tmdbId} mediaId={detail.media.id} episode={episode} watched={watchedMap.get(episode.id)} today={today} timeZone={timeZone} /> : null}
                   </li>
                 );})}
               </ol>
