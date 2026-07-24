@@ -430,3 +430,17 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Preserve overlay/link separation, poster sizing, grids, and Profile favourite rails
 * [x] Add focused poster interaction and layout regression tests
 * [x] Run lint, type checking, unit tests, production build, and diff check
+
+### Profile Statistics performance optimization
+
+* [x] Audit the existing Profile Statistics execution and data flow
+* [x] Add an authenticated owner-scoped scalar statistics RPC
+* [x] Add an authenticated owner-scoped favourite projection RPC
+* [x] Load both Profile RPCs concurrently in one network wave
+* [x] Remove Profile-only full episode, history, show, and movie loading
+* [x] Preserve removed-show history and runtime fallback semantics
+* [x] Preserve current completed, caught-up, movie, and favourite semantics
+* [x] Add focused database security and semantic regression tests
+* [x] Add focused application mapping and loading-contract tests
+* [x] Keep Shows and Movies loading behavior unchanged
+* [x] Defer caching and stored statistics
