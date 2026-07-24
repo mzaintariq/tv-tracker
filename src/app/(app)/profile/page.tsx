@@ -69,7 +69,7 @@ export default async function ProfilePage() {
 
       <div className="mt-12 min-w-0">
         <Suspense fallback={<StatisticsSkeleton />}>
-          <ProfileStatistics userId={user.id} />
+          <ProfileStatistics />
         </Suspense>
       </div>
     </section>

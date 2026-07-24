@@ -1,28 +1,87 @@
-import type { MovieSnapshot } from "@/lib/movies/movies";
-import type { DerivedShow } from "@/lib/shows/watch-list";
-import type { Episode, MediaItem, WatchedEpisode } from "@/types/database";
-
-export type HistoricalEpisode = { watched: WatchedEpisode; episode: Episode; media: MediaItem };
 export type ProfileStatistics = {
   trackedShows: number; episodesWatched: number; moviesInLibrary: number; moviesWatched: number;
   favouriteShows: number; favouriteMovies: number; completedShows: number; caughtUpShows: number;
   tvMinutes: number; movieMinutes: number; totalMinutes: number;
 };
 
-export function deriveProfileStatistics(shows: readonly DerivedShow[], movies: readonly MovieSnapshot[], history: readonly HistoricalEpisode[]): ProfileStatistics {
-  const tvMinutes = history.reduce((total, item) => total + (item.episode.runtime_minutes ?? item.media.average_episode_runtime_minutes ?? 0), 0);
-  const watchedMovies = movies.filter((movie) => movie.membership.watched_at !== null);
-  const movieMinutes = watchedMovies.reduce((total, movie) => total + (movie.media.runtime_minutes ?? 0), 0);
+export type ProfileFavourite = {
+  membershipId: string;
+  mediaItemId: string;
+  tmdbId: number;
+  mediaType: "tv" | "movie";
+  title: string;
+  posterPath: string | null;
+};
+
+export type ProfileStatisticsRow = {
+  tracked_shows: number;
+  episodes_watched: number;
+  movies_in_library: number;
+  movies_watched: number;
+  favourite_shows: number;
+  favourite_movies: number;
+  completed_shows: number;
+  caught_up_shows: number;
+  tv_minutes: number;
+  movie_minutes: number;
+};
+
+export type ProfileFavouriteRow = {
+  membership_id: string;
+  media_item_id: string;
+  tmdb_id: number;
+  media_type: string;
+  title: string;
+  poster_path: string | null;
+};
+
+export function mapProfileStatistics(row: ProfileStatisticsRow): ProfileStatistics {
+  const tvMinutes = row.tv_minutes;
+  const movieMinutes = row.movie_minutes;
+
   return {
-    trackedShows: shows.length,
-    episodesWatched: history.length,
-    moviesInLibrary: movies.length,
-    moviesWatched: watchedMovies.length,
-    favouriteShows: shows.filter((show) => show.membership.is_favourite).length,
-    favouriteMovies: movies.filter((movie) => movie.membership.is_favourite).length,
-    completedShows: shows.filter((show) => show.primaryState === "completed").length,
-    caughtUpShows: shows.filter((show) => show.primaryState === "caught_up").length,
-    tvMinutes, movieMinutes, totalMinutes: tvMinutes + movieMinutes,
+    trackedShows: row.tracked_shows,
+    episodesWatched: row.episodes_watched,
+    moviesInLibrary: row.movies_in_library,
+    moviesWatched: row.movies_watched,
+    favouriteShows: row.favourite_shows,
+    favouriteMovies: row.favourite_movies,
+    completedShows: row.completed_shows,
+    caughtUpShows: row.caught_up_shows,
+    tvMinutes,
+    movieMinutes,
+    totalMinutes: tvMinutes + movieMinutes,
+  };
+}
+
+export function mapProfileFavourites(rows: readonly ProfileFavouriteRow[]): {
+  favouriteShows: ProfileFavourite[];
+  favouriteMovies: ProfileFavourite[];
+} {
+  const favourites = rows.flatMap((row) => {
+    if (row.media_type !== "tv" && row.media_type !== "movie") return [];
+
+    const favourite: ProfileFavourite = {
+      membershipId: row.membership_id,
+      mediaItemId: row.media_item_id,
+      tmdbId: row.tmdb_id,
+      mediaType: row.media_type,
+      title: row.title,
+      posterPath: row.poster_path,
+    };
+    return [favourite];
+  });
+  const compareTitle = (left: ProfileFavourite, right: ProfileFavourite) =>
+    left.title.localeCompare(right.title, undefined, { sensitivity: "base" }) ||
+    left.tmdbId - right.tmdbId;
+
+  return {
+    favouriteShows: favourites
+      .filter((item) => item.mediaType === "tv")
+      .sort(compareTitle),
+    favouriteMovies: favourites
+      .filter((item) => item.mediaType === "movie")
+      .sort(compareTitle),
   };
 }
 

@@ -253,6 +253,32 @@ export type Database = {
       reconcile_show_episodes: { Args: { p_media_item_id: string; p_episodes: Json }; Returns: undefined };
       load_watch_list_episode_data: { Args: Record<never, never>; Returns: Json };
       load_movie_library_data: { Args: Record<never, never>; Returns: Json };
+      load_profile_statistics: {
+        Args: Record<never, never>;
+        Returns: {
+          tracked_shows: number;
+          episodes_watched: number;
+          movies_in_library: number;
+          movies_watched: number;
+          favourite_shows: number;
+          favourite_movies: number;
+          completed_shows: number;
+          caught_up_shows: number;
+          tv_minutes: number;
+          movie_minutes: number;
+        }[];
+      };
+      load_profile_favourites: {
+        Args: Record<never, never>;
+        Returns: {
+          membership_id: string;
+          media_item_id: string;
+          tmdb_id: number;
+          media_type: string;
+          title: string;
+          poster_path: string | null;
+        }[];
+      };
       load_upcoming_data: { Args: { p_today: string }; Returns: Json };
       load_upcoming_refresh_candidates: { Args: { p_tmdb_ids: number[] }; Returns: Json };
       skip_unresolved_tv_time_media_by_type: { Args: { p_user_id: string; p_import_id: string; p_media_type: string }; Returns: number };

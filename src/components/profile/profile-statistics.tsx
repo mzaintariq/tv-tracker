@@ -1,17 +1,13 @@
 import { StatisticsSummary } from "@/components/profile/statistics-summary";
-import { loadProfilePageData } from "@/lib/profile/data";
+import { loadProfileStatisticsData } from "@/lib/profile/data";
 
-type ProfileStatisticsProps = {
-  userId: string;
-};
-
-export async function ProfileStatistics({ userId }: ProfileStatisticsProps) {
-  const pageData = await loadProfilePageData(userId);
+export async function ProfileStatistics() {
+  const pageData = await loadProfileStatisticsData();
   return (
     <StatisticsSummary
       statistics={pageData.statistics}
-      shows={pageData.shows}
-      movies={pageData.movies}
+      favouriteShows={pageData.favouriteShows}
+      favouriteMovies={pageData.favouriteMovies}
     />
   );
 }
