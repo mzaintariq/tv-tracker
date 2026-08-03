@@ -14,12 +14,15 @@ const consumers = [
 ] as const;
 
 describe("MediaPoster consumers", () => {
-  it.each(consumers)("uses the shared poster without changing the sizing contract in %s", (path, sizing) => {
-    const source = readFileSync(path, "utf8");
-    expect(source).toContain("<MediaPoster");
-    expect(source).toContain(sizing);
-    expect(source).not.toContain('from "next/image"');
-  });
+  it.each(consumers)(
+    "uses the shared poster without changing the sizing contract in %s",
+    (path, sizing) => {
+      const source = readFileSync(path, "utf8");
+      expect(source).toContain("<MediaPoster");
+      expect(source).toContain(sizing);
+      expect(source).not.toContain('from "next/image"');
+    },
+  );
 
   it("keeps detail routes as server components", () => {
     for (const path of consumers.slice(-2).map(([value]) => value)) {
@@ -28,7 +31,10 @@ describe("MediaPoster consumers", () => {
   });
 
   it("preserves neutral import fallbacks and decorative alt intent", () => {
-    for (const path of ["src/components/import/candidate-card.tsx", "src/components/import/import-issues-disclosure.tsx"]) {
+    for (const path of [
+      "src/components/import/candidate-card.tsx",
+      "src/components/import/import-issues-disclosure.tsx",
+    ]) {
       const source = readFileSync(path, "utf8");
       expect(source).toContain('fallbackLabel="No poster"');
       expect(source).toContain('alt=""');
@@ -36,15 +42,25 @@ describe("MediaPoster consumers", () => {
   });
 
   it("uses decorative posters beside visible card titles and decorative favourite glyphs", () => {
-    for (const path of ["src/components/explore/media-card.tsx", "src/components/shows/show-card.tsx", "src/components/movies/movie-card.tsx"]) {
+    for (const path of [
+      "src/components/explore/media-card.tsx",
+      "src/components/shows/show-card.tsx",
+      "src/components/movies/movie-card.tsx",
+    ]) {
       expect(readFileSync(path, "utf8")).toContain('alt=""');
     }
-    for (const path of ["src/components/shows/show-card.tsx", "src/components/movies/movie-card.tsx"]) {
+    for (const path of [
+      "src/components/shows/show-card.tsx",
+      "src/components/movies/movie-card.tsx",
+    ]) {
       const source = readFileSync(path, "utf8");
       expect(source).toContain("<PosterCardTitle");
       expect(source).toContain("aria-label=");
     }
-    const titlePrimitive = readFileSync("src/components/media/poster-card-title.tsx", "utf8");
+    const titlePrimitive = readFileSync(
+      "src/components/media/poster-card-title.tsx",
+      "utf8",
+    );
     expect(titlePrimitive).toContain('aria-hidden="true"');
     expect(titlePrimitive).toContain('className="sr-only"');
     expect(titlePrimitive).toContain('className="truncate font-semibold"');

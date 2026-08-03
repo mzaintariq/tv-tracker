@@ -3,11 +3,7 @@ const DEFAULT_NEXT_PATH = "/shows";
 export const AUTH_NEXT_COOKIE = "tv_tracker_auth_next";
 
 export function sanitizeNextPath(nextPath: string | null | undefined): string {
-  if (
-    nextPath &&
-    nextPath.startsWith("/") &&
-    !nextPath.startsWith("//")
-  ) {
+  if (nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")) {
     return nextPath;
   }
 
@@ -47,10 +43,7 @@ export function authNextCookieOptions(origin: string) {
 }
 
 export type LoginErrorCode =
-  | "auth_callback_failed"
-  | "access_denied"
-  | "oauth_error"
-  | string;
+  "auth_callback_failed" | "access_denied" | "oauth_error" | string;
 
 export function getLoginErrorMessage(
   errorCode: string | null | undefined,
@@ -71,9 +64,7 @@ export function getLoginErrorMessage(
   }
 }
 
-export function mapOAuthCallbackError(
-  error: string | null,
-): LoginErrorCode {
+export function mapOAuthCallbackError(error: string | null): LoginErrorCode {
   if (!error) {
     return "auth_callback_failed";
   }

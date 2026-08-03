@@ -131,10 +131,7 @@ describe("withLibraryFlags", () => {
       }),
     ];
 
-    const flagged = withLibraryFlags(
-      items,
-      new Set([libraryKey("tv", 1)]),
-    );
+    const flagged = withLibraryFlags(items, new Set([libraryKey("tv", 1)]));
 
     expect(flagged[0].inLibrary).toBe(true);
     expect(flagged[1].inLibrary).toBe(false);

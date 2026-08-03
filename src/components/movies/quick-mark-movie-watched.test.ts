@@ -3,7 +3,13 @@ import { act, create } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  setMovieWatched: vi.fn(async () => ({ success: "Movie marked watched." }) as { error?: string; success?: string }),
+  setMovieWatched: vi.fn(
+    async () =>
+      ({ success: "Movie marked watched." }) as {
+        error?: string;
+        success?: string;
+      },
+  ),
   refresh: vi.fn(),
   now: "2026-07-15T12:00:00.000Z",
 }));
@@ -21,7 +27,9 @@ import { QuickMarkMovieWatched } from "./quick-mark-movie-watched";
 describe("QuickMarkMovieWatched", () => {
   beforeEach(() => {
     mocks.setMovieWatched.mockReset();
-    mocks.setMovieWatched.mockResolvedValue({ success: "Movie marked watched." });
+    mocks.setMovieWatched.mockResolvedValue({
+      success: "Movie marked watched.",
+    });
     mocks.refresh.mockReset();
     vi.spyOn(Date.prototype, "toISOString").mockReturnValue(mocks.now);
   });

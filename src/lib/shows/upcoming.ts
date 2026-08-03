@@ -1,11 +1,32 @@
 import type { Episode, MediaItem, UserShow } from "@/types/database";
-import { addCalendarDays, dateInTimeZone, formatDateOnly } from "@/lib/date-time";
+import {
+  addCalendarDays,
+  dateInTimeZone,
+  formatDateOnly,
+} from "@/lib/date-time";
 
 export { addCalendarDays, dateInTimeZone };
 
 export type UpcomingMembership = Pick<UserShow, "media_item_id" | "status">;
-export type UpcomingMedia = Pick<MediaItem, "id" | "tmdb_id" | "title" | "poster_path" | "tmdb_status" | "episodes_synced_at">;
-export type UpcomingEpisode = Pick<Episode, "id" | "media_item_id" | "season_number" | "episode_number" | "title" | "air_date" | "tmdb_episode_id">;
+export type UpcomingMedia = Pick<
+  MediaItem,
+  | "id"
+  | "tmdb_id"
+  | "title"
+  | "poster_path"
+  | "tmdb_status"
+  | "episodes_synced_at"
+>;
+export type UpcomingEpisode = Pick<
+  Episode,
+  | "id"
+  | "media_item_id"
+  | "season_number"
+  | "episode_number"
+  | "title"
+  | "air_date"
+  | "tmdb_episode_id"
+>;
 
 export type UpcomingSnapshot = {
   membership: UpcomingMembership;
@@ -49,11 +70,19 @@ const titleCompare = (left: UpcomingMedia, right: UpcomingMedia) =>
 function itemCompare(left: UpcomingItem, right: UpcomingItem): number {
   const byTitle = titleCompare(left.media, right.media);
   if (byTitle !== 0) return byTitle;
-  const leftSeason = left.kind === "episode" ? left.episode.season_number : left.seasonNumber;
-  const rightSeason = right.kind === "episode" ? right.episode.season_number : right.seasonNumber;
+  const leftSeason =
+    left.kind === "episode" ? left.episode.season_number : left.seasonNumber;
+  const rightSeason =
+    right.kind === "episode" ? right.episode.season_number : right.seasonNumber;
   if (leftSeason !== rightSeason) return leftSeason - rightSeason;
-  const leftEpisode = left.kind === "episode" ? left.episode.episode_number : left.episodes[0]?.episode_number ?? 0;
-  const rightEpisode = right.kind === "episode" ? right.episode.episode_number : right.episodes[0]?.episode_number ?? 0;
+  const leftEpisode =
+    left.kind === "episode"
+      ? left.episode.episode_number
+      : (left.episodes[0]?.episode_number ?? 0);
+  const rightEpisode =
+    right.kind === "episode"
+      ? right.episode.episode_number
+      : (right.episodes[0]?.episode_number ?? 0);
   return leftEpisode - rightEpisode || left.key.localeCompare(right.key);
 }
 
@@ -62,12 +91,25 @@ export function deriveUpcoming(
   today: string,
 ): UpcomingDateGroup[] {
   const earliestDate = addCalendarDays(today, -2);
-  const releases = new Map<string, { airDate: string; media: UpcomingMedia; seasonNumber: number; episodes: UpcomingEpisode[] }>();
+  const releases = new Map<
+    string,
+    {
+      airDate: string;
+      media: UpcomingMedia;
+      seasonNumber: number;
+      episodes: UpcomingEpisode[];
+    }
+  >();
 
   for (const snapshot of snapshots) {
     if (snapshot.membership.status !== "active") continue;
     for (const episode of snapshot.episodes) {
-      if (episode.season_number === 0 || episode.air_date === null || episode.air_date < earliestDate) continue;
+      if (
+        episode.season_number === 0 ||
+        episode.air_date === null ||
+        episode.air_date < earliestDate
+      )
+        continue;
       const key = `${episode.air_date}:${snapshot.media.id}:${episode.season_number}`;
       const release = releases.get(key) ?? {
         airDate: episode.air_date,
@@ -82,13 +124,27 @@ export function deriveUpcoming(
 
   const byDate = new Map<string, UpcomingItem[]>();
   for (const [key, release] of releases) {
-    release.episodes.sort((left, right) =>
-      left.episode_number - right.episode_number ||
-      left.tmdb_episode_id - right.tmdb_episode_id ||
-      left.id.localeCompare(right.id));
-    const item: UpcomingItem = release.episodes.length > 1
-      ? { kind: "season", key, media: release.media, seasonNumber: release.seasonNumber, episodes: release.episodes }
-      : { kind: "episode", key, media: release.media, episode: release.episodes[0] };
+    release.episodes.sort(
+      (left, right) =>
+        left.episode_number - right.episode_number ||
+        left.tmdb_episode_id - right.tmdb_episode_id ||
+        left.id.localeCompare(right.id),
+    );
+    const item: UpcomingItem =
+      release.episodes.length > 1
+        ? {
+            kind: "season",
+            key,
+            media: release.media,
+            seasonNumber: release.seasonNumber,
+            episodes: release.episodes,
+          }
+        : {
+            kind: "episode",
+            key,
+            media: release.media,
+            episode: release.episodes[0],
+          };
     const items = byDate.get(release.airDate) ?? [];
     items.push(item);
     byDate.set(release.airDate, items);

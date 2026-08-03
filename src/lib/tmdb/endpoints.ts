@@ -16,8 +16,15 @@ function excludeAdultParams() {
   return { include_adult: false, page: PAGE } as const;
 }
 
-export async function getTvSeason(tmdbId: number, seasonNumber: number, forceRefresh = false): Promise<TmdbSeasonDetails> {
-  return fetchTmdb<TmdbSeasonDetails>({ path: `/tv/${tmdbId}/season/${seasonNumber}`, forceRefresh });
+export async function getTvSeason(
+  tmdbId: number,
+  seasonNumber: number,
+  forceRefresh = false,
+): Promise<TmdbSeasonDetails> {
+  return fetchTmdb<TmdbSeasonDetails>({
+    path: `/tv/${tmdbId}/season/${seasonNumber}`,
+    forceRefresh,
+  });
 }
 
 export async function getTrendingTv(): Promise<TmdbTvListItem[]> {
@@ -38,7 +45,10 @@ export async function getTrendingMovies(): Promise<TmdbMovieListItem[]> {
   return data.results.filter((item) => !item.adult);
 }
 
-export async function searchTv(query: string, firstAirYear?: number): Promise<TmdbTvListItem[]> {
+export async function searchTv(
+  query: string,
+  firstAirYear?: number,
+): Promise<TmdbTvListItem[]> {
   const data = await fetchTmdb<TmdbPaginatedResponse<TmdbTvListItem>>({
     path: "/search/tv",
     searchParams: {
@@ -67,7 +77,10 @@ export async function searchMovies(
   return data.results.filter((item) => !item.adult);
 }
 
-export async function getTvDetails(tmdbId: number, forceRefresh = false): Promise<TmdbTvDetails> {
+export async function getTvDetails(
+  tmdbId: number,
+  forceRefresh = false,
+): Promise<TmdbTvDetails> {
   return fetchTmdb<TmdbTvDetails>({
     path: `/tv/${tmdbId}`,
     searchParams: {

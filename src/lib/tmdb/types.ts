@@ -53,13 +53,22 @@ export type TmdbTvDetails = TmdbTvListItem & {
 };
 
 export type TmdbSeasonSummary = {
-  id: number; season_number: number; episode_count: number; name: string;
-  air_date?: string | null; poster_path: TmdbImagePath;
+  id: number;
+  season_number: number;
+  episode_count: number;
+  name: string;
+  air_date?: string | null;
+  poster_path: TmdbImagePath;
 };
 
 export type TmdbEpisode = {
-  id: number; episode_number: number; season_number: number; name: string;
-  air_date?: string | null; runtime?: number | null; overview?: string;
+  id: number;
+  episode_number: number;
+  season_number: number;
+  name: string;
+  air_date?: string | null;
+  runtime?: number | null;
+  overview?: string;
 };
 
 export type TmdbSeasonDetails = TmdbSeasonSummary & { episodes: TmdbEpisode[] };

@@ -1,5 +1,12 @@
-import { buildTrackTvExport, ExportDataIntegrityError } from "@/lib/export/build";
-import { ExportLoadError, loadExportSourceData, type ExportLoadStage } from "@/lib/export/data";
+import {
+  buildTrackTvExport,
+  ExportDataIntegrityError,
+} from "@/lib/export/build";
+import {
+  ExportLoadError,
+  loadExportSourceData,
+  type ExportLoadStage,
+} from "@/lib/export/data";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -10,15 +17,23 @@ const PRIVATE_HEADERS = {
 };
 
 function jsonError(message: string, status: number): Response {
-  return Response.json({ error: message }, { status, headers: PRIVATE_HEADERS });
+  return Response.json(
+    { error: message },
+    { status, headers: PRIVATE_HEADERS },
+  );
 }
 
 function filename(timestamp: string): string {
   return `tracktv-export-${timestamp.replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z")}.json`;
 }
 
-function logFailure(stage: ExportLoadStage | "auth" | "assembly", category: "database_error" | "data_integrity_error"): void {
-  console.error(JSON.stringify({ event: "user_export_failed", stage, category }));
+function logFailure(
+  stage: ExportLoadStage | "auth" | "assembly",
+  category: "database_error" | "data_integrity_error",
+): void {
+  console.error(
+    JSON.stringify({ event: "user_export_failed", stage, category }),
+  );
 }
 
 export async function GET(): Promise<Response> {
@@ -47,8 +62,15 @@ export async function GET(): Promise<Response> {
       },
     });
   } catch (error) {
-    if (error instanceof ExportLoadError) logFailure(error.stage, "database_error");
-    else logFailure("assembly", error instanceof ExportDataIntegrityError ? "data_integrity_error" : "database_error");
+    if (error instanceof ExportLoadError)
+      logFailure(error.stage, "database_error");
+    else
+      logFailure(
+        "assembly",
+        error instanceof ExportDataIntegrityError
+          ? "data_integrity_error"
+          : "database_error",
+      );
     return jsonError("Your data could not be exported.", 500);
   }
 }

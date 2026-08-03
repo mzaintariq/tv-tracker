@@ -21,13 +21,48 @@ type LoadingContract = {
 };
 
 const routes: LoadingContract[] = [
-  { name: "Movies", component: MoviesLoading, announcement: "Loading movies…", regions: ["movie-grid"] },
-  { name: "Profile", component: ProfileLoading, announcement: "Loading profile…", regions: ["heading", "overview", "statistics"] },
-  { name: "Settings", component: ProfileSettingsLoading, announcement: "Loading settings…", regions: ["heading", "preferences", "theme", "account-tools"] },
-  { name: "Import list", component: ImportLoading, announcement: "Loading import…", regions: ["heading", "upload", "sessions", "cleanup"] },
-  { name: "Import detail", component: ImportDetailLoading, announcement: "Loading import details…", regions: ["heading", "summary", "progress", "resolution"] },
-  { name: "Show detail", component: ShowDetailLoading, announcement: "Loading show…", regions: ["poster-header", "tracking-setup", "episodes"] },
-  { name: "Movie detail", component: MovieDetailLoading, announcement: "Loading movie…", regions: ["poster-header", "tracking-controls"] },
+  {
+    name: "Movies",
+    component: MoviesLoading,
+    announcement: "Loading movies…",
+    regions: ["movie-grid"],
+  },
+  {
+    name: "Profile",
+    component: ProfileLoading,
+    announcement: "Loading profile…",
+    regions: ["heading", "overview", "statistics"],
+  },
+  {
+    name: "Settings",
+    component: ProfileSettingsLoading,
+    announcement: "Loading settings…",
+    regions: ["heading", "preferences", "theme", "account-tools"],
+  },
+  {
+    name: "Import list",
+    component: ImportLoading,
+    announcement: "Loading import…",
+    regions: ["heading", "upload", "sessions", "cleanup"],
+  },
+  {
+    name: "Import detail",
+    component: ImportDetailLoading,
+    announcement: "Loading import details…",
+    regions: ["heading", "summary", "progress", "resolution"],
+  },
+  {
+    name: "Show detail",
+    component: ShowDetailLoading,
+    announcement: "Loading show…",
+    regions: ["poster-header", "tracking-setup", "episodes"],
+  },
+  {
+    name: "Movie detail",
+    component: MovieDetailLoading,
+    announcement: "Loading movie…",
+    regions: ["poster-header", "tracking-controls"],
+  },
 ];
 
 function markup(component: ComponentType): string {
@@ -40,22 +75,31 @@ describe("core route loading states", () => {
     { component: ExploreLoading, announcement: "Loading Explore…" },
     { component: ShowsLoading, announcement: "Loading watch list…" },
     { component: UpcomingLoading, announcement: "Loading upcoming episodes…" },
-  ])("announces and hides decorative legacy skeletons", ({ component, announcement }) => {
-    const html = markup(component);
-    expect(html).toContain('role="status"');
-    expect(html).toContain(announcement);
-    expect(html).toContain('aria-hidden="true"');
-  });
+  ])(
+    "announces and hides decorative legacy skeletons",
+    ({ component, announcement }) => {
+      const html = markup(component);
+      expect(html).toContain('role="status"');
+      expect(html).toContain(announcement);
+      expect(html).toContain('aria-hidden="true"');
+    },
+  );
 
-  it.each(routes)("renders an accessible, non-interactive $name state", ({ component, announcement, regions }) => {
-    const html = markup(component);
-    expect(html).toContain(`role="status"`);
-    expect(html).toContain(announcement);
-    expect(html).toContain('aria-hidden="true"');
-    for (const region of regions) expect(html).toContain(`data-skeleton-region="${region}"`);
-    expect(html).not.toMatch(/<(?:a|button|input|select|textarea)\b/i);
-    expect(html).not.toMatch(/(?:[\w.+-]+@[\w.-]+|\b\d{4}-\d{2}-\d{2}\b|\.zip\b)/i);
-  });
+  it.each(routes)(
+    "renders an accessible, non-interactive $name state",
+    ({ component, announcement, regions }) => {
+      const html = markup(component);
+      expect(html).toContain(`role="status"`);
+      expect(html).toContain(announcement);
+      expect(html).toContain('aria-hidden="true"');
+      for (const region of regions)
+        expect(html).toContain(`data-skeleton-region="${region}"`);
+      expect(html).not.toMatch(/<(?:a|button|input|select|textarea)\b/i);
+      expect(html).not.toMatch(
+        /(?:[\w.+-]+@[\w.-]+|\b\d{4}-\d{2}-\d{2}\b|\.zip\b)/i,
+      );
+    },
+  );
 
   it("reserves poster and responsive header structure for detail routes", () => {
     for (const component of [ShowDetailLoading, MovieDetailLoading]) {
@@ -68,6 +112,7 @@ describe("core route loading states", () => {
   });
 
   it("uses static placeholders without motion-dependent animation", () => {
-    for (const { component } of routes) expect(markup(component)).not.toContain("animate-");
+    for (const { component } of routes)
+      expect(markup(component)).not.toContain("animate-");
   });
 });

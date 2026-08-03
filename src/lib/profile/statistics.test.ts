@@ -110,8 +110,6 @@ describe("profile statistics", () => {
       hours: "41 hours",
       daysAndHours: "1 day 17 hours",
     });
-    expect(formatDuration(60 * 24 * 40).daysAndHours).toBe(
-      "40 days 0 hours",
-    );
+    expect(formatDuration(60 * 24 * 40).daysAndHours).toBe("40 days 0 hours");
   });
 });

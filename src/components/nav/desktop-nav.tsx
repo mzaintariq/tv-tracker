@@ -15,7 +15,10 @@ export function DesktopNav() {
           TrackTV
         </p>
       </div>
-      <nav aria-label="Primary" className="flex flex-1 flex-col gap-1 px-3 pb-6">
+      <nav
+        aria-label="Primary"
+        className="flex flex-1 flex-col gap-1 px-3 pb-6"
+      >
         {APP_NAV_ITEMS.map((item) => {
           const active =
             pathname === item.href || pathname.startsWith(`${item.href}/`);

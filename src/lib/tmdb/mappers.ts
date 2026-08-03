@@ -1,7 +1,4 @@
-import type {
-  ExploreMediaItem,
-  MediaItemCacheRow,
-} from "@/lib/media/types";
+import type { ExploreMediaItem, MediaItemCacheRow } from "@/lib/media/types";
 import { yearFromDate } from "@/lib/media/types";
 import type {
   TmdbMovieDetails,

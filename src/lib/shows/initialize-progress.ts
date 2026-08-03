@@ -2,9 +2,14 @@ import type { ValidInitialProgress } from "@/lib/shows/validation";
 import type { SyncResult } from "@/lib/shows/sync";
 
 type Synchronize = () => Promise<SyncResult>;
-type InitializeMembership = (mediaItemId: string) => Promise<{ error: string | null }>;
+type InitializeMembership = (
+  mediaItemId: string,
+) => Promise<{ error: string | null }>;
 
-export type InitializeProgressResult = { error?: string; failedSeasons?: number[] };
+export type InitializeProgressResult = {
+  error?: string;
+  failedSeasons?: number[];
+};
 
 export async function initializeProgress(
   selection: ValidInitialProgress,
@@ -23,7 +28,9 @@ export async function initializeProgress(
 
   const failedRegular = failedSeasons.filter((season) => season > 0);
   if (selection.mode !== "start" && failedRegular.length) {
-    return { error: `Could not synchronize regular season${failedRegular.length === 1 ? "" : "s"} ${failedRegular.join(", ")}. The show was not added.` };
+    return {
+      error: `Could not synchronize regular season${failedRegular.length === 1 ? "" : "s"} ${failedRegular.join(", ")}. The show was not added.`,
+    };
   }
 
   const initialized = await initializeMembership(mediaItemId);

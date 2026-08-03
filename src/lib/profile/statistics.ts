@@ -1,7 +1,15 @@
 export type ProfileStatistics = {
-  trackedShows: number; episodesWatched: number; moviesInLibrary: number; moviesWatched: number;
-  favouriteShows: number; favouriteMovies: number; completedShows: number; caughtUpShows: number;
-  tvMinutes: number; movieMinutes: number; totalMinutes: number;
+  trackedShows: number;
+  episodesWatched: number;
+  moviesInLibrary: number;
+  moviesWatched: number;
+  favouriteShows: number;
+  favouriteMovies: number;
+  completedShows: number;
+  caughtUpShows: number;
+  tvMinutes: number;
+  movieMinutes: number;
+  totalMinutes: number;
 };
 
 export type ProfileFavourite = {
@@ -35,7 +43,9 @@ export type ProfileFavouriteRow = {
   poster_path: string | null;
 };
 
-export function mapProfileStatistics(row: ProfileStatisticsRow): ProfileStatistics {
+export function mapProfileStatistics(
+  row: ProfileStatisticsRow,
+): ProfileStatistics {
   const tvMinutes = row.tv_minutes;
   const movieMinutes = row.movie_minutes;
 
@@ -85,7 +95,11 @@ export function mapProfileFavourites(rows: readonly ProfileFavouriteRow[]): {
   };
 }
 
-export function formatDuration(minutes: number): { minutes: string; hours: string; daysAndHours: string } {
+export function formatDuration(minutes: number): {
+  minutes: string;
+  hours: string;
+  daysAndHours: string;
+} {
   const safe = Math.max(0, Math.floor(minutes));
   const totalHours = Math.floor(safe / 60);
   const days = Math.floor(totalHours / 24);
@@ -93,6 +107,8 @@ export function formatDuration(minutes: number): { minutes: string; hours: strin
   return {
     minutes: `${safe.toLocaleString("en-US")} ${safe === 1 ? "minute" : "minutes"}`,
     hours: `${totalHours.toLocaleString("en-US")} ${totalHours === 1 ? "hour" : "hours"}`,
-    daysAndHours: days ? `${days.toLocaleString("en-US")} ${days === 1 ? "day" : "days"} ${hours} ${hours === 1 ? "hour" : "hours"}` : `${hours} ${hours === 1 ? "hour" : "hours"}`,
+    daysAndHours: days
+      ? `${days.toLocaleString("en-US")} ${days === 1 ? "day" : "days"} ${hours} ${hours === 1 ? "hour" : "hours"}`
+      : `${hours} ${hours === 1 ? "hour" : "hours"}`,
   };
 }

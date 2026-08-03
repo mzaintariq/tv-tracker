@@ -29,11 +29,13 @@ describe("ExploreToolbar query ordering", () => {
     globalThis.IS_REACT_ACT_ENVIRONMENT = true;
     let renderer: ReactTestRenderer | undefined;
     await act(() => {
-      renderer = create(createElement(
-        ExploreToolbar,
-        { filter: "all", query: "hom" },
-        createElement("p", null, "results for hom"),
-      ));
+      renderer = create(
+        createElement(
+          ExploreToolbar,
+          { filter: "all", query: "hom" },
+          createElement("p", null, "results for hom"),
+        ),
+      );
     });
     if (!renderer) throw new Error("Toolbar renderer was not created.");
 
@@ -45,23 +47,31 @@ describe("ExploreToolbar query ordering", () => {
     expect(replace).toHaveBeenLastCalledWith("/explore?type=all&q=home+alone");
 
     await act(() => {
-      renderer?.update(createElement(
-        ExploreToolbar,
-        { filter: "all", query: "hom" },
-        createElement("p", null, "stale results"),
-      ));
+      renderer?.update(
+        createElement(
+          ExploreToolbar,
+          { filter: "all", query: "hom" },
+          createElement("p", null, "stale results"),
+        ),
+      );
     });
     expect(renderer.root.findByType("input").props.value).toBe("home alone");
-    expect(renderer.root.findAllByProps({ children: "stale results" })).toHaveLength(0);
+    expect(
+      renderer.root.findAllByProps({ children: "stale results" }),
+    ).toHaveLength(0);
 
     await act(() => {
-      renderer?.update(createElement(
-        ExploreToolbar,
-        { filter: "all", query: "home alone" },
-        createElement("p", null, "latest results"),
-      ));
+      renderer?.update(
+        createElement(
+          ExploreToolbar,
+          { filter: "all", query: "home alone" },
+          createElement("p", null, "latest results"),
+        ),
+      );
     });
     expect(renderer.root.findByType("input").props.value).toBe("home alone");
-    expect(renderer.root.findAllByProps({ children: "latest results" })).toHaveLength(1);
+    expect(
+      renderer.root.findAllByProps({ children: "latest results" }),
+    ).toHaveLength(1);
   });
 });

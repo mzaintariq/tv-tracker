@@ -1,7 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from "react";
 
 import { removeFromLibrary } from "@/app/actions/library";
 import {
@@ -17,22 +24,57 @@ import {
 } from "@/app/actions/shows";
 import { deriveInitialProgressOptions } from "@/lib/shows/initial-progress-options";
 import { timestampToDateTimeLocal } from "@/lib/date-time";
-import type { Episode, ShowTrackingStatus, UserShow, WatchedEpisode } from "@/types/database";
+import type {
+  Episode,
+  ShowTrackingStatus,
+  UserShow,
+  WatchedEpisode,
+} from "@/types/database";
 import { useNotifications } from "@/components/ui/notifications";
 
-function ActionMessage({ id, result }: { id?: string; result: ShowActionResult | null }) {
+function ActionMessage({
+  id,
+  result,
+}: {
+  id?: string;
+  result: ShowActionResult | null;
+}) {
   if (!result) return null;
-  return <div className="min-w-0 space-y-1 break-words text-sm">
-    {result.error ? <p id={id} className="text-[var(--danger)]" role="alert">{result.error}</p> : null}
-    {result.success ? <p className="text-[var(--success)]" role="status">{result.success}</p> : null}
-    {result.warning ? <p className="text-[var(--warning)]"><span className="font-semibold">Warning:</span> {result.warning}</p> : null}
-  </div>;
+  return (
+    <div className="min-w-0 space-y-1 break-words text-sm">
+      {result.error ? (
+        <p id={id} className="text-[var(--danger)]" role="alert">
+          {result.error}
+        </p>
+      ) : null}
+      {result.success ? (
+        <p className="text-[var(--success)]" role="status">
+          {result.success}
+        </p>
+      ) : null}
+      {result.warning ? (
+        <p className="text-[var(--warning)]">
+          <span className="font-semibold">Warning:</span> {result.warning}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
-const button = "interactive-control touch-target max-w-full cursor-pointer whitespace-normal rounded-lg border bg-[var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-elevated)]";
-const primaryButton = "touch-target max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]";
+const button =
+  "interactive-control touch-target max-w-full cursor-pointer whitespace-normal rounded-lg border bg-[var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-elevated)]";
+const primaryButton =
+  "touch-target max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]";
 
-export function MetadataButton({ tmdbId, setup = false, missingEpisodes = false }: { tmdbId: number; setup?: boolean; missingEpisodes?: boolean }) {
+export function MetadataButton({
+  tmdbId,
+  setup = false,
+  missingEpisodes = false,
+}: {
+  tmdbId: number;
+  setup?: boolean;
+  missingEpisodes?: boolean;
+}) {
   const router = useRouter();
   const { notify } = useNotifications();
   const [pending, start] = useTransition();
@@ -40,14 +82,22 @@ export function MetadataButton({ tmdbId, setup = false, missingEpisodes = false 
   const [pullDistance, setPullDistance] = useState(0);
   const touchStart = useRef<number | null>(null);
   const pullDistanceRef = useRef(0);
-  const label = setup ? missingEpisodes ? "Retry episode sync" : "Load episode information" : "Refresh Metadata";
+  const label = setup
+    ? missingEpisodes
+      ? "Retry episode sync"
+      : "Load episode information"
+    : "Refresh Metadata";
   const refreshMetadata = useCallback(() => {
     if (pending) return;
     start(async () => {
       const response = await syncShowMetadata(tmdbId);
       setResult(response);
       if (!response.error) router.refresh();
-      if (!setup) notify(response.error ?? response.success ?? "Metadata refreshed.", response.error ? "error" : "success");
+      if (!setup)
+        notify(
+          response.error ?? response.success ?? "Metadata refreshed.",
+          response.error ? "error" : "success",
+        );
     });
   }, [notify, pending, router, setup, tmdbId]);
 
@@ -60,11 +110,20 @@ export function MetadataButton({ tmdbId, setup = false, missingEpisodes = false 
       setPullDistance(0);
     };
     const onTouchStart = (event: TouchEvent) => {
-      if (window.scrollY <= 0 && event.touches.length === 1) touchStart.current = event.touches[0].clientY;
+      if (window.scrollY <= 0 && event.touches.length === 1)
+        touchStart.current = event.touches[0].clientY;
     };
     const onTouchMove = (event: TouchEvent) => {
-      if (touchStart.current === null || window.scrollY > 0 || event.touches.length !== 1) return;
-      const distance = Math.min(96, Math.max(0, (event.touches[0].clientY - touchStart.current) * 0.5));
+      if (
+        touchStart.current === null ||
+        window.scrollY > 0 ||
+        event.touches.length !== 1
+      )
+        return;
+      const distance = Math.min(
+        96,
+        Math.max(0, (event.touches[0].clientY - touchStart.current) * 0.5),
+      );
       pullDistanceRef.current = distance;
       setPullDistance(distance);
     };
@@ -78,7 +137,10 @@ export function MetadataButton({ tmdbId, setup = false, missingEpisodes = false 
         if (event.deltaY > 0) resetPull();
         return;
       }
-      const distance = Math.min(96, pullDistanceRef.current + Math.abs(event.deltaY) * 0.35);
+      const distance = Math.min(
+        96,
+        pullDistanceRef.current + Math.abs(event.deltaY) * 0.35,
+      );
       pullDistanceRef.current = distance;
       setPullDistance(distance);
       if (wheelEndTimer !== undefined) window.clearTimeout(wheelEndTimer);
@@ -103,9 +165,38 @@ export function MetadataButton({ tmdbId, setup = false, missingEpisodes = false 
     };
   }, [setup, refreshMetadata]);
 
-  if (setup) return <div className="min-w-0"><button className={button} disabled={pending} onClick={refreshMetadata}>{pending ? "Synchronizing…" : label}</button><ActionMessage result={result} /></div>;
+  if (setup)
+    return (
+      <div className="min-w-0">
+        <button className={button} disabled={pending} onClick={refreshMetadata}>
+          {pending ? "Synchronizing…" : label}
+        </button>
+        <ActionMessage result={result} />
+      </div>
+    );
   const pullReady = pullDistance >= 64;
-  return <div className="min-w-0"><div aria-hidden={pullDistance === 0 && !pending} className={`fixed left-1/2 top-[calc(0.75rem+var(--safe-area-top))] z-40 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 whitespace-nowrap rounded-full border border-[var(--control-border)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold shadow-lg transition-opacity ${pullDistance > 0 || pending ? "opacity-100" : "pointer-events-none opacity-0"}`} role="status">{pending ? "Refreshing metadata…" : pullReady ? "Release to refresh" : "Pull down or scroll up to refresh"}</div><button className="interactive-control sr-only focus:not-sr-only focus:fixed focus:left-1/2 focus:top-[calc(0.75rem+var(--safe-area-top))] focus:z-50 focus:-translate-x-1/2 focus:rounded-lg focus:border focus:bg-[var(--surface)] focus:px-3 focus:py-2" disabled={pending} onClick={refreshMetadata}>Refresh metadata</button></div>;
+  return (
+    <div className="min-w-0">
+      <div
+        aria-hidden={pullDistance === 0 && !pending}
+        className={`fixed left-1/2 top-[calc(0.75rem+var(--safe-area-top))] z-40 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 whitespace-nowrap rounded-full border border-[var(--control-border)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold shadow-lg transition-opacity ${pullDistance > 0 || pending ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        role="status"
+      >
+        {pending
+          ? "Refreshing metadata…"
+          : pullReady
+            ? "Release to refresh"
+            : "Pull down or scroll up to refresh"}
+      </div>
+      <button
+        className="interactive-control sr-only focus:not-sr-only focus:fixed focus:left-1/2 focus:top-[calc(0.75rem+var(--safe-area-top))] focus:z-50 focus:-translate-x-1/2 focus:rounded-lg focus:border focus:bg-[var(--surface)] focus:px-3 focus:py-2"
+        disabled={pending}
+        onClick={refreshMetadata}
+      >
+        Refresh metadata
+      </button>
+    </div>
+  );
 }
 
 export function RemoveShowButton({ tmdbId }: { tmdbId: number }) {
@@ -135,17 +226,32 @@ export function RemoveShowButton({ tmdbId }: { tmdbId: number }) {
   );
 }
 
-export function SettingsControls({ tmdbId, mediaId, membership }: { tmdbId: number; mediaId: string; membership: UserShow }) {
+export function SettingsControls({
+  tmdbId,
+  mediaId,
+  membership,
+}: {
+  tmdbId: number;
+  mediaId: string;
+  membership: UserShow;
+}) {
   const { notify } = useNotifications();
   const [pending, start] = useTransition();
   const [status, setStatus] = useState<ShowTrackingStatus>(membership.status);
   const savedStatus = useRef<ShowTrackingStatus>(membership.status);
   const queuedStatus = useRef<ShowTrackingStatus | null>(null);
   const statusSaving = useRef(false);
-  const run = (values: { status?: ShowTrackingStatus; isFavourite?: boolean }) => start(async () => {
-    const response = await updateShowSettings(tmdbId, mediaId, values);
-    notify(response.error ?? response.success ?? "Show settings updated.", response.error ? "error" : "success");
-  });
+  const run = (values: {
+    status?: ShowTrackingStatus;
+    isFavourite?: boolean;
+  }) =>
+    start(async () => {
+      const response = await updateShowSettings(tmdbId, mediaId, values);
+      notify(
+        response.error ?? response.success ?? "Show settings updated.",
+        response.error ? "error" : "success",
+      );
+    });
   const statuses = [
     { label: "Active", value: "active" },
     { label: "Paused", value: "paused" },
@@ -162,8 +268,13 @@ export function SettingsControls({ tmdbId, mediaId, membership }: { tmdbId: numb
         while (queuedStatus.current !== null) {
           const statusToSave = queuedStatus.current;
           queuedStatus.current = null;
-          const response = await updateShowSettings(tmdbId, mediaId, { status: statusToSave });
-          notify(response.error ?? response.success ?? "Show settings updated.", response.error ? "error" : "success");
+          const response = await updateShowSettings(tmdbId, mediaId, {
+            status: statusToSave,
+          });
+          notify(
+            response.error ?? response.success ?? "Show settings updated.",
+            response.error ? "error" : "success",
+          );
           if (response.error) {
             if (queuedStatus.current === null) setStatus(savedStatus.current);
           } else savedStatus.current = statusToSave;
@@ -173,7 +284,12 @@ export function SettingsControls({ tmdbId, mediaId, membership }: { tmdbId: numb
       }
     });
   };
-  const indicatorPosition = status === "active" ? "translate-x-0" : status === "paused" ? "translate-x-full" : "translate-x-[200%]";
+  const indicatorPosition =
+    status === "active"
+      ? "translate-x-0"
+      : status === "paused"
+        ? "translate-x-full"
+        : "translate-x-[200%]";
   return (
     <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
       <div className="grid w-full min-w-0 grid-cols-2 gap-3 sm:w-auto">
@@ -187,10 +303,7 @@ export function SettingsControls({ tmdbId, mediaId, membership }: { tmdbId: numb
         </button>
         <RemoveShowButton tmdbId={tmdbId} />
       </div>
-      <fieldset
-        aria-label="Tracking status"
-        className="min-w-0"
-      >
+      <fieldset aria-label="Tracking status" className="min-w-0">
         <div className="relative grid w-full min-w-0 grid-cols-3 rounded-full border border-[var(--control-border)] bg-[var(--surface)] sm:w-auto">
           <span
             aria-hidden="true"
@@ -215,18 +328,34 @@ export function SettingsControls({ tmdbId, mediaId, membership }: { tmdbId: numb
   );
 }
 
-export function InitialProgressForm({ tmdbId, episodes }: { tmdbId: number; episodes: Episode[] }) {
+export function InitialProgressForm({
+  tmdbId,
+  episodes,
+}: {
+  tmdbId: number;
+  episodes: Episode[];
+}) {
   const options = deriveInitialProgressOptions(episodes);
   const regular = options.episodes;
   const seasons = options.seasons;
   const hasEpisodeOptions = regular.length > 0;
   const [mode, setMode] = useState<InitialMode["mode"]>("start");
-  const [target, setTarget] = useState(regular[0] ? `${regular[0].season_number}:${regular[0].episode_number}` : "");
+  const [target, setTarget] = useState(
+    regular[0]
+      ? `${regular[0].season_number}:${regular[0].episode_number}`
+      : "",
+  );
   const [selected, setSelected] = useState<number[]>([]);
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ShowActionResult | null>(null);
-  const effectiveTarget = target || (regular[0] ? `${regular[0].season_number}:${regular[0].episode_number}` : "");
-  const selectionInvalid = (mode === "before_episode" && !effectiveTarget) || (mode === "seasons" && selected.length === 0);
+  const effectiveTarget =
+    target ||
+    (regular[0]
+      ? `${regular[0].season_number}:${regular[0].episode_number}`
+      : "");
+  const selectionInvalid =
+    (mode === "before_episode" && !effectiveTarget) ||
+    (mode === "seasons" && selected.length === 0);
   const helpId = `show-setup-help-${tmdbId}`;
   const unavailableId = `show-setup-unavailable-${tmdbId}`;
   const errorId = `show-setup-error-${tmdbId}`;
@@ -234,63 +363,376 @@ export function InitialProgressForm({ tmdbId, episodes }: { tmdbId: number; epis
   function submit() {
     let selection: InitialMode = { mode: "start" };
     if (mode === "before_episode") {
-      const [seasonNumber, episodeNumber] = effectiveTarget.split(":").map(Number);
+      const [seasonNumber, episodeNumber] = effectiveTarget
+        .split(":")
+        .map(Number);
       selection = { mode, seasonNumber, episodeNumber };
-    } else if (mode === "seasons") selection = { mode, seasonNumbers: selected };
+    } else if (mode === "seasons")
+      selection = { mode, seasonNumbers: selected };
     start(async () => setResult(await initializeShow(tmdbId, selection)));
   }
 
-  return <section className="min-w-0 space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5">
-    <h2 className="break-words text-xl font-semibold">Add show and set progress</h2>
-    <p id={helpId} className="break-words text-sm text-[var(--muted)]">Choose where your regular-episode progress should begin. Specials in Season 0 are excluded.</p>
-    {!hasEpisodeOptions ? <><p id={unavailableId} className="break-words text-sm text-[var(--warning)]"><span className="font-semibold">Warning:</span> Episode information could not be loaded. Retry to use episode- and season-based progress options.</p><MetadataButton tmdbId={tmdbId} setup missingEpisodes /></> : null}
-    <form className="min-w-0" onSubmit={(event) => { event.preventDefault(); if (!selectionInvalid) submit(); }}>
-      <fieldset aria-describedby={[helpId, !hasEpisodeOptions ? unavailableId : null, result?.error ? errorId : null].filter(Boolean).join(" ")} aria-invalid={selectionInvalid || undefined} className="min-w-0 space-y-4">
-        <legend className="break-words font-semibold">Starting progress</legend>
-        <div className="min-w-0"><input id={`progress-start-${tmdbId}`} name={`progress-mode-${tmdbId}`} type="radio" checked={mode === "start"} onChange={() => setMode("start")} /><label htmlFor={`progress-start-${tmdbId}`} className="ml-2 break-words">Start from Season 1, Episode 1</label></div>
-        <div className="min-w-0"><input id={`progress-before-${tmdbId}`} name={`progress-mode-${tmdbId}`} type="radio" checked={mode === "before_episode"} disabled={!hasEpisodeOptions} onChange={() => setMode("before_episode")} /><label htmlFor={`progress-before-${tmdbId}`} className="ml-2 break-words">Mark everything before a selected episode</label></div>
-        {mode === "before_episode" && hasEpisodeOptions ? <div className="min-w-0 space-y-2"><label htmlFor={`first-unwatched-${tmdbId}`} className="block break-words text-sm font-medium">Select the first unwatched episode</label><select id={`first-unwatched-${tmdbId}`} aria-describedby={helpId} aria-invalid={!effectiveTarget || undefined} className="interactive-control touch-target w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-[var(--foreground)]" value={effectiveTarget} onChange={(event) => setTarget(event.target.value)}>{regular.map((episode) => <option key={episode.id} value={`${episode.season_number}:${episode.episode_number}`}>Season {episode.season_number}, Episode {episode.episode_number} — {episode.title}</option>)}</select></div> : null}
-        <div className="min-w-0"><input id={`progress-seasons-${tmdbId}`} name={`progress-mode-${tmdbId}`} type="radio" checked={mode === "seasons"} disabled={!hasEpisodeOptions} onChange={() => setMode("seasons")} /><label htmlFor={`progress-seasons-${tmdbId}`} className="ml-2 break-words">Select complete watched seasons</label></div>
-        {mode === "seasons" && hasEpisodeOptions ? <fieldset aria-describedby={helpId} aria-invalid={selected.length === 0 || undefined} className="min-w-0 space-y-2"><legend className="break-words text-sm font-medium">Watched regular seasons</legend><div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap">{seasons.map(({ seasonNumber, episodeCount }) => { const id = `watched-season-${tmdbId}-${seasonNumber}`; return <div key={seasonNumber} className="min-w-0"><input id={id} type="checkbox" checked={selected.includes(seasonNumber)} onChange={() => setSelected((current) => current.includes(seasonNumber) ? current.filter((item) => item !== seasonNumber) : [...current, seasonNumber])} /><label htmlFor={id} className="ml-2 break-words">Season {seasonNumber} ({episodeCount} episode{episodeCount === 1 ? "" : "s"})</label></div>; })}</div></fieldset> : null}
-        <button type="submit" className={primaryButton} disabled={pending || selectionInvalid}>{pending ? "Synchronizing and adding…" : "Add to library"}</button>
-      </fieldset>
-    </form>
-    <ActionMessage id={errorId} result={result} />
-  </section>;
+  return (
+    <section className="min-w-0 space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5">
+      <h2 className="break-words text-xl font-semibold">
+        Add show and set progress
+      </h2>
+      <p id={helpId} className="break-words text-sm text-[var(--muted)]">
+        Choose where your regular-episode progress should begin. Specials in
+        Season 0 are excluded.
+      </p>
+      {!hasEpisodeOptions ? (
+        <>
+          <p
+            id={unavailableId}
+            className="break-words text-sm text-[var(--warning)]"
+          >
+            <span className="font-semibold">Warning:</span> Episode information
+            could not be loaded. Retry to use episode- and season-based progress
+            options.
+          </p>
+          <MetadataButton tmdbId={tmdbId} setup missingEpisodes />
+        </>
+      ) : null}
+      <form
+        className="min-w-0"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!selectionInvalid) submit();
+        }}
+      >
+        <fieldset
+          aria-describedby={[
+            helpId,
+            !hasEpisodeOptions ? unavailableId : null,
+            result?.error ? errorId : null,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          aria-invalid={selectionInvalid || undefined}
+          className="min-w-0 space-y-4"
+        >
+          <legend className="break-words font-semibold">
+            Starting progress
+          </legend>
+          <div className="min-w-0">
+            <input
+              id={`progress-start-${tmdbId}`}
+              name={`progress-mode-${tmdbId}`}
+              type="radio"
+              checked={mode === "start"}
+              onChange={() => setMode("start")}
+            />
+            <label
+              htmlFor={`progress-start-${tmdbId}`}
+              className="ml-2 break-words"
+            >
+              Start from Season 1, Episode 1
+            </label>
+          </div>
+          <div className="min-w-0">
+            <input
+              id={`progress-before-${tmdbId}`}
+              name={`progress-mode-${tmdbId}`}
+              type="radio"
+              checked={mode === "before_episode"}
+              disabled={!hasEpisodeOptions}
+              onChange={() => setMode("before_episode")}
+            />
+            <label
+              htmlFor={`progress-before-${tmdbId}`}
+              className="ml-2 break-words"
+            >
+              Mark everything before a selected episode
+            </label>
+          </div>
+          {mode === "before_episode" && hasEpisodeOptions ? (
+            <div className="min-w-0 space-y-2">
+              <label
+                htmlFor={`first-unwatched-${tmdbId}`}
+                className="block break-words text-sm font-medium"
+              >
+                Select the first unwatched episode
+              </label>
+              <select
+                id={`first-unwatched-${tmdbId}`}
+                aria-describedby={helpId}
+                aria-invalid={!effectiveTarget || undefined}
+                className="interactive-control touch-target w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-[var(--foreground)]"
+                value={effectiveTarget}
+                onChange={(event) => setTarget(event.target.value)}
+              >
+                {regular.map((episode) => (
+                  <option
+                    key={episode.id}
+                    value={`${episode.season_number}:${episode.episode_number}`}
+                  >
+                    Season {episode.season_number}, Episode{" "}
+                    {episode.episode_number} — {episode.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+          <div className="min-w-0">
+            <input
+              id={`progress-seasons-${tmdbId}`}
+              name={`progress-mode-${tmdbId}`}
+              type="radio"
+              checked={mode === "seasons"}
+              disabled={!hasEpisodeOptions}
+              onChange={() => setMode("seasons")}
+            />
+            <label
+              htmlFor={`progress-seasons-${tmdbId}`}
+              className="ml-2 break-words"
+            >
+              Select complete watched seasons
+            </label>
+          </div>
+          {mode === "seasons" && hasEpisodeOptions ? (
+            <fieldset
+              aria-describedby={helpId}
+              aria-invalid={selected.length === 0 || undefined}
+              className="min-w-0 space-y-2"
+            >
+              <legend className="break-words text-sm font-medium">
+                Watched regular seasons
+              </legend>
+              <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap">
+                {seasons.map(({ seasonNumber, episodeCount }) => {
+                  const id = `watched-season-${tmdbId}-${seasonNumber}`;
+                  return (
+                    <div key={seasonNumber} className="min-w-0">
+                      <input
+                        id={id}
+                        type="checkbox"
+                        checked={selected.includes(seasonNumber)}
+                        onChange={() =>
+                          setSelected((current) =>
+                            current.includes(seasonNumber)
+                              ? current.filter((item) => item !== seasonNumber)
+                              : [...current, seasonNumber],
+                          )
+                        }
+                      />
+                      <label htmlFor={id} className="ml-2 break-words">
+                        Season {seasonNumber} ({episodeCount} episode
+                        {episodeCount === 1 ? "" : "s"})
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+            </fieldset>
+          ) : null}
+          <button
+            type="submit"
+            className={primaryButton}
+            disabled={pending || selectionInvalid}
+          >
+            {pending ? "Synchronizing and adding…" : "Add to library"}
+          </button>
+        </fieldset>
+      </form>
+      <ActionMessage id={errorId} result={result} />
+    </section>
+  );
 }
 
-export function EpisodeControls({ tmdbId, mediaId, episode, watched, today, timeZone }: { tmdbId: number; mediaId: string; episode: Episode; watched: WatchedEpisode | undefined; today: string; timeZone: string }) {
+export function EpisodeControls({
+  tmdbId,
+  mediaId,
+  episode,
+  watched,
+  today,
+  timeZone,
+}: {
+  tmdbId: number;
+  mediaId: string;
+  episode: Episode;
+  watched: WatchedEpisode | undefined;
+  today: string;
+  timeZone: string;
+}) {
   const displayTimeZone = useSyncExternalStore(
     () => () => undefined,
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || timeZone,
     () => timeZone,
   );
   const [pending, start] = useTransition();
-  const [actionResult, setActionResult] = useState<ShowActionResult | null>(null);
+  const [actionResult, setActionResult] = useState<ShowActionResult | null>(
+    null,
+  );
   const [dateResult, setDateResult] = useState<ShowActionResult | null>(null);
   const [editingDate, setEditingDate] = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
   const dateTriggerRef = useRef<HTMLButtonElement>(null);
   const released = episode.air_date !== null && episode.air_date <= today;
-  const dateValue = watched ? timestampToDateTimeLocal(watched.watched_at, displayTimeZone) : "";
-  const maximumDateValue = timestampToDateTimeLocal(new Date().toISOString(), displayTimeZone);
+  const dateValue = watched
+    ? timestampToDateTimeLocal(watched.watched_at, displayTimeZone)
+    : "";
+  const maximumDateValue = timestampToDateTimeLocal(
+    new Date().toISOString(),
+    displayTimeZone,
+  );
   const coordinate = `S${String(episode.season_number).padStart(2, "0")}E${String(episode.episode_number).padStart(2, "0")}`;
   const dateId = `date-${episode.id}`;
   const errorId = `date-error-${episode.id}`;
-  return <div className="flex min-w-0 flex-col gap-2">
-    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-      <button className={button} disabled={pending || (!watched && !released)} onClick={() => start(async () => { setDateResult(null); setActionResult(await setEpisodeWatched(tmdbId, mediaId, episode.id, !watched)); })}>{pending ? "Saving…" : watched ? "Mark unwatched" : released ? "Mark watched" : "Unreleased"}</button>
-      <button className={button} disabled={pending || episode.season_number === 0} onClick={() => start(async () => { setDateResult(null); setActionResult(await markPreviousEpisodes(tmdbId, mediaId, episode.season_number, episode.episode_number)); })}>Mark previous watched</button>
+  return (
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <button
+          className={button}
+          disabled={pending || (!watched && !released)}
+          onClick={() =>
+            start(async () => {
+              setDateResult(null);
+              setActionResult(
+                await setEpisodeWatched(tmdbId, mediaId, episode.id, !watched),
+              );
+            })
+          }
+        >
+          {pending
+            ? "Saving…"
+            : watched
+              ? "Mark unwatched"
+              : released
+                ? "Mark watched"
+                : "Unreleased"}
+        </button>
+        <button
+          className={button}
+          disabled={pending || episode.season_number === 0}
+          onClick={() =>
+            start(async () => {
+              setDateResult(null);
+              setActionResult(
+                await markPreviousEpisodes(
+                  tmdbId,
+                  mediaId,
+                  episode.season_number,
+                  episode.episode_number,
+                ),
+              );
+            })
+          }
+        >
+          Mark previous watched
+        </button>
+      </div>
+      {watched ? (
+        <div className="min-w-0 space-y-2">
+          <div className="flex min-w-0 items-center gap-3">
+            <p className="min-w-0 break-words text-sm">
+              <span className="font-semibold">Watched</span> ·{" "}
+              <time dateTime={watched.watched_at}>
+                {new Intl.DateTimeFormat(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                  timeZone: displayTimeZone,
+                }).format(new Date(watched.watched_at))}
+              </time>
+            </p>
+            <button
+              ref={dateTriggerRef}
+              type="button"
+              className="interactive-control touch-target shrink-0 cursor-pointer rounded px-2 text-sm font-medium no-underline underline-offset-4 hover:underline focus-visible:underline"
+              aria-label={`${editingDate ? "Cancel editing" : "Edit"} watched date for ${coordinate}: ${episode.title}`}
+              aria-expanded={editingDate}
+              aria-controls={`date-editor-${episode.id}`}
+              onClick={() => {
+                if (editingDate) {
+                  setDateResult(null);
+                  setEditingDate(false);
+                  return;
+                }
+                setEditingDate(true);
+                queueMicrotask(() => dateInputRef.current?.focus());
+              }}
+            >
+              {editingDate ? "Cancel" : "Edit"}
+            </button>
+          </div>
+          {editingDate ? (
+            <div
+              id={`date-editor-${episode.id}`}
+              className="flex w-full min-w-0 max-w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"
+            >
+              <label htmlFor={dateId} className="break-words text-sm">
+                Watched date for {coordinate}
+              </label>
+              <input
+                ref={dateInputRef}
+                type="datetime-local"
+                defaultValue={dateValue}
+                max={maximumDateValue}
+                className="interactive-control touch-target block w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)] sm:w-auto sm:text-sm"
+                id={dateId}
+                aria-describedby={dateResult?.error ? errorId : undefined}
+                aria-invalid={dateResult?.error ? true : undefined}
+              />
+              <button
+                aria-label={`Save watched date for ${coordinate}: ${episode.title}`}
+                className={button}
+                disabled={pending}
+                onClick={() => {
+                  const value = dateInputRef.current?.value;
+                  if (value)
+                    start(async () => {
+                      setActionResult(null);
+                      const response = await updateWatchedDate(
+                        tmdbId,
+                        mediaId,
+                        episode.id,
+                        value,
+                        displayTimeZone,
+                      );
+                      setDateResult(response);
+                      if (!response.error) {
+                        setEditingDate(false);
+                        queueMicrotask(() => dateTriggerRef.current?.focus());
+                      }
+                    });
+                }}
+              >
+                Save
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      <ActionMessage id={errorId} result={dateResult} />
+      <ActionMessage result={actionResult} />
     </div>
-    {watched ? <div className="min-w-0 space-y-2"><div className="flex min-w-0 items-center gap-3"><p className="min-w-0 break-words text-sm"><span className="font-semibold">Watched</span> · <time dateTime={watched.watched_at}>{new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: displayTimeZone }).format(new Date(watched.watched_at))}</time></p><button ref={dateTriggerRef} type="button" className="interactive-control touch-target shrink-0 cursor-pointer rounded px-2 text-sm font-medium no-underline underline-offset-4 hover:underline focus-visible:underline" aria-label={`${editingDate ? "Cancel editing" : "Edit"} watched date for ${coordinate}: ${episode.title}`} aria-expanded={editingDate} aria-controls={`date-editor-${episode.id}`} onClick={() => { if (editingDate) { setDateResult(null); setEditingDate(false); return; } setEditingDate(true); queueMicrotask(() => dateInputRef.current?.focus()); }}>{editingDate ? "Cancel" : "Edit"}</button></div>{editingDate ? <div id={`date-editor-${episode.id}`} className="flex w-full min-w-0 max-w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"><label htmlFor={dateId} className="break-words text-sm">Watched date for {coordinate}</label><input ref={dateInputRef} type="datetime-local" defaultValue={dateValue} max={maximumDateValue} className="interactive-control touch-target block w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)] sm:w-auto sm:text-sm" id={dateId} aria-describedby={dateResult?.error ? errorId : undefined} aria-invalid={dateResult?.error ? true : undefined} /><button aria-label={`Save watched date for ${coordinate}: ${episode.title}`} className={button} disabled={pending} onClick={() => { const value = dateInputRef.current?.value; if (value) start(async () => { setActionResult(null); const response = await updateWatchedDate(tmdbId, mediaId, episode.id, value, displayTimeZone); setDateResult(response); if (!response.error) { setEditingDate(false); queueMicrotask(() => dateTriggerRef.current?.focus()); } }); }}>Save</button></div> : null}</div> : null}
-    <ActionMessage id={errorId} result={dateResult} />
-    <ActionMessage result={actionResult} />
-  </div>;
+  );
 }
 
-export function SeasonControls({ tmdbId, mediaId, season }: { tmdbId: number; mediaId: string; season: number }) {
+export function SeasonControls({
+  tmdbId,
+  mediaId,
+  season,
+}: {
+  tmdbId: number;
+  mediaId: string;
+  season: number;
+}) {
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ShowActionResult | null>(null);
-  const run = (watched: boolean) => start(async () => setResult(await setSeasonWatched(tmdbId, mediaId, season, watched)));
-  return <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap"><button className={button} disabled={pending} onClick={() => run(true)}>Mark season watched</button><button className={button} disabled={pending} onClick={() => run(false)}>Mark season unwatched</button><ActionMessage result={result} /></div>;
+  const run = (watched: boolean) =>
+    start(async () =>
+      setResult(await setSeasonWatched(tmdbId, mediaId, season, watched)),
+    );
+  return (
+    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap">
+      <button className={button} disabled={pending} onClick={() => run(true)}>
+        Mark season watched
+      </button>
+      <button className={button} disabled={pending} onClick={() => run(false)}>
+        Mark season unwatched
+      </button>
+      <ActionMessage result={result} />
+    </div>
+  );
 }

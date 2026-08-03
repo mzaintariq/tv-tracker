@@ -37,7 +37,8 @@ export function LimitedWatchListSection({
   const [expanded, setExpanded] = useState(false);
   const needsLimit = totalCount > initialLimit;
   const items = Children.toArray(children);
-  const visibleItems = needsLimit && !expanded ? items.slice(0, initialLimit) : items;
+  const visibleItems =
+    needsLimit && !expanded ? items.slice(0, initialLimit) : items;
   const ListTag = listAs;
 
   const onToggle = () => {
@@ -60,13 +61,24 @@ export function LimitedWatchListSection({
   };
 
   return (
-    <section className="min-w-0 space-y-3" aria-labelledby={showHeading ? headingId : undefined} aria-label={showHeading ? undefined : title}>
+    <section
+      className="min-w-0 space-y-3"
+      aria-labelledby={showHeading ? headingId : undefined}
+      aria-label={showHeading ? undefined : title}
+    >
       <div className="min-w-0">
-        {showHeading ? <h2 id={headingId} className="break-words text-2xl font-semibold tracking-tight">
-          {formatSectionHeading(title, totalCount)}
-        </h2> : null}
+        {showHeading ? (
+          <h2
+            id={headingId}
+            className="break-words text-2xl font-semibold tracking-tight"
+          >
+            {formatSectionHeading(title, totalCount)}
+          </h2>
+        ) : null}
         {description ? (
-          <p className="mt-1 break-words text-sm text-[var(--muted)]">{description}</p>
+          <p className="mt-1 break-words text-sm text-[var(--muted)]">
+            {description}
+          </p>
         ) : null}
       </div>
       <ListTag id={listId} className={listClassName}>

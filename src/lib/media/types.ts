@@ -35,7 +35,9 @@ export function isMediaType(value: string): value is MediaType {
   return value === "tv" || value === "movie";
 }
 
-export function isExploreMediaFilter(value: string): value is ExploreMediaFilter {
+export function isExploreMediaFilter(
+  value: string,
+): value is ExploreMediaFilter {
   return value === "all" || isMediaType(value);
 }
 

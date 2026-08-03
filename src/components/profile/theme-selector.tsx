@@ -68,7 +68,11 @@ export function ThemeSelector() {
         })}
       </div>
       {error ? (
-        <p id="theme-error" className="text-sm text-[var(--danger)]" role="alert">
+        <p
+          id="theme-error"
+          className="text-sm text-[var(--danger)]"
+          role="alert"
+        >
           {error}
         </p>
       ) : null}

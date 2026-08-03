@@ -1,21 +1,180 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { reconcileMatchingProgress, startMatchingProgressPolling, type MatchingProgressSnapshot } from "@/lib/import/tv-time/matching-progress";
-import { matchingEta, type EtaSample } from "@/lib/import/tv-time/resolution-snapshot";
+import {
+  reconcileMatchingProgress,
+  startMatchingProgressPolling,
+  type MatchingProgressSnapshot,
+} from "@/lib/import/tv-time/matching-progress";
+import {
+  matchingEta,
+  type EtaSample,
+} from "@/lib/import/tv-time/resolution-snapshot";
 import { notifyResolutionRefresh } from "./resolution-events";
 
-export function ImportMatchingProgress({ importId, initialProgress }: { importId: string; initialProgress: MatchingProgressSnapshot }) {
-  const [progress, setProgress] = useState(initialProgress); const progressRef = useRef(initialProgress); const [warning, setWarning] = useState(false); const [eta, setEta] = useState<string | null>(null); const stoppedRef = useRef(false);
-  const samplesRef = useRef<EtaSample[]>([]); const revisionRef = useRef(`${initialProgress.needsReview}:${initialProgress.skipped}:${initialProgress.complete}`);
-  const accept = useCallback((incoming: MatchingProgressSnapshot) => {
-    const next = reconcileMatchingProgress(progressRef.current, incoming); const now = Date.now();
-    if (!samplesRef.current.length) samplesRef.current = [{ at: now, processed: progressRef.current.processed }];
-    if (next.processed > progressRef.current.processed) samplesRef.current = [...samplesRef.current, { at: now, processed: next.processed }].filter((sample) => sample.at >= now - 120_000);
-    const revision = `${next.needsReview}:${next.skipped}:${next.complete}`; if (revision !== revisionRef.current) { revisionRef.current = revision; notifyResolutionRefresh(importId); }
-    progressRef.current = next; setProgress(next); setEta(matchingEta(samplesRef.current, next.remaining)); setWarning(false);
+export function ImportMatchingProgress({
+  importId,
+  initialProgress,
+}: {
+  importId: string;
+  initialProgress: MatchingProgressSnapshot;
+}) {
+  const [progress, setProgress] = useState(initialProgress);
+  const progressRef = useRef(initialProgress);
+  const [warning, setWarning] = useState(false);
+  const [eta, setEta] = useState<string | null>(null);
+  const stoppedRef = useRef(false);
+  const samplesRef = useRef<EtaSample[]>([]);
+  const revisionRef = useRef(
+    `${initialProgress.needsReview}:${initialProgress.skipped}:${initialProgress.complete}`,
+  );
+  const accept = useCallback(
+    (incoming: MatchingProgressSnapshot) => {
+      const next = reconcileMatchingProgress(progressRef.current, incoming);
+      const now = Date.now();
+      if (!samplesRef.current.length)
+        samplesRef.current = [
+          { at: now, processed: progressRef.current.processed },
+        ];
+      if (next.processed > progressRef.current.processed)
+        samplesRef.current = [
+          ...samplesRef.current,
+          { at: now, processed: next.processed },
+        ].filter((sample) => sample.at >= now - 120_000);
+      const revision = `${next.needsReview}:${next.skipped}:${next.complete}`;
+      if (revision !== revisionRef.current) {
+        revisionRef.current = revision;
+        notifyResolutionRefresh(importId);
+      }
+      progressRef.current = next;
+      setProgress(next);
+      setEta(matchingEta(samplesRef.current, next.remaining));
+      setWarning(false);
+    },
+    [importId],
+  );
+  const fetchProgress = useCallback(async () => {
+    const response = await fetch(`/api/imports/${importId}/matching-progress`, {
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("matching_progress_request_failed");
+    return response.json() as Promise<MatchingProgressSnapshot>;
   }, [importId]);
-  const fetchProgress = useCallback(async () => { const response = await fetch(`/api/imports/${importId}/matching-progress`, { cache: "no-store" }); if (!response.ok) throw new Error("matching_progress_request_failed"); return response.json() as Promise<MatchingProgressSnapshot>; }, [importId]);
-  useEffect(() => { stoppedRef.current = false; const poller = startMatchingProgressPolling({ fetchProgress, onProgress: accept, onError: () => { setWarning(true); setEta(null); }, shouldContinue: (next) => !stoppedRef.current && next.status === "matching" && next.remaining > 0 }); const onProgress = (event: Event) => { if ((event as CustomEvent<{ importId: string }>).detail?.importId === importId) poller.refresh(); }; const onStopped = (event: Event) => { if ((event as CustomEvent<{ importId: string }>).detail?.importId === importId) { stoppedRef.current = true; poller.stop(); } }; window.addEventListener("tv-time-matching-progress", onProgress); window.addEventListener("tv-time-matching-stopped", onStopped); return () => { stoppedRef.current = true; poller.stop(); window.removeEventListener("tv-time-matching-progress", onProgress); window.removeEventListener("tv-time-matching-stopped", onStopped); }; }, [accept, fetchProgress, importId]);
-  return <section className="min-w-0 space-y-3 rounded-xl border border-[var(--border)] p-4"><p className="sr-only" role="status">{progress.complete ? "Automatic matching completed." : "Automatic matching started."}</p><div className="flex min-w-0 flex-wrap items-baseline justify-between gap-2"><div className="min-w-0"><h2 className="break-words text-xl font-semibold">{progress.complete ? "Automatic matching complete" : "Automatic matching"}</h2><p className="break-words text-sm text-[var(--muted)]">{progress.complete ? "Automatic checking has finished. Manual review may still be required." : "Checking your TV Time library…"}</p></div><span className="font-medium tabular-nums" aria-hidden="true">{progress.percentage}%</span></div><div role="progressbar" aria-label="Automatic matching progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percentage} aria-valuetext={`${progress.processed} of ${progress.total} checked, ${progress.percentage}%`} className="progress-track h-3 overflow-hidden rounded-full"><div className="progress-fill h-full bg-[var(--accent)]" style={{ width: `${progress.percentage}%` }} /></div><div className="min-w-0 text-sm"><p className="break-words font-medium tabular-nums">{progress.processed.toLocaleString()} of {progress.total.toLocaleString()} checked · {progress.percentage}%</p><p className="break-words text-[var(--muted)] tabular-nums">{progress.remaining.toLocaleString()} remaining</p>{eta ? <p className="break-words text-[var(--muted)]">{eta}</p> : null}</div><div className="grid min-w-0 gap-1 text-sm sm:grid-cols-3"><p className="break-words"><span className="font-medium tabular-nums">{progress.confirmed.toLocaleString()}</span> matched automatically</p><p className="break-words"><span className="font-medium tabular-nums">{progress.needsReview.toLocaleString()}</span> need your review</p><p className="break-words"><span className="font-medium tabular-nums">{progress.skipped.toLocaleString()}</span> skipped</p></div><p className="break-words text-xs text-[var(--muted)]">Based on all normalized media items in this import, including items resolved by durable mappings.</p>{warning ? <p className="break-words text-xs text-[var(--warning)]" role="status"><span className="font-semibold">Warning:</span> Live status is temporarily unavailable; matching can continue.</p> : null}</section>;
+  useEffect(() => {
+    stoppedRef.current = false;
+    const poller = startMatchingProgressPolling({
+      fetchProgress,
+      onProgress: accept,
+      onError: () => {
+        setWarning(true);
+        setEta(null);
+      },
+      shouldContinue: (next) =>
+        !stoppedRef.current && next.status === "matching" && next.remaining > 0,
+    });
+    const onProgress = (event: Event) => {
+      if (
+        (event as CustomEvent<{ importId: string }>).detail?.importId ===
+        importId
+      )
+        poller.refresh();
+    };
+    const onStopped = (event: Event) => {
+      if (
+        (event as CustomEvent<{ importId: string }>).detail?.importId ===
+        importId
+      ) {
+        stoppedRef.current = true;
+        poller.stop();
+      }
+    };
+    window.addEventListener("tv-time-matching-progress", onProgress);
+    window.addEventListener("tv-time-matching-stopped", onStopped);
+    return () => {
+      stoppedRef.current = true;
+      poller.stop();
+      window.removeEventListener("tv-time-matching-progress", onProgress);
+      window.removeEventListener("tv-time-matching-stopped", onStopped);
+    };
+  }, [accept, fetchProgress, importId]);
+  return (
+    <section className="min-w-0 space-y-3 rounded-xl border border-[var(--border)] p-4">
+      <p className="sr-only" role="status">
+        {progress.complete
+          ? "Automatic matching completed."
+          : "Automatic matching started."}
+      </p>
+      <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="break-words text-xl font-semibold">
+            {progress.complete
+              ? "Automatic matching complete"
+              : "Automatic matching"}
+          </h2>
+          <p className="break-words text-sm text-[var(--muted)]">
+            {progress.complete
+              ? "Automatic checking has finished. Manual review may still be required."
+              : "Checking your TV Time library…"}
+          </p>
+        </div>
+        <span className="font-medium tabular-nums" aria-hidden="true">
+          {progress.percentage}%
+        </span>
+      </div>
+      <div
+        role="progressbar"
+        aria-label="Automatic matching progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={progress.percentage}
+        aria-valuetext={`${progress.processed} of ${progress.total} checked, ${progress.percentage}%`}
+        className="progress-track h-3 overflow-hidden rounded-full"
+      >
+        <div
+          className="progress-fill h-full bg-[var(--accent)]"
+          style={{ width: `${progress.percentage}%` }}
+        />
+      </div>
+      <div className="min-w-0 text-sm">
+        <p className="break-words font-medium tabular-nums">
+          {progress.processed.toLocaleString()} of{" "}
+          {progress.total.toLocaleString()} checked · {progress.percentage}%
+        </p>
+        <p className="break-words text-[var(--muted)] tabular-nums">
+          {progress.remaining.toLocaleString()} remaining
+        </p>
+        {eta ? <p className="break-words text-[var(--muted)]">{eta}</p> : null}
+      </div>
+      <div className="grid min-w-0 gap-1 text-sm sm:grid-cols-3">
+        <p className="break-words">
+          <span className="font-medium tabular-nums">
+            {progress.confirmed.toLocaleString()}
+          </span>{" "}
+          matched automatically
+        </p>
+        <p className="break-words">
+          <span className="font-medium tabular-nums">
+            {progress.needsReview.toLocaleString()}
+          </span>{" "}
+          need your review
+        </p>
+        <p className="break-words">
+          <span className="font-medium tabular-nums">
+            {progress.skipped.toLocaleString()}
+          </span>{" "}
+          skipped
+        </p>
+      </div>
+      <p className="break-words text-xs text-[var(--muted)]">
+        Based on all normalized media items in this import, including items
+        resolved by durable mappings.
+      </p>
+      {warning ? (
+        <p className="break-words text-xs text-[var(--warning)]" role="status">
+          <span className="font-semibold">Warning:</span> Live status is
+          temporarily unavailable; matching can continue.
+        </p>
+      ) : null}
+    </section>
+  );
 }

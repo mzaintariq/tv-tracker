@@ -55,10 +55,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
       </header>
 
       <Suspense fallback={null}>
-        <ExploreToolbar
-          filter={data.filter}
-          query={data.query}
-        >
+        <ExploreToolbar filter={data.filter} query={data.query}>
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-[var(--foreground)]">
               {heading}

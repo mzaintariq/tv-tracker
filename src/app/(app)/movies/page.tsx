@@ -6,8 +6,48 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function MoviesPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const list = await loadMovies(user.id);
-  return <div className="mx-auto w-full max-w-6xl space-y-10">{!list.movies.length ? <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center"><h2 className="text-xl font-semibold">No movies yet</h2><p className="mt-2 text-[var(--muted)]">Find a movie in Explore and add it to your watch list.</p><Link href="/explore?type=movie" className="mt-4 inline-block rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]">Explore movies</Link></div> : <><MovieSection title="Watch Next" description="Movies in your library that you have not watched." movies={list.watchNext} quickMarkWatched limitInitially /><MovieSection title="Recently Watched" description="Your ten most recently watched movies." movies={list.recentlyWatched} /><MovieSection title="Watched" movies={list.watched} limitInitially /><MovieSection title="Favourites" description="Favourites can be watched or still on your watch list." movies={list.favourites} /></>}</div>;
+  return (
+    <div className="mx-auto w-full max-w-6xl space-y-10">
+      {!list.movies.length ? (
+        <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center">
+          <h2 className="text-xl font-semibold">No movies yet</h2>
+          <p className="mt-2 text-[var(--muted)]">
+            Find a movie in Explore and add it to your watch list.
+          </p>
+          <Link
+            href="/explore?type=movie"
+            className="mt-4 inline-block rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]"
+          >
+            Explore movies
+          </Link>
+        </div>
+      ) : (
+        <>
+          <MovieSection
+            title="Watch Next"
+            description="Movies in your library that you have not watched."
+            movies={list.watchNext}
+            quickMarkWatched
+            limitInitially
+          />
+          <MovieSection
+            title="Recently Watched"
+            description="Your ten most recently watched movies."
+            movies={list.recentlyWatched}
+          />
+          <MovieSection title="Watched" movies={list.watched} limitInitially />
+          <MovieSection
+            title="Favourites"
+            description="Favourites can be watched or still on your watch list."
+            movies={list.favourites}
+          />
+        </>
+      )}
+    </div>
+  );
 }

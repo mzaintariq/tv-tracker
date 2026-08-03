@@ -27,7 +27,12 @@ export function QuickMarkMovieWatched({
     const watchedAt = new Date().toISOString();
     startTransition(async () => {
       try {
-        const response = await setMovieWatched(tmdbId, mediaId, true, watchedAt);
+        const response = await setMovieWatched(
+          tmdbId,
+          mediaId,
+          true,
+          watchedAt,
+        );
         setResult(response);
         if (!response.error) router.refresh();
       } finally {

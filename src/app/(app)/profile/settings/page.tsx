@@ -87,12 +87,17 @@ export default async function ProfileSettingsPage() {
       </div>
 
       <section className="mt-8 min-w-0 rounded-xl border border-[var(--border)] p-4 sm:p-5">
-        <h2 className="break-words text-xl font-semibold">Download your data</h2>
+        <h2 className="break-words text-xl font-semibold">
+          Download your data
+        </h2>
         <p className="mt-1 max-w-3xl break-words text-[var(--muted)]">
-          Download a private JSON copy of your profile preferences, tracked shows, watched episode history, movies, favourites, and watched dates.
+          Download a private JSON copy of your profile preferences, tracked
+          shows, watched episode history, movies, favourites, and watched dates.
         </p>
         <p className="mt-2 max-w-3xl break-words text-sm text-[var(--muted)]">
-          The export excludes your email, internal IDs, TV Time source files, and import diagnostics. It is generated on demand and is not retained by TrackTV.
+          The export excludes your email, internal IDs, TV Time source files,
+          and import diagnostics. It is generated on demand and is not retained
+          by TrackTV.
         </p>
         <a
           href="/api/export"
@@ -104,7 +109,9 @@ export default async function ProfileSettingsPage() {
       </section>
 
       <div className="mt-8 min-w-0 rounded-xl border border-[var(--border)] p-4 sm:p-5">
-        <h2 className="break-words text-xl font-semibold">Import from TV Time</h2>
+        <h2 className="break-words text-xl font-semibold">
+          Import from TV Time
+        </h2>
         <p className="mt-1 break-words text-[var(--muted)]">
           Privately analyze and import your TV Time GDPR export.
         </p>

@@ -16,7 +16,10 @@ describe("watch list section controls", () => {
 
   it("shows the first 10 items and no disclosure at the limit", async () => {
     globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-    const items = Array.from({ length: SECONDARY_SECTION_INITIAL_LIMIT }, (_, index) => `Item ${index + 1}`);
+    const items = Array.from(
+      { length: SECONDARY_SECTION_INITIAL_LIMIT },
+      (_, index) => `Item ${index + 1}`,
+    );
     let renderer: ReturnType<typeof create> | undefined;
     await act(() => {
       renderer = create(
@@ -40,7 +43,10 @@ describe("watch list section controls", () => {
 
   it("limits to 10, expands to all, and collapses back while preserving order", async () => {
     globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-    const items = Array.from({ length: 12 }, (_, index) => `Show ${String.fromCharCode(65 + index)}`);
+    const items = Array.from(
+      { length: 12 },
+      (_, index) => `Show ${String.fromCharCode(65 + index)}`,
+    );
     let renderer: ReturnType<typeof create> | undefined;
     await act(() => {
       renderer = create(
@@ -60,9 +66,12 @@ describe("watch list section controls", () => {
 
     expect(JSON.stringify(renderer.toJSON())).toContain("Paused · 12");
     expect(renderer.root.findByType("ul").children).toHaveLength(10);
-    expect(renderer.root.findByType("ul").findAllByType("li").map((node) => node.children[0])).toEqual(
-      items.slice(0, 10),
-    );
+    expect(
+      renderer.root
+        .findByType("ul")
+        .findAllByType("li")
+        .map((node) => node.children[0]),
+    ).toEqual(items.slice(0, 10));
 
     const expand = renderer.root.findByType("button");
     expect(expand.props["aria-expanded"]).toBe(false);
@@ -70,14 +79,22 @@ describe("watch list section controls", () => {
     expect(expand.children).toContain("Show all 12");
 
     await act(() => expand.props.onClick());
-    expect(renderer.root.findByType("ul").findAllByType("li").map((node) => node.children[0])).toEqual(items);
+    expect(
+      renderer.root
+        .findByType("ul")
+        .findAllByType("li")
+        .map((node) => node.children[0]),
+    ).toEqual(items);
     expect(expand.props["aria-expanded"]).toBe(true);
     expect(expand.children).toContain("Show less");
 
     await act(() => expand.props.onClick());
-    expect(renderer.root.findByType("ul").findAllByType("li").map((node) => node.children[0])).toEqual(
-      items.slice(0, 10),
-    );
+    expect(
+      renderer.root
+        .findByType("ul")
+        .findAllByType("li")
+        .map((node) => node.children[0]),
+    ).toEqual(items.slice(0, 10));
     expect(expand.props["aria-expanded"]).toBe(false);
     expect(expand.children).toContain("Show all 12");
   });

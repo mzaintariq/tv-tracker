@@ -2,11 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import {
-  isMediaType,
-  parseTmdbId,
-  type MediaType,
-} from "@/lib/media/types";
+import { isMediaType, parseTmdbId, type MediaType } from "@/lib/media/types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { TmdbApiError } from "@/lib/tmdb/client";
@@ -21,27 +17,39 @@ export type LibraryActionState = {
   success?: string;
 };
 
-export async function prepareShowProgress(tmdbIdRaw: string | number): Promise<LibraryActionState> {
+export async function prepareShowProgress(
+  tmdbIdRaw: string | number,
+): Promise<LibraryActionState> {
   const tmdbId = parseTmdbId(tmdbIdRaw);
   if (tmdbId === null) return { error: "TMDB ID must be a positive integer." };
   const supabase = await createClient();
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) return { error: "You must be signed in to set show progress." };
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError || !user)
+    return { error: "You must be signed in to set show progress." };
   try {
     const cacheRow = await upsertMediaItem("tv", tmdbId);
-    const { error } = await createAdminClient().from("media_items").upsert(cacheRow, { onConflict: "tmdb_id,media_type" });
-    if (error) return { error: "Could not prepare this show. Please try again." };
+    const { error } = await createAdminClient()
+      .from("media_items")
+      .upsert(cacheRow, { onConflict: "tmdb_id,media_type" });
+    if (error)
+      return { error: "Could not prepare this show. Please try again." };
     revalidatePath(`/shows/${tmdbId}`);
     revalidatePath("/explore");
     return { success: "Show metadata is ready." };
   } catch (error) {
-    if (error instanceof TmdbApiError && error.status === 404) return { error: "This TV show could not be found." };
+    if (error instanceof TmdbApiError && error.status === 404)
+      return { error: "This TV show could not be found." };
     return { error: "Could not prepare this show. Please try again." };
   }
 }
 
 function uniqueViolation(error: { code?: string; message?: string }): boolean {
-  return error.code === "23505" || Boolean(error.message?.includes("duplicate"));
+  return (
+    error.code === "23505" || Boolean(error.message?.includes("duplicate"))
+  );
 }
 
 async function upsertMediaItem(mediaType: MediaType, tmdbId: number) {
@@ -71,8 +79,7 @@ export async function addToLibrary(
 
   if (mediaType === "tv") {
     return {
-      error:
-        "TV shows must be added through the show progress setup workflow.",
+      error: "TV shows must be added through the show progress setup workflow.",
     };
   }
 

@@ -45,7 +45,9 @@ describe("Phase 9D.3 mobile layout contracts", () => {
     for (const path of datetimeSources) {
       const source = readFileSync(path, "utf8");
       expect(source, path).toContain('type="datetime-local"');
-      expect(source, path).toMatch(/datetime-local[\s\S]*?className="[^"]*min-w-0[^"]*max-w-full/);
+      expect(source, path).toMatch(
+        /datetime-local[\s\S]*?className="[^"]*min-w-0[^"]*max-w-full/,
+      );
     }
   });
 
@@ -62,6 +64,8 @@ describe("Phase 9D.3 mobile layout contracts", () => {
   });
 
   it("does not hide horizontal overflow globally", () => {
-    expect(readFileSync("src/app/globals.css", "utf8")).not.toContain("overflow-x-hidden");
+    expect(readFileSync("src/app/globals.css", "utf8")).not.toContain(
+      "overflow-x-hidden",
+    );
   });
 });

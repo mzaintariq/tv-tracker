@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { addToLibrary, prepareShowProgress, removeFromLibrary } from "@/app/actions/library";
+import {
+  addToLibrary,
+  prepareShowProgress,
+  removeFromLibrary,
+} from "@/app/actions/library";
 import type { ExploreMediaItem } from "@/lib/media/types";
 import { MediaPoster } from "@/components/media/media-poster";
 import { PosterCardTitle } from "@/components/media/poster-card-title";
@@ -66,15 +70,52 @@ export function MediaCard({ item }: MediaCardProps) {
     <article className="flex min-w-0 flex-col gap-3">
       <div className="relative aspect-[2/3]">
         {inLibrary ? (
-          <Link href={detailHref} aria-label={`Open ${item.title}`} className="poster-interactive-surface block h-full overflow-hidden rounded-lg border bg-[var(--surface-elevated)]"><MediaPoster source={item.posterPath} title={item.title} alt="" sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw" fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]" /></Link>
+          <Link
+            href={detailHref}
+            aria-label={`Open ${item.title}`}
+            className="poster-interactive-surface block h-full overflow-hidden rounded-lg border bg-[var(--surface-elevated)]"
+          >
+            <MediaPoster
+              source={item.posterPath}
+              title={item.title}
+              alt=""
+              sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+              fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]"
+            />
+          </Link>
         ) : (
-          <div className="block h-full overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]"><MediaPoster source={item.posterPath} title={item.title} alt="" sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw" fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]" /></div>
+          <div className="block h-full overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]">
+            <MediaPoster
+              source={item.posterPath}
+              title={item.title}
+              alt=""
+              sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+              fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]"
+            />
+          </div>
         )}
-        <button type="button" onClick={handleToggle} disabled={isPending} aria-busy={isPending} aria-label={`${actionLabel}: ${item.title}`} className="poster-overlay-action touch-target absolute right-2 top-2 z-10 grid h-11 w-11 cursor-pointer place-items-center rounded-lg border text-2xl font-semibold"><span aria-hidden="true">{isPending ? "…" : inLibrary ? "−" : "+"}</span></button>
+        <button
+          type="button"
+          onClick={handleToggle}
+          disabled={isPending}
+          aria-busy={isPending}
+          aria-label={`${actionLabel}: ${item.title}`}
+          className="poster-overlay-action touch-target absolute right-2 top-2 z-10 grid h-11 w-11 cursor-pointer place-items-center rounded-lg border text-2xl font-semibold"
+        >
+          <span aria-hidden="true">
+            {isPending ? "…" : inLibrary ? "−" : "+"}
+          </span>
+        </button>
       </div>
 
       <div className="min-w-0 space-y-1">
-        {inLibrary ? <Link href={detailHref} title={item.title}><PosterCardTitle title={item.title} /></Link> : <PosterCardTitle title={item.title} />}
+        {inLibrary ? (
+          <Link href={detailHref} title={item.title}>
+            <PosterCardTitle title={item.title} />
+          </Link>
+        ) : (
+          <PosterCardTitle title={item.title} />
+        )}
         <p className="break-words text-sm text-[var(--muted)]">
           {mediaLabel}
           {item.year ? ` · ${item.year}` : null}

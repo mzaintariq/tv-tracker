@@ -6,7 +6,9 @@ import { createAdminFetch } from "./admin";
 
 describe("admin Supabase request authorization", () => {
   it("keeps opaque secret apikey authentication but removes its invalid bearer header", async () => {
-    const fetchImplementation = vi.fn(async () => new Response(null, { status: 200 })) as unknown as typeof fetch;
+    const fetchImplementation = vi.fn(
+      async () => new Response(null, { status: 200 }),
+    ) as unknown as typeof fetch;
     const adminFetch = createAdminFetch("sb_secret_local", fetchImplementation);
 
     await adminFetch("http://127.0.0.1:54321/rest/v1/imports", {
@@ -25,7 +27,11 @@ describe("admin Supabase request authorization", () => {
   });
 
   it("preserves legacy JWT service-role request behavior unchanged", () => {
-    const fetchImplementation = vi.fn(async () => new Response(null, { status: 200 })) as unknown as typeof fetch;
-    expect(createAdminFetch("legacy.jwt.service-role", fetchImplementation)).toBe(fetchImplementation);
+    const fetchImplementation = vi.fn(
+      async () => new Response(null, { status: 200 }),
+    ) as unknown as typeof fetch;
+    expect(
+      createAdminFetch("legacy.jwt.service-role", fetchImplementation),
+    ).toBe(fetchImplementation);
   });
 });

@@ -1,7 +1,13 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  type ReactNode,
+} from "react";
 import { ExploreSkeletonGrid } from "@/components/explore/explore-states";
 
 import type { ExploreMediaFilter } from "@/lib/media/types";
@@ -19,7 +25,11 @@ type ExploreToolbarProps = {
   children?: ReactNode;
 };
 
-export function ExploreToolbar({ filter, query, children }: ExploreToolbarProps) {
+export function ExploreToolbar({
+  filter,
+  query,
+  children,
+}: ExploreToolbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -31,7 +41,8 @@ export function ExploreToolbar({ filter, query, children }: ExploreToolbarProps)
   const acceptExternalNavigationRef = useRef(false);
 
   const renderedQuery = (query ?? "").trim();
-  const responseIsCurrent = renderedQuery === requestedQuery && filter === requestedFilter;
+  const responseIsCurrent =
+    renderedQuery === requestedQuery && filter === requestedFilter;
 
   function updateUrl(nextFilter: ExploreMediaFilter, nextQuery: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -94,67 +105,73 @@ export function ExploreToolbar({ filter, query, children }: ExploreToolbarProps)
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
-        <label className="flex min-w-0 flex-1 flex-col gap-2">
-          <span className="text-sm font-medium text-[var(--foreground)]">
-            Search shows and movies
-          </span>
-          <input
-            type="search"
-            name="q"
-            value={searchValue}
-            maxLength={MAX_SEARCH_QUERY_LENGTH}
-            placeholder="Search TMDB…"
-            autoComplete="off"
-            onChange={(event) => setSearchValue(event.target.value)}
-            className="interactive-control touch-target h-11 w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)] placeholder:text-[var(--muted)] sm:text-sm"
-            aria-describedby="explore-search-hint"
-          />
-          <span id="explore-search-hint" className="sr-only">
-            Results update after you stop typing. Leave empty to browse trending.
-          </span>
-        </label>
-      </div>
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
+          <label className="flex min-w-0 flex-1 flex-col gap-2">
+            <span className="text-sm font-medium text-[var(--foreground)]">
+              Search shows and movies
+            </span>
+            <input
+              type="search"
+              name="q"
+              value={searchValue}
+              maxLength={MAX_SEARCH_QUERY_LENGTH}
+              placeholder="Search TMDB…"
+              autoComplete="off"
+              onChange={(event) => setSearchValue(event.target.value)}
+              className="interactive-control touch-target h-11 w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)] placeholder:text-[var(--muted)] sm:text-sm"
+              aria-describedby="explore-search-hint"
+            />
+            <span id="explore-search-hint" className="sr-only">
+              Results update after you stop typing. Leave empty to browse
+              trending.
+            </span>
+          </label>
+        </div>
 
-      <div
-        className="flex flex-wrap gap-2"
-        role="group"
-        aria-label="Media type filter"
-      >
-        {FILTERS.map((item) => {
-          const selected = filter === item.value;
+        <div
+          className="flex flex-wrap gap-2"
+          role="group"
+          aria-label="Media type filter"
+        >
+          {FILTERS.map((item) => {
+            const selected = filter === item.value;
 
-          return (
-            <button
-              key={item.value}
-              type="button"
-              aria-pressed={selected}
-              disabled={isPending}
-              onClick={() => {
-                skipDebounceRef.current = true;
-                updateUrl(item.value, searchValue);
-              }}
-              className={
-                selected
-                  ? "touch-target min-h-11 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] shadow-[inset_0_0_0_2px_var(--foreground)]"
-                  : "interactive-control touch-target min-h-11 rounded-lg border bg-[var(--surface)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-elevated)]"
-              }
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </div>
-
+            return (
+              <button
+                key={item.value}
+                type="button"
+                aria-pressed={selected}
+                disabled={isPending}
+                onClick={() => {
+                  skipDebounceRef.current = true;
+                  updateUrl(item.value, searchValue);
+                }}
+                className={
+                  selected
+                    ? "touch-target min-h-11 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] shadow-[inset_0_0_0_2px_var(--foreground)]"
+                    : "interactive-control touch-target min-h-11 rounded-lg border bg-[var(--surface)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-elevated)]"
+                }
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div aria-busy={isPending || !responseIsCurrent} className="min-w-0">
         {isPending || !responseIsCurrent ? (
           <div className="space-y-4">
-            <p className="text-sm text-[var(--muted)]" role="status">Loading results…</p>
-            <div aria-hidden="true"><ExploreSkeletonGrid /></div>
+            <p className="text-sm text-[var(--muted)]" role="status">
+              Loading results…
+            </p>
+            <div aria-hidden="true">
+              <ExploreSkeletonGrid />
+            </div>
           </div>
-        ) : children}
+        ) : (
+          children
+        )}
       </div>
     </div>
   );

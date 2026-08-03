@@ -33,7 +33,10 @@ describe("poster interaction polish", () => {
   });
 
   it("shares a 44px overlay treatment while preserving accessible action names", () => {
-    const explore = readFileSync("src/components/explore/media-card.tsx", "utf8");
+    const explore = readFileSync(
+      "src/components/explore/media-card.tsx",
+      "utf8",
+    );
     const movieAction = readFileSync(
       "src/components/movies/quick-mark-movie-watched.tsx",
       "utf8",
@@ -49,10 +52,13 @@ describe("poster interaction polish", () => {
   });
 
   it("keeps overlay buttons as siblings after poster links", () => {
-    const explore = readFileSync("src/components/explore/media-card.tsx", "utf8");
+    const explore = readFileSync(
+      "src/components/explore/media-card.tsx",
+      "utf8",
+    );
     const movie = readFileSync("src/components/movies/movie-card.tsx", "utf8");
     expect(explore).toMatch(/<Link[\s\S]*?<\/Link>[\s\S]*?\)}\s*<button/);
-    expect(movie).toMatch(/<\/Link>\{action \? <div/);
+    expect(movie).toMatch(/<\/Link>\s*\{action \? \(\s*<div/);
     expect(explore).toContain("absolute right-2 top-2 z-10");
     expect(movie).toContain("absolute right-2 top-2 z-10");
   });

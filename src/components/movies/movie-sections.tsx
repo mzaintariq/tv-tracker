@@ -3,7 +3,8 @@ import { QuickMarkMovieWatched } from "@/components/movies/quick-mark-movie-watc
 import { LimitedWatchListSection } from "@/components/shows/limited-watch-list-section";
 import type { MovieLibraryMedia, MovieSnapshot } from "@/lib/movies/movies";
 
-const movieGridClassName = "grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4";
+const movieGridClassName =
+  "grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4";
 
 export function MovieSection({
   title,
@@ -21,13 +22,18 @@ export function MovieSection({
   if (!movies.length) return null;
   const items = movies.map((movie) => (
     <li key={movie.membership.id} className="min-w-0">
-      <MovieCard movie={movie} action={quickMarkWatched ? (
-        <QuickMarkMovieWatched
-          title={movie.media.title}
-          tmdbId={movie.media.tmdb_id}
-          mediaId={movie.media.id}
-        />
-      ) : undefined} />
+      <MovieCard
+        movie={movie}
+        action={
+          quickMarkWatched ? (
+            <QuickMarkMovieWatched
+              title={movie.media.title}
+              tmdbId={movie.media.tmdb_id}
+              mediaId={movie.media.id}
+            />
+          ) : undefined
+        }
+      />
     </li>
   ));
 
@@ -52,7 +58,9 @@ export function MovieSection({
           {title} · {movies.length}
         </h2>
         {description ? (
-          <p className="mt-1 break-words text-sm text-[var(--muted)]">{description}</p>
+          <p className="mt-1 break-words text-sm text-[var(--muted)]">
+            {description}
+          </p>
         ) : null}
       </div>
       <ul className={movieGridClassName}>{items}</ul>

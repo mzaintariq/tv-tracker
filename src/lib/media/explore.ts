@@ -20,7 +20,15 @@ import {
 } from "@/lib/media/types";
 import { createClient } from "@/lib/supabase/server";
 import { TmdbApiError } from "@/lib/tmdb/client";
-import { buildLibraryKeys, ExploreLibraryReadError, loadLibraryPages, mediaIdChunks, requireLibraryRows, type LibraryMediaRow, type MembershipMediaRow } from "@/lib/media/library-state";
+import {
+  buildLibraryKeys,
+  ExploreLibraryReadError,
+  loadLibraryPages,
+  mediaIdChunks,
+  requireLibraryRows,
+  type LibraryMediaRow,
+  type MembershipMediaRow,
+} from "@/lib/media/library-state";
 
 export type ExplorePageData = {
   filter: ExploreMediaFilter;
@@ -41,14 +49,37 @@ async function loadLibraryKeys(userId: string): Promise<Set<string>> {
   const supabase = await createClient();
 
   const [shows, movies] = await Promise.all([
-    loadLibraryPages<MembershipMediaRow>("user_shows", (from, to) => supabase.from("user_shows").select("media_item_id").eq("user_id", userId).order("id").range(from, to)),
-    loadLibraryPages<MembershipMediaRow>("user_movies", (from, to) => supabase.from("user_movies").select("media_item_id").eq("user_id", userId).order("id").range(from, to)),
+    loadLibraryPages<MembershipMediaRow>("user_shows", (from, to) =>
+      supabase
+        .from("user_shows")
+        .select("media_item_id")
+        .eq("user_id", userId)
+        .order("id")
+        .range(from, to),
+    ),
+    loadLibraryPages<MembershipMediaRow>("user_movies", (from, to) =>
+      supabase
+        .from("user_movies")
+        .select("media_item_id")
+        .eq("user_id", userId)
+        .order("id")
+        .range(from, to),
+    ),
   ]);
 
   const chunks = mediaIdChunks(shows, movies);
   if (!chunks.length) return new Set();
-  const results = await Promise.all(chunks.map((ids) => supabase.from("media_items").select("id,tmdb_id,media_type").in("id", ids)));
-  const media = results.flatMap((result) => requireLibraryRows(result, "media_items") as LibraryMediaRow[]);
+  const results = await Promise.all(
+    chunks.map((ids) =>
+      supabase
+        .from("media_items")
+        .select("id,tmdb_id,media_type")
+        .in("id", ids),
+    ),
+  );
+  const media = results.flatMap(
+    (result) => requireLibraryRows(result, "media_items") as LibraryMediaRow[],
+  );
   return buildLibraryKeys(shows, movies, media);
 }
 
@@ -120,7 +151,14 @@ export async function loadExplorePageData(options: {
       error: null,
     };
   } catch (error) {
-    if (error instanceof ExploreLibraryReadError) console.error(JSON.stringify({ event: "explore_library_load_failed", stage: error.stage, category: "database_error" }));
+    if (error instanceof ExploreLibraryReadError)
+      console.error(
+        JSON.stringify({
+          event: "explore_library_load_failed",
+          stage: error.stage,
+          category: "database_error",
+        }),
+      );
     const message =
       error instanceof TmdbApiError
         ? "Could not load media from TMDB. Please try again."

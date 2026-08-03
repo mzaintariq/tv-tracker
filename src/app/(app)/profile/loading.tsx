@@ -9,7 +9,10 @@ export default function ProfileLoading() {
           <div className="h-9 w-36 rounded bg-[var(--surface-elevated)]" />
           <div className="h-5 w-96 max-w-full rounded bg-[var(--surface-elevated)]" />
         </header>
-        <section data-skeleton-region="overview" className="mt-8 space-y-3 rounded-xl border border-[var(--border)] p-4 sm:p-5">
+        <section
+          data-skeleton-region="overview"
+          className="mt-8 space-y-3 rounded-xl border border-[var(--border)] p-4 sm:p-5"
+        >
           <div className="h-6 w-28 rounded bg-[var(--surface-elevated)]" />
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="h-16 rounded-lg bg-[var(--surface-elevated)]" />

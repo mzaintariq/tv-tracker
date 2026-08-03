@@ -3,9 +3,15 @@ import { describe, expect, it } from "vitest";
 
 describe("Phase 9E.1 profile and settings separation", () => {
   const profile = readFileSync("src/app/(app)/profile/page.tsx", "utf8");
-  const settings = readFileSync("src/app/(app)/profile/settings/page.tsx", "utf8");
+  const settings = readFileSync(
+    "src/app/(app)/profile/settings/page.tsx",
+    "utf8",
+  );
   const form = readFileSync("src/components/profile/profile-form.tsx", "utf8");
-  const theme = readFileSync("src/components/profile/theme-selector.tsx", "utf8");
+  const theme = readFileSync(
+    "src/components/profile/theme-selector.tsx",
+    "utf8",
+  );
   const actions = readFileSync("src/app/actions/profile.ts", "utf8");
 
   it("keeps Profile focused on overview and streamed statistics", () => {
@@ -42,8 +48,10 @@ describe("Phase 9E.1 profile and settings separation", () => {
     expect(theme).toContain("updateThemePreference");
     expect(theme).toContain("setTheme(previousTheme)");
     expect(actions).toContain("export async function updateThemePreference");
-    expect(actions).toContain('update({ theme })');
-    expect(actions).toContain('update({\n      display_name: displayName,\n    })');
+    expect(actions).toContain("update({ theme })");
+    expect(actions).toContain(
+      "update({\n      display_name: displayName,\n    })",
+    );
   });
 });
 
@@ -52,8 +60,8 @@ describe("Phase 9E.1 browser favicon branding", () => {
     expect(existsSync("src/app/favicon.ico")).toBe(false);
     expect(existsSync("src/app/icon.png")).toBe(true);
     const metadata = readFileSync("src/lib/pwa/metadata.ts", "utf8");
-    expect(metadata).toContain('/icons/tracktv-192.png');
-    expect(metadata).toContain('/icons/tracktv-512.png');
-    expect(metadata).toContain('/icons/apple-touch-icon-180.png');
+    expect(metadata).toContain("/icons/tracktv-192.png");
+    expect(metadata).toContain("/icons/tracktv-512.png");
+    expect(metadata).toContain("/icons/apple-touch-icon-180.png");
   });
 });

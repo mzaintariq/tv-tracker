@@ -34,7 +34,8 @@ export function displayNameFromEmail(email: string | null | undefined): string {
 }
 
 export function normalizeTimeZone(value: unknown): string | null {
-  if (typeof value !== "string" || !value.trim() || value.length > 100) return null;
+  if (typeof value !== "string" || !value.trim() || value.length > 100)
+    return null;
   try {
     new Intl.DateTimeFormat("en-US", { timeZone: value }).format(new Date(0));
     return value;

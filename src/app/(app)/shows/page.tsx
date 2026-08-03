@@ -38,18 +38,41 @@ export default async function ShowsPage() {
       ) : (
         <>
           <WatchNextWatchListSection items={list.watchNext} />
-          <SecondaryRecentlyWatchedSection items={list.recentlyWatched} timeZone={list.timeZone} />
+          <SecondaryRecentlyWatchedSection
+            items={list.recentlyWatched}
+            timeZone={list.timeZone}
+          />
           <SecondaryShowSection
             sectionId="inactive"
             title="Haven't Watched for a While"
             description="Active shows with no recent watching and no newly aired episode in the last 30 days."
             shows={list.inactive}
           />
-          <SecondaryShowSection sectionId="not-started" title="Haven't Started" shows={list.notStarted} />
-          <SecondaryShowSection sectionId="caught-up" title="Caught Up" shows={list.caughtUp} />
-          <SecondaryShowSection sectionId="completed" title="Completed" shows={list.completed} />
-          <SecondaryShowSection sectionId="paused" title="Paused" shows={list.paused} />
-          <SecondaryShowSection sectionId="dropped" title="Dropped" shows={list.dropped} />
+          <SecondaryShowSection
+            sectionId="not-started"
+            title="Haven't Started"
+            shows={list.notStarted}
+          />
+          <SecondaryShowSection
+            sectionId="caught-up"
+            title="Caught Up"
+            shows={list.caughtUp}
+          />
+          <SecondaryShowSection
+            sectionId="completed"
+            title="Completed"
+            shows={list.completed}
+          />
+          <SecondaryShowSection
+            sectionId="paused"
+            title="Paused"
+            shows={list.paused}
+          />
+          <SecondaryShowSection
+            sectionId="dropped"
+            title="Dropped"
+            shows={list.dropped}
+          />
           <SecondaryNeedsEpisodeDataSection shows={list.needsEpisodeData} />
         </>
       )}

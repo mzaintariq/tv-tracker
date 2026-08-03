@@ -13,9 +13,24 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#f3efe6",
     theme_color: "#0f6a5c",
     icons: [
-      { src: "/icons/tracktv-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/icons/tracktv-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-      { src: "/icons/tracktv-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      {
+        src: "/icons/tracktv-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icons/tracktv-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icons/tracktv-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
     ],
   };
 }

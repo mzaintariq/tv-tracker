@@ -7,7 +7,9 @@ const page = readFileSync("src/app/(app)/shows/[tmdbId]/page.tsx", "utf8");
 
 describe("show progress navigation contract", () => {
   it("links the poster and title to the detail/setup flow", () => {
-    expect(card).toContain('const detailHref = `/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`');
+    expect(card).toContain(
+      'const detailHref = `/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`',
+    );
     expect(card).toContain("inLibrary ? (");
     expect(card).toContain("<Link href={detailHref}");
   });
@@ -20,8 +22,12 @@ describe("show progress navigation contract", () => {
 
   it("prepares metadata before overlay navigation to the setup flow", () => {
     expect(card).toContain('from "next/link"');
-    expect(card.indexOf("await prepareShowProgress(item.tmdbId)")).toBeGreaterThan(-1);
-    expect(card.indexOf("await prepareShowProgress(item.tmdbId)")).toBeLessThan(card.indexOf("router.push(`/shows/${item.tmdbId}`)"));
+    expect(
+      card.indexOf("await prepareShowProgress(item.tmdbId)"),
+    ).toBeGreaterThan(-1);
+    expect(card.indexOf("await prepareShowProgress(item.tmdbId)")).toBeLessThan(
+      card.indexOf("router.push(`/shows/${item.tmdbId}`)"),
+    );
   });
 
   it("revalidates the concrete show route after metadata insertion", () => {

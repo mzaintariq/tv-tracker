@@ -9,7 +9,9 @@ export async function proxy(request: NextRequest) {
 
   // Supabase may send the OAuth/magic-link code to the Site URL (`/` or `/login`)
   // when the requested redirectTo is not allowlisted. Forward it to the callback.
-  if (shouldForwardAuthParamsToCallback(pathname, request.nextUrl.searchParams)) {
+  if (
+    shouldForwardAuthParamsToCallback(pathname, request.nextUrl.searchParams)
+  ) {
     const callbackUrl = request.nextUrl.clone();
     callbackUrl.pathname = "/auth/callback";
     return NextResponse.redirect(callbackUrl);

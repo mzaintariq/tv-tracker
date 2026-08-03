@@ -38,9 +38,7 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      return clearAuthNextCookie(
-        NextResponse.redirect(new URL(next, origin)),
-      );
+      return clearAuthNextCookie(NextResponse.redirect(new URL(next, origin)));
     }
   }
 

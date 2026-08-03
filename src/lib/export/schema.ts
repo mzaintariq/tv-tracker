@@ -11,7 +11,12 @@ export type TrackTvExportProfile = {
 };
 
 export type TrackTvExportShowTracking =
-  | { inLibrary: true; status: ShowTrackingStatus; isFavourite: boolean; addedAt: string }
+  | {
+      inLibrary: true;
+      status: ShowTrackingStatus;
+      isFavourite: boolean;
+      addedAt: string;
+    }
   | { inLibrary: false };
 
 export type TrackTvExportWatchedEpisode = {

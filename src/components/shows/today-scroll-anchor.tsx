@@ -9,7 +9,9 @@ export function TodayScrollAnchor() {
     const today = document.getElementById("today");
     if (!today) return;
     window.history.replaceState({ ...state, tracktvTodayPositioned: true }, "");
-    requestAnimationFrame(() => today.scrollIntoView({ block: "start", behavior: "auto" }));
+    requestAnimationFrame(() =>
+      today.scrollIntoView({ block: "start", behavior: "auto" }),
+    );
   }, []);
   return null;
 }

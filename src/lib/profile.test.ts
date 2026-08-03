@@ -6,10 +6,7 @@ import {
   normalizeDisplayName,
   normalizeTimeZone,
 } from "@/lib/profile";
-import {
-  isAuthPath,
-  isProtectedPath,
-} from "@/lib/supabase/proxy";
+import { isAuthPath, isProtectedPath } from "@/lib/supabase/proxy";
 
 describe("normalizeDisplayName", () => {
   it("trims and collapses whitespace", () => {
@@ -50,7 +47,9 @@ describe("displayNameFromEmail", () => {
 describe("normalizeTimeZone", () => {
   it("accepts IANA timezones and rejects invalid values", () => {
     expect(normalizeTimeZone("Asia/Karachi")).toBe("Asia/Karachi");
-    expect(normalizeTimeZone("America/Los_Angeles")).toBe("America/Los_Angeles");
+    expect(normalizeTimeZone("America/Los_Angeles")).toBe(
+      "America/Los_Angeles",
+    );
     expect(normalizeTimeZone("not/a-timezone")).toBeNull();
     expect(normalizeTimeZone("")).toBeNull();
   });

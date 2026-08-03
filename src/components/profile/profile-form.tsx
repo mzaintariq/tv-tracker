@@ -2,10 +2,7 @@
 
 import { useActionState } from "react";
 
-import {
-  updateProfile,
-  type ProfileActionState,
-} from "@/app/actions/profile";
+import { updateProfile, type ProfileActionState } from "@/app/actions/profile";
 import type { Profile } from "@/types/database";
 
 const initialState: ProfileActionState = {};
@@ -22,7 +19,10 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
   );
 
   return (
-    <form action={formAction} className="flex w-full min-w-0 max-w-lg flex-col gap-5">
+    <form
+      action={formAction}
+      className="flex w-full min-w-0 max-w-lg flex-col gap-5"
+    >
       <div className="flex flex-col gap-2">
         <label
           htmlFor="email"
@@ -60,7 +60,11 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
       </div>
 
       {state.error ? (
-        <p id="profile-error" className="text-sm text-[var(--danger)]" role="alert">
+        <p
+          id="profile-error"
+          className="text-sm text-[var(--danger)]"
+          role="alert"
+        >
           {state.error}
         </p>
       ) : null}

@@ -9,16 +9,24 @@ describe("touched mutation error contracts", () => {
 
   it("does not return raw database messages from touched actions", () => {
     for (const source of [imports, shows, movies, library]) {
-      expect(source).not.toMatch(/return\s+\{\s*error:\s*(?:\w+\.)?error\.message/);
+      expect(source).not.toMatch(
+        /return\s+\{\s*error:\s*(?:\w+\.)?error\.message/,
+      );
       expect(source).not.toMatch(/return\s+\{\s*error:\s*\w+Error\.message/);
     }
   });
 
   it("uses stable mutation fallbacks while retaining domain validation", () => {
     expect(shows).toContain("The show could not be updated. Please try again.");
-    expect(movies).toContain("The movie could not be updated. Please try again.");
-    expect(library).toContain("Your library could not be updated. Please try again.");
-    expect(imports).toContain("This item is currently being matched. Try again shortly.");
+    expect(movies).toContain(
+      "The movie could not be updated. Please try again.",
+    );
+    expect(library).toContain(
+      "Your library could not be updated. Please try again.",
+    );
+    expect(imports).toContain(
+      "This item is currently being matched. Try again shortly.",
+    );
     expect(imports).toContain("An import being applied cannot be deleted.");
   });
 });

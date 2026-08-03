@@ -5,17 +5,26 @@ export class ImportRouteReadError extends Error {
   }
 }
 
-export function requireImportList<T>(result: { data: T[] | null; error: unknown }): T[] {
+export function requireImportList<T>(result: {
+  data: T[] | null;
+  error: unknown;
+}): T[] {
   if (result.error) throw new ImportRouteReadError("list");
   return result.data ?? [];
 }
 
-export function requireImportSession<T>(result: { data: T | null; error: unknown }): T | null {
+export function requireImportSession<T>(result: {
+  data: T | null;
+  error: unknown;
+}): T | null {
   if (result.error) throw new ImportRouteReadError("session");
   return result.data;
 }
 
-export function requireImportProgress<T>(result: { data: T | null; error: unknown }): T | null {
+export function requireImportProgress<T>(result: {
+  data: T | null;
+  error: unknown;
+}): T | null {
   if (result.error) throw new ImportRouteReadError("progress");
   return result.data;
 }

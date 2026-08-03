@@ -4,7 +4,9 @@ import { act, create } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
 
 const refresh = vi.fn();
-vi.mock("next/link", () => ({ default: (props: Record<string, unknown>) => createElement("a", props) }));
+vi.mock("next/link", () => ({
+  default: (props: Record<string, unknown>) => createElement("a", props),
+}));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh }) }));
 import AppError from "@/app/(app)/error";
 import MoviesError from "@/app/(app)/movies/error";
@@ -30,7 +32,12 @@ const boundaries = [
 
 describe("safe route error states", () => {
   it.each(boundaries)("renders fixed safe copy for %s", (Boundary, title) => {
-    const html = renderToStaticMarkup(createElement(Boundary, { error: new Error(raw), reset: () => undefined }));
+    const html = renderToStaticMarkup(
+      createElement(Boundary, {
+        error: new Error(raw),
+        reset: () => undefined,
+      }),
+    );
     expect(html).toContain(title);
     expect(html).toContain("Try again");
     expect(html).not.toContain(raw);
@@ -41,7 +48,17 @@ describe("safe route error states", () => {
     globalThis.IS_REACT_ACT_ENVIRONMENT = true;
     const reset = vi.fn();
     let renderer: ReturnType<typeof create> | undefined;
-    await act(() => { renderer = create(createElement(RouteErrorState, { title: "Safe title", description: "Safe description", reset, backHref: "/shows", backLabel: "Back" })); });
+    await act(() => {
+      renderer = create(
+        createElement(RouteErrorState, {
+          title: "Safe title",
+          description: "Safe description",
+          reset,
+          backHref: "/shows",
+          backLabel: "Back",
+        }),
+      );
+    });
     if (!renderer) throw new Error("Error-state renderer was not created.");
     const mounted = renderer;
     await act(() => mounted.root.findByType("button").props.onClick());

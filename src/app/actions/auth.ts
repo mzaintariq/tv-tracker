@@ -78,7 +78,9 @@ export async function signInWithMagicLink(
   _prevState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
   const nextPath = sanitizeNextPath(String(formData.get("next") ?? "/shows"));
 
   if (!isValidEmail(email)) {

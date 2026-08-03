@@ -1,21 +1,35 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { updateTimeZonePreference, type TimeZoneActionResult } from "@/app/actions/profile";
+import {
+  updateTimeZonePreference,
+  type TimeZoneActionResult,
+} from "@/app/actions/profile";
 
 function availableTimeZones(current: string): string[] {
   const supportedValuesOf = (
     Intl as typeof Intl & { supportedValuesOf?: (key: "timeZone") => string[] }
   ).supportedValuesOf;
-  const values = supportedValuesOf ? supportedValuesOf.call(Intl, "timeZone") : [current, "UTC"];
-  return [...new Set([current, "UTC", ...values])].sort((left, right) => left.localeCompare(right));
+  const values = supportedValuesOf
+    ? supportedValuesOf.call(Intl, "timeZone")
+    : [current, "UTC"];
+  return [...new Set([current, "UTC", ...values])].sort((left, right) =>
+    left.localeCompare(right),
+  );
 }
 
-export function TimeZoneSelector({ currentTimeZone }: { currentTimeZone: string }) {
+export function TimeZoneSelector({
+  currentTimeZone,
+}: {
+  currentTimeZone: string;
+}) {
   const [selected, setSelected] = useState(currentTimeZone);
   const [result, setResult] = useState<TimeZoneActionResult | null>(null);
   const [pending, startTransition] = useTransition();
-  const timeZones = useMemo(() => availableTimeZones(currentTimeZone), [currentTimeZone]);
+  const timeZones = useMemo(
+    () => availableTimeZones(currentTimeZone),
+    [currentTimeZone],
+  );
 
   function save(timeZone: string) {
     setResult(null);
@@ -43,7 +57,9 @@ export function TimeZoneSelector({ currentTimeZone }: { currentTimeZone: string 
         Used to decide which releases appear under Today and Tomorrow.
       </p>
       <div className="mt-4 flex w-full min-w-0 max-w-lg flex-col gap-3">
-        <label htmlFor="profile-timezone" className="text-sm font-medium">Timezone</label>
+        <label htmlFor="profile-timezone" className="text-sm font-medium">
+          Timezone
+        </label>
         <select
           id="profile-timezone"
           value={selected}
@@ -51,7 +67,11 @@ export function TimeZoneSelector({ currentTimeZone }: { currentTimeZone: string 
           onChange={(event) => setSelected(event.target.value)}
           className="interactive-control touch-target w-full min-w-0 rounded-lg border bg-[var(--surface)] px-3 text-[var(--foreground)]"
         >
-          {timeZones.map((timeZone) => <option key={timeZone} value={timeZone}>{timeZone}</option>)}
+          {timeZones.map((timeZone) => (
+            <option key={timeZone} value={timeZone}>
+              {timeZone}
+            </option>
+          ))}
         </select>
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap">
           <button
@@ -71,8 +91,16 @@ export function TimeZoneSelector({ currentTimeZone }: { currentTimeZone: string 
             Save timezone
           </button>
         </div>
-        {result?.error ? <p role="alert" className="text-sm text-[var(--danger)]">{result.error}</p> : null}
-        {result?.success ? <p role="status" className="text-sm text-[var(--success)]">{result.success}</p> : null}
+        {result?.error ? (
+          <p role="alert" className="text-sm text-[var(--danger)]">
+            {result.error}
+          </p>
+        ) : null}
+        {result?.success ? (
+          <p role="status" className="text-sm text-[var(--success)]">
+            {result.success}
+          </p>
+        ) : null}
       </div>
     </section>
   );

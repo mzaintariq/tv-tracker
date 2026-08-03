@@ -10,7 +10,9 @@ export function isEpisodeMetadataStale(
   if (episodesSyncedAt === null) return true;
   const synchronizedAt = Date.parse(episodesSyncedAt);
   if (!Number.isFinite(synchronizedAt)) return true;
-  return synchronizedAt <= now.getTime() - EPISODE_METADATA_STALE_HOURS * HOUR_MS;
+  return (
+    synchronizedAt <= now.getTime() - EPISODE_METADATA_STALE_HOURS * HOUR_MS
+  );
 }
 
 export function shouldAutomaticallyRefreshEpisodes(
@@ -19,12 +21,16 @@ export function shouldAutomaticallyRefreshEpisodes(
   episodesSyncedAt: string | null,
   now: Date,
 ): boolean {
-  return trackingStatus === "active" &&
+  return (
+    trackingStatus === "active" &&
     !isShowEnded(tmdbStatus) &&
-    isEpisodeMetadataStale(episodesSyncedAt, now);
+    isEpisodeMetadataStale(episodesSyncedAt, now)
+  );
 }
 
-export function regularSeasonSyncSucceeded(failedSeasons: readonly number[]): boolean {
+export function regularSeasonSyncSucceeded(
+  failedSeasons: readonly number[],
+): boolean {
   return failedSeasons.every((season) => season === 0);
 }
 
@@ -40,7 +46,10 @@ export async function settleWithConcurrency<T, R>(
       const index = cursor;
       cursor += 1;
       try {
-        results[index] = { status: "fulfilled", value: await task(items[index]) };
+        results[index] = {
+          status: "fulfilled",
+          value: await task(items[index]),
+        };
       } catch (reason) {
         results[index] = { status: "rejected", reason };
       }

@@ -132,16 +132,11 @@ describe("TrackTV application icon assets", () => {
     }
 
     expect([...png.pixels.subarray(0, 3)]).toEqual([15, 106, 92]);
-    expect(png.pixels.length).toBe(
-      png.width * png.height * png.bytesPerPixel,
-    );
+    expect(png.pixels.length).toBe(png.width * png.height * png.bytesPerPixel);
   });
 
   it("retains a portable exact-color SVG source without external content", () => {
-    const source = readFileSync(
-      "public/icons/tracktv-icon-source.svg",
-      "utf8",
-    );
+    const source = readFileSync("public/icons/tracktv-icon-source.svg", "utf8");
     const rootMatch = source.match(/<svg\b[^>]*>/i);
 
     expect(rootMatch).not.toBeNull();

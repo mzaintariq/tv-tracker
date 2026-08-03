@@ -6,7 +6,11 @@ import { ProgressBar } from "./progress-bar";
 
 describe("show progress semantics", () => {
   it("provides a complete progressbar contract", () => {
-    const html = renderToStaticMarkup(createElement(ProgressBar, { progress: { state: "partial", watched: 3, total: 10, percentage: 30 } }));
+    const html = renderToStaticMarkup(
+      createElement(ProgressBar, {
+        progress: { state: "partial", watched: 3, total: 10, percentage: 30 },
+      }),
+    );
     expect(html).toContain('role="progressbar"');
     expect(html).toContain('aria-label="Show watch progress"');
     expect(html).toContain('aria-valuemin="0"');

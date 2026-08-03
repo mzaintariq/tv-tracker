@@ -93,7 +93,9 @@ export async function updateThemePreference(
     .eq("id", user.id);
 
   if (error) {
-    return { error: "Theme could not be saved. Your previous selection was restored." };
+    return {
+      error: "Theme could not be saved. Your previous selection was restored.",
+    };
   }
 
   const { cookies } = await import("next/headers");
@@ -119,7 +121,8 @@ export async function updateTimeZonePreference(
     data: { user },
     error: userError,
   } = await supabase.auth.getUser();
-  if (userError || !user) return { error: "You must be signed in to update your timezone." };
+  if (userError || !user)
+    return { error: "You must be signed in to update your timezone." };
 
   const { data, error } = await supabase
     .from("profiles")
@@ -127,7 +130,8 @@ export async function updateTimeZonePreference(
     .eq("id", user.id)
     .select("id")
     .maybeSingle();
-  if (error || !data) return { error: "Timezone could not be saved. Please try again." };
+  if (error || !data)
+    return { error: "Timezone could not be saved. Please try again." };
 
   revalidateProfileRoutes();
   revalidatePath("/shows");

@@ -24,16 +24,38 @@ export type ResolutionSnapshot = {
   };
 };
 
-export function acceptResolutionSnapshot(current: ResolutionSnapshot, incoming: ResolutionSnapshot, latestSequence: number, resolvedIds: ReadonlySet<string>) {
+export function acceptResolutionSnapshot(
+  current: ResolutionSnapshot,
+  incoming: ResolutionSnapshot,
+  latestSequence: number,
+  resolvedIds: ReadonlySet<string>,
+) {
   if (incoming.sequence < latestSequence) return current;
-  return { ...incoming, items: incoming.items.filter((item) => !resolvedIds.has(item.id)) };
+  return {
+    ...incoming,
+    items: incoming.items.filter((item) => !resolvedIds.has(item.id)),
+  };
 }
 
-export function resolutionRevision(input: { itemUpdatedAt?: string | null; issueUpdatedAt?: string | null; unresolvedCount: number; openIssueCount: number }) {
-  return [input.itemUpdatedAt ?? "", input.issueUpdatedAt ?? "", input.unresolvedCount, input.openIssueCount].join(":");
+export function resolutionRevision(input: {
+  itemUpdatedAt?: string | null;
+  issueUpdatedAt?: string | null;
+  unresolvedCount: number;
+  openIssueCount: number;
+}) {
+  return [
+    input.itemUpdatedAt ?? "",
+    input.issueUpdatedAt ?? "",
+    input.unresolvedCount,
+    input.openIssueCount,
+  ].join(":");
 }
 
-export function createResolutionSnapshotLoader(options: { fetchSnapshot: (signal: AbortSignal) => Promise<ResolutionSnapshot>; onSnapshot: (snapshot: ResolutionSnapshot) => void; onError: () => void }) {
+export function createResolutionSnapshotLoader(options: {
+  fetchSnapshot: (signal: AbortSignal) => Promise<ResolutionSnapshot>;
+  onSnapshot: (snapshot: ResolutionSnapshot) => void;
+  onError: () => void;
+}) {
   let running = false;
   let queued = false;
   let stopped = false;
@@ -41,22 +63,63 @@ export function createResolutionSnapshotLoader(options: { fetchSnapshot: (signal
   let controller: AbortController | null = null;
   const run = async () => {
     if (stopped) return;
-    if (running) { queued = true; return; }
-    running = true; controller = new AbortController(); const requestSequence = ++sequence;
-    try { const snapshot = await options.fetchSnapshot(controller.signal); if (!stopped) options.onSnapshot({ ...snapshot, sequence: requestSequence }); }
-    catch (error) { if (!stopped && !(error instanceof DOMException && error.name === "AbortError")) options.onError(); }
-    finally { running = false; controller = null; if (!stopped && queued) { queued = false; void run(); } }
+    if (running) {
+      queued = true;
+      return;
+    }
+    running = true;
+    controller = new AbortController();
+    const requestSequence = ++sequence;
+    try {
+      const snapshot = await options.fetchSnapshot(controller.signal);
+      if (!stopped)
+        options.onSnapshot({ ...snapshot, sequence: requestSequence });
+    } catch (error) {
+      if (
+        !stopped &&
+        !(error instanceof DOMException && error.name === "AbortError")
+      )
+        options.onError();
+    } finally {
+      running = false;
+      controller = null;
+      if (!stopped && queued) {
+        queued = false;
+        void run();
+      }
+    }
   };
-  return { refresh: () => void run(), stop: () => { stopped = true; queued = false; controller?.abort(); }, isRunning: () => running };
+  return {
+    refresh: () => void run(),
+    stop: () => {
+      stopped = true;
+      queued = false;
+      controller?.abort();
+    },
+    isRunning: () => running,
+  };
 }
 
 export type EtaSample = { at: number; processed: number };
-export function matchingEta(samples: EtaSample[], remaining: number): string | null {
+export function matchingEta(
+  samples: EtaSample[],
+  remaining: number,
+): string | null {
   if (remaining <= 0 || samples.length < 2) return null;
-  const recent = samples.filter((sample) => sample.at >= samples[samples.length - 1].at - 120_000);
-  const first = recent[0]; const last = recent[recent.length - 1];
-  if (!first || !last || last.at - first.at < 20_000 || last.processed - first.processed < 30) return null;
-  const perMinute = ((last.processed - first.processed) * 60_000) / (last.at - first.at);
+  const recent = samples.filter(
+    (sample) => sample.at >= samples[samples.length - 1].at - 120_000,
+  );
+  const first = recent[0];
+  const last = recent[recent.length - 1];
+  if (
+    !first ||
+    !last ||
+    last.at - first.at < 20_000 ||
+    last.processed - first.processed < 30
+  )
+    return null;
+  const perMinute =
+    ((last.processed - first.processed) * 60_000) / (last.at - first.at);
   if (!Number.isFinite(perMinute) || perMinute < 1) return null;
   const minutes = Math.max(1, Math.ceil(remaining / perMinute));
   return `About ${minutes} minute${minutes === 1 ? "" : "s"} remaining`;

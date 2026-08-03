@@ -13,8 +13,12 @@ export function createAdminFetch(
   if (!secretKey.startsWith("sb_secret_")) return fetchImplementation;
 
   return (async (input: RequestInfo | URL, init?: RequestInit) => {
-    const headers = new Headers(input instanceof Request ? input.headers : undefined);
-    new Headers(init?.headers).forEach((value, name) => headers.set(name, value));
+    const headers = new Headers(
+      input instanceof Request ? input.headers : undefined,
+    );
+    new Headers(init?.headers).forEach((value, name) =>
+      headers.set(name, value),
+    );
     headers.delete("Authorization");
 
     return fetchImplementation(input, {

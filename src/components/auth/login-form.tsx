@@ -45,7 +45,11 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
       </form>
 
       {error ? (
-        <p id="login-error" className="text-sm text-[var(--danger)]" role="alert">
+        <p
+          id="login-error"
+          className="text-sm text-[var(--danger)]"
+          role="alert"
+        >
           {error}
         </p>
       ) : null}
@@ -60,7 +64,10 @@ export function LoginForm({ nextPath, initialError }: LoginFormProps) {
 
       <form action={magicAction} className="flex w-full flex-col gap-4">
         <input type="hidden" name="next" value={nextPath} />
-        <label htmlFor="login-email" className="flex flex-col gap-2 text-sm font-medium text-[var(--foreground)]">
+        <label
+          htmlFor="login-email"
+          className="flex flex-col gap-2 text-sm font-medium text-[var(--foreground)]"
+        >
           Email
           <input
             id="login-email"
