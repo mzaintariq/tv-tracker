@@ -444,3 +444,19 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Add focused application mapping and loading-contract tests
 * [x] Keep Shows and Movies loading behavior unchanged
 * [x] Defer caching and stored statistics
+
+### Shows Watch List projection performance
+
+* [x] Audit and document existing category, recency, and ordering semantics
+* [x] Add an authenticated owner-scoped compact Watch List projection RPC
+* [x] Return one derived row per current membership and one next episode only where needed
+* [x] Bound Recently Watched to the latest 10 current-library episode rows
+* [x] Preserve timezone inputs and the inclusive 30-day Watch Next boundary
+* [x] Preserve every primary category, progress state, and deterministic section order
+* [x] Replace only the `/shows` full snapshot loading pathway
+* [x] Keep Upcoming, show detail, Movies, Profile, imports, and mutations unchanged
+* [x] Add focused database security, isolation, category, and boundary tests
+* [x] Add compact application mapping and loader contract tests
+* [x] Keep caching, stored summaries, and speculative indexes deferred
+* [x] Validate local database lint and pgTAP suite
+* [x] Run lint, type checking, unit tests, production build, and diff check

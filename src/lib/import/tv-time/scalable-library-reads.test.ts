@@ -6,6 +6,10 @@ describe("scalable current-library reads", () => {
     "supabase/migrations/20260716030000_shared_metadata_scalable_reads.sql",
     "utf8",
   );
+  const projectionMigration = readFileSync(
+    "supabase/migrations/20260803000000_create_watch_list_projection.sql",
+    "utf8",
+  );
   const libraryReads = migration.slice(
     migration.indexOf("create function public.load_watch_list_episode_data"),
     migration.indexOf("create function public.load_upcoming_data"),
@@ -13,14 +17,18 @@ describe("scalable current-library reads", () => {
   const shows = readFileSync("src/lib/shows/data.ts", "utf8");
   const movies = readFileSync("src/lib/movies/data.ts", "utf8");
 
-  it("loads shows through one authenticated joined snapshot", () => {
+  it("loads shows through one authenticated compact projection", () => {
     const watchListLoader = shows.slice(
       shows.indexOf("export async function loadWatchList"),
       shows.indexOf("export async function loadShowDetail"),
     );
     expect(migration).toContain("from public.user_shows us");
     expect(migration).toContain("join public.media_items m");
-    expect(watchListLoader).toContain('rpc("load_watch_list_episode_data")');
+    expect(projectionMigration).toContain(
+      "create function public.load_watch_list_projection",
+    );
+    expect(watchListLoader).toContain('rpc("load_watch_list_projection"');
+    expect(watchListLoader).not.toContain("load_watch_list_episode_data");
     expect(watchListLoader).not.toContain(".in(");
   });
 
@@ -44,7 +52,7 @@ describe("scalable current-library reads", () => {
   });
 
   it("preserves operation-specific safe diagnostics", () => {
-    expect(shows).toContain('"load_watch_list_episode_data"');
+    expect(shows).toContain('"load_watch_list_projection"');
     expect(movies).toContain('"load_movie_library_data"');
   });
 });
