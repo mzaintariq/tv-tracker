@@ -47,3 +47,4 @@ local-data/
 
 # Local Supabase SQL editor scratch files
 supabase/snippets/
+supabase/.temp/

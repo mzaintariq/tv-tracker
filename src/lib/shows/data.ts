@@ -2,12 +2,10 @@ import "server-only";
 
 import { calculateShowProgress, type ShowProgress } from "@/lib/shows/progress";
 import {
-  deriveWatchList,
-  type TrackedShowSnapshot,
+  mapWatchListProjection,
   type WatchListCategories,
-  type WatchListEpisode,
   type WatchListMedia,
-  type WatchListWatchedEpisode,
+  type WatchListProjection,
 } from "@/lib/shows/watch-list";
 import { createClient } from "@/lib/supabase/server";
 import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
@@ -100,20 +98,11 @@ export async function loadWatchList(
   now = new Date(),
 ): Promise<WatchListPageData> {
   const supabase = await createClient();
-  const timestamp = now.toISOString();
-  const [episodeDataResult, profileResult] = await Promise.all([
-    supabase.rpc("load_watch_list_episode_data"),
-    supabase.from("profiles").select("timezone").eq("id", userId).maybeSingle(),
-  ]);
-  if (episodeDataResult.error) {
-    const code = logSafeReadFailure(
-      "shows",
-      "load_watch_list_episode_data",
-      episodeDataResult.error,
-      episodeDataResult.status,
-    );
-    throw new Error(`Could not load show metadata. [${code}]`);
-  }
+  const profileResult = await supabase
+    .from("profiles")
+    .select("timezone")
+    .eq("id", userId)
+    .maybeSingle();
   if (profileResult.error) {
     const code = logSafeReadFailure(
       "shows",
@@ -125,55 +114,31 @@ export async function loadWatchList(
   }
   const timeZone = profileResult.data?.timezone ?? "UTC";
   const currentDate = dateInTimeZone(now, timeZone);
-
-  const episodeData = episodeDataResult.data as {
-    memberships?: UserShow[];
-    media?: WatchListMedia[];
-    episodes?: WatchListEpisode[];
-    watched?: WatchListWatchedEpisode[];
-  } | null;
-  const memberships = Array.isArray(episodeData?.memberships)
-    ? episodeData.memberships
-    : [];
-  const media = Array.isArray(episodeData?.media) ? episodeData.media : [];
-  const episodes = Array.isArray(episodeData?.episodes)
-    ? episodeData.episodes
-    : [];
-  const watchedRows = Array.isArray(episodeData?.watched)
-    ? episodeData.watched
-    : [];
-
-  const mediaById = new Map(media.map((item) => [item.id, item]));
-  const episodesByMediaId = new Map<string, WatchListEpisode[]>();
-  for (const episode of episodes) {
-    const rows = episodesByMediaId.get(episode.media_item_id) ?? [];
-    rows.push(episode);
-    episodesByMediaId.set(episode.media_item_id, rows);
-  }
-  const episodeById = new Map(episodes.map((episode) => [episode.id, episode]));
-  const watchedByMediaId = new Map<string, WatchListWatchedEpisode[]>();
-  for (const watched of watchedRows) {
-    const episode = episodeById.get(watched.episode_id);
-    if (!episode) continue;
-    const rows = watchedByMediaId.get(episode.media_item_id) ?? [];
-    rows.push(watched);
-    watchedByMediaId.set(episode.media_item_id, rows);
-  }
-
-  const snapshots: TrackedShowSnapshot[] = memberships.flatMap((membership) => {
-    const media = mediaById.get(membership.media_item_id);
-    return media
-      ? [
-          {
-            membership,
-            media,
-            episodes: episodesByMediaId.get(media.id) ?? [],
-            watched: watchedByMediaId.get(media.id) ?? [],
-          },
-        ]
-      : [];
+  const cutoff = new Date(
+    now.getTime() - 30 * 24 * 60 * 60 * 1000,
+  ).toISOString();
+  const projectionResult = await supabase.rpc("load_watch_list_projection", {
+    p_today: currentDate,
+    p_recent_cutoff: cutoff,
+    p_recent_cutoff_date: cutoff.slice(0, 10),
   });
-  return { ...deriveWatchList(snapshots, currentDate, timestamp), timeZone };
+  if (projectionResult.error) {
+    const code = logSafeReadFailure(
+      "shows",
+      "load_watch_list_projection",
+      projectionResult.error,
+      projectionResult.status,
+    );
+    throw new Error(`Could not load show metadata. [${code}]`);
+  }
+  const raw = projectionResult.data as Partial<WatchListProjection> | null;
+  const projection: WatchListProjection = {
+    shows: Array.isArray(raw?.shows) ? raw.shows : [],
+    recently_watched: Array.isArray(raw?.recently_watched)
+      ? raw.recently_watched
+      : [],
+  };
+  return { ...mapWatchListProjection(projection), timeZone };
 }
 
 export async function loadShowDetail(

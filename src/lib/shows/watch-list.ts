@@ -79,6 +79,61 @@ export type WatchListCategories = {
   needsEpisodeData: DerivedShow[];
 };
 
+export type WatchListProjectionRow = {
+  membership_id: string;
+  user_id: string;
+  media_item_id: string;
+  status: UserShow["status"];
+  is_favourite: boolean;
+  created_at: string;
+  updated_at: string;
+  tmdb_id: number;
+  title: string;
+  poster_path: string | null;
+  release_date: string | null;
+  tmdb_status: string | null;
+  released_count: number;
+  watched_released_count: number;
+  latest_regular_watched_at: string | null;
+  latest_unwatched_released_air_date: string | null;
+  category:
+    | "watch_next"
+    | "inactive"
+    | Exclude<PrimaryShowState, "active_incomplete">;
+  next_episode_id: string | null;
+  next_season_number: number | null;
+  next_episode_number: number | null;
+  next_episode_title: string | null;
+  next_episode_air_date: string | null;
+};
+
+export type RecentlyWatchedProjectionRow = {
+  watched_id: string;
+  episode_id: string;
+  watched_at: string;
+  membership_id: string;
+  user_id: string;
+  media_item_id: string;
+  status: UserShow["status"];
+  is_favourite: boolean;
+  created_at: string;
+  updated_at: string;
+  tmdb_id: number;
+  title: string;
+  poster_path: string | null;
+  release_date: string | null;
+  tmdb_status: string | null;
+  season_number: number;
+  episode_number: number;
+  episode_title: string;
+  air_date: string | null;
+};
+
+export type WatchListProjection = {
+  shows: WatchListProjectionRow[];
+  recently_watched: RecentlyWatchedProjectionRow[];
+};
+
 const titleCompare = (
   left: { media: WatchListMedia },
   right: { media: WatchListMedia },
@@ -277,5 +332,145 @@ export function deriveWatchList(
     paused: primary("paused"),
     dropped: primary("dropped"),
     needsEpisodeData: primary("needs_episode_data"),
+  };
+}
+
+/** Maps the compact database projection into the established rendering contract. */
+export function mapWatchListProjection(
+  projection: WatchListProjection,
+): WatchListCategories {
+  const shows = projection.shows.map((row): DerivedShow => {
+    const percentage =
+      row.released_count === 0
+        ? 0
+        : Math.round(
+            (row.watched_released_count / row.released_count) * 100,
+          );
+    const progressState: ShowProgress["state"] =
+      row.watched_released_count === 0
+        ? "none"
+        : row.watched_released_count < row.released_count
+          ? "partial"
+          : row.tmdb_status?.toLowerCase() === "ended"
+            ? "complete"
+            : "caught-up";
+    const primaryState: PrimaryShowState =
+      row.category === "watch_next" || row.category === "inactive"
+        ? "active_incomplete"
+        : row.category;
+    return {
+      membership: {
+        id: row.membership_id,
+        user_id: row.user_id,
+        media_item_id: row.media_item_id,
+        status: row.status,
+        is_favourite: row.is_favourite,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+      },
+      media: {
+        id: row.media_item_id,
+        tmdb_id: row.tmdb_id,
+        title: row.title,
+        poster_path: row.poster_path,
+        release_date: row.release_date,
+        tmdb_status: row.tmdb_status,
+      },
+      episodes: [],
+      watched: [],
+      primaryState,
+      progress: {
+        watched: row.watched_released_count,
+        total: row.released_count,
+        percentage,
+        state: progressState,
+      },
+      latestRegularWatchedAt: row.latest_regular_watched_at,
+    };
+  });
+  const byMembership = new Map(
+    shows.map((show) => [show.membership.id, show]),
+  );
+  const rowsByMembership = new Map(
+    projection.shows.map((row) => [row.membership_id, row]),
+  );
+  const titleSort = (left: DerivedShow, right: DerivedShow) =>
+    titleCompare(left, right);
+  const select = (...categories: WatchListProjectionRow["category"][]) =>
+    shows.filter((show) =>
+      categories.includes(rowsByMembership.get(show.membership.id)!.category),
+    );
+  const watchNext = select("watch_next")
+    .flatMap((show): WatchNextItem[] => {
+      const row = rowsByMembership.get(show.membership.id)!;
+      if (
+        row.next_episode_id === null ||
+        row.next_season_number === null ||
+        row.next_episode_number === null ||
+        row.next_episode_title === null
+      )
+        return [];
+      return [{
+        ...show,
+        episode: {
+          id: row.next_episode_id,
+          media_item_id: row.media_item_id,
+          season_number: row.next_season_number,
+          episode_number: row.next_episode_number,
+          title: row.next_episode_title,
+          air_date: row.next_episode_air_date,
+        },
+      }];
+    })
+    .sort((left, right) =>
+      (right.latestRegularWatchedAt ?? "").localeCompare(
+        left.latestRegularWatchedAt ?? "",
+      ) || titleCompare(left, right),
+    );
+  const inactive = select("inactive").sort(
+    (left, right) =>
+      (left.latestRegularWatchedAt ?? "").localeCompare(
+        right.latestRegularWatchedAt ?? "",
+      ) || titleCompare(left, right),
+  );
+  const recentlyWatched = projection.recently_watched.flatMap(
+    (row): RecentlyWatchedItem[] => {
+      const show = byMembership.get(row.membership_id);
+      return show
+        ? [{
+            membership: show.membership,
+            media: show.media,
+            episode: {
+              id: row.episode_id,
+              media_item_id: row.media_item_id,
+              season_number: row.season_number,
+              episode_number: row.episode_number,
+              title: row.episode_title,
+              air_date: row.air_date,
+            },
+            watched: {
+              id: row.watched_id,
+              episode_id: row.episode_id,
+              watched_at: row.watched_at,
+            },
+          }]
+        : [];
+    },
+  );
+  return {
+    shows,
+    watchNext,
+    recentlyWatched,
+    inactive,
+    notStarted: select("not_started").sort(
+      (left, right) =>
+        right.membership.created_at.localeCompare(left.membership.created_at) ||
+        titleSort(left, right),
+    ),
+    caughtUp: select("caught_up").sort(titleSort),
+    completed: select("completed").sort(titleSort),
+    paused: select("paused").sort(titleSort),
+    dropped: select("dropped").sort(titleSort),
+    needsEpisodeData: select("needs_episode_data").sort(titleSort),
   };
 }

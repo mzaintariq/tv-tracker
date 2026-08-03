@@ -540,6 +540,14 @@ export type Database = {
         Args: Record<never, never>;
         Returns: Json;
       };
+      load_watch_list_projection: {
+        Args: {
+          p_today: string;
+          p_recent_cutoff: string;
+          p_recent_cutoff_date: string;
+        };
+        Returns: Json;
+      };
       load_movie_library_data: { Args: Record<never, never>; Returns: Json };
       load_profile_statistics: {
         Args: Record<never, never>;
