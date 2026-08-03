@@ -431,6 +431,16 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Add focused poster interaction and layout regression tests
 * [x] Run lint, type checking, unit tests, production build, and diff check
 
+### Release and streaming region preference foundation
+
+* [x] Add nullable constrained `profiles.region` migration without a default or backfill
+* [x] Keep region separate from timezone and avoid timezone-to-country inference
+* [x] Add a typed, alphabetized static supported-region list and validation helpers
+* [x] Add the accessible Profile Settings region selector and local feedback
+* [x] Validate owner-scoped server-side saves without raw database errors
+* [x] Add focused helper, UI/action-contract, constraint, and RLS tests
+* [x] Run database lint, pgTAP, lint, type checking, unit tests, build, and diff check
+
 ### Profile Statistics performance optimization
 
 * [x] Audit the existing Profile Statistics execution and data flow

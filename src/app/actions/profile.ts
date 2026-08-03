@@ -10,6 +10,11 @@ import {
   type ThemePreference,
 } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
+import {
+  isSupportedRegionCode,
+  normalizeRegionCode,
+  type RegionCode,
+} from "@/lib/regions";
 
 export type ProfileActionState = {
   error?: string;
@@ -21,6 +26,11 @@ export type ThemeActionResult = {
 };
 
 export type TimeZoneActionResult = {
+  error?: string;
+  success?: string;
+};
+
+export type RegionActionResult = {
   error?: string;
   success?: string;
 };
@@ -137,4 +147,36 @@ export async function updateTimeZonePreference(
   revalidatePath("/shows");
   revalidatePath("/shows/upcoming");
   return { success: "Timezone updated." };
+}
+
+export async function updateRegionPreference(
+  regionRaw: unknown,
+): Promise<RegionActionResult> {
+  const normalized = normalizeRegionCode(regionRaw);
+  if (!normalized || !isSupportedRegionCode(normalized)) {
+    return { error: "Choose a supported release and streaming region." };
+  }
+  const region: RegionCode = normalized;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError || !user) {
+    return { error: "You must be signed in to update your region." };
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ region })
+    .eq("id", user.id)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) {
+    return { error: "Region could not be saved. Please try again." };
+  }
+
+  revalidatePath("/profile/settings");
+  return { success: "Release and streaming region updated." };
 }

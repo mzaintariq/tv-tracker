@@ -22,6 +22,7 @@ export type Database = {
           avatar_url: string | null;
           theme: ThemePreference;
           timezone: string;
+          region: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -31,6 +32,7 @@ export type Database = {
           avatar_url?: string | null;
           theme?: ThemePreference;
           timezone?: string;
+          region?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -40,6 +42,7 @@ export type Database = {
           avatar_url?: string | null;
           theme?: ThemePreference;
           timezone?: string;
+          region?: string | null;
           created_at?: string;
           updated_at?: string;
         };
