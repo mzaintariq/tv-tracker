@@ -5,6 +5,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { ThemeSelector } from "@/components/profile/theme-selector";
 import { TimeZoneSelector } from "@/components/profile/timezone-selector";
+import { RegionSelector } from "@/components/profile/region-selector";
 import { displayNameFromEmail } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/types/database";
@@ -37,6 +38,7 @@ export default async function ProfileSettingsPage() {
       avatar_url: null,
       theme: "system",
       timezone: "UTC",
+      region: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } satisfies Profile);
@@ -84,6 +86,10 @@ export default async function ProfileSettingsPage() {
 
       <div className="mt-8 min-w-0 max-w-lg">
         <TimeZoneSelector currentTimeZone={resolvedProfile.timezone} />
+      </div>
+
+      <div className="mt-8 min-w-0 max-w-lg">
+        <RegionSelector currentRegion={resolvedProfile.region} />
       </div>
 
       <section className="mt-8 min-w-0 rounded-xl border border-[var(--border)] p-4 sm:p-5">
