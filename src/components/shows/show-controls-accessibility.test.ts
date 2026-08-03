@@ -14,9 +14,10 @@ vi.mock("@/app/actions/shows", () => ({
   updateWatchedDate: vi.fn(),
 }));
 
-import type { Episode, WatchedEpisode } from "@/types/database";
-import { EpisodeControls, InitialProgressForm } from "./show-controls";
+import type { Episode, UserShow, WatchedEpisode } from "@/types/database";
+import { EpisodeControls, InitialProgressForm, SettingsControls } from "./show-controls";
 import { timestampToDateTimeLocal } from "@/lib/date-time";
+import { NotificationProvider } from "@/components/ui/notifications";
 
 function episode(season: number, number: number): Episode {
   return { id: `${season}-${number}`, season_number: season, episode_number: number, title: `Episode ${number}`, air_date: "2020-01-01" } as Episode;
@@ -24,7 +25,7 @@ function episode(season: number, number: number): Episode {
 
 async function mount(element: React.ReactElement): Promise<ReactTestRenderer> {
   let renderer: ReactTestRenderer | undefined;
-  await act(() => { renderer = create(element); });
+  await act(() => { renderer = create(createElement(NotificationProvider, null, element)); });
   if (!renderer) throw new Error("Renderer unavailable.");
   return renderer;
 }
@@ -32,6 +33,16 @@ async function mount(element: React.ReactElement): Promise<ReactTestRenderer> {
 beforeAll(() => { globalThis.IS_REACT_ACT_ENVIRONMENT = true; });
 
 describe("show control accessibility", () => {
+  it("presents tracking status as one named three-way toggle", async () => {
+    const membership = { status: "paused", is_favourite: false } as UserShow;
+    const renderer = await mount(createElement(SettingsControls, { tmdbId: 42, mediaId: "media", membership }));
+    const fieldset = renderer.root.findByType("fieldset");
+    expect(fieldset.props["aria-label"]).toBe("Tracking status");
+    const toggles = fieldset.findAllByType("button");
+    expect(toggles.map((toggle) => toggle.findByType("span").children.join(""))).toEqual(["Active", "Paused", "Dropped"]);
+    expect(toggles.map((toggle) => toggle.props["aria-pressed"])).toEqual([false, true, false]);
+  });
+
   it("uses a native named radio group and labelled mode-specific controls", async () => {
     const renderer = await mount(createElement(InitialProgressForm, { tmdbId: 42, episodes: [episode(0, 1), episode(1, 1), episode(2, 1)] }));
     const radios = renderer.root.findAllByProps({ type: "radio" });

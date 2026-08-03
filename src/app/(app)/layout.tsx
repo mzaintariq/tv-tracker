@@ -4,6 +4,7 @@ import { AuthenticatedAppShell } from "@/components/layout/authenticated-app-she
 import { DesktopNav } from "@/components/nav/desktop-nav";
 import { MobileBottomNav } from "@/components/nav/mobile-bottom-nav";
 import { ThemeSync } from "@/components/theme/theme-sync";
+import { NotificationProvider } from "@/components/ui/notifications";
 import { isThemePreference } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 
@@ -36,7 +37,7 @@ export default async function AppLayout({
       desktopNavigation={<DesktopNav />}
       mobileNavigation={<MobileBottomNav />}
     >
-      {children}
+      <NotificationProvider>{children}</NotificationProvider>
     </AuthenticatedAppShell>
   );
 }

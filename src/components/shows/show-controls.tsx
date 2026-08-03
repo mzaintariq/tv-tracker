@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useSyncExternalStore, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
 
 import { removeFromLibrary } from "@/app/actions/library";
 import {
@@ -18,6 +18,7 @@ import {
 import { deriveInitialProgressOptions } from "@/lib/shows/initial-progress-options";
 import { timestampToDateTimeLocal } from "@/lib/date-time";
 import type { Episode, ShowTrackingStatus, UserShow, WatchedEpisode } from "@/types/database";
+import { useNotifications } from "@/components/ui/notifications";
 
 function ActionMessage({ id, result }: { id?: string; result: ShowActionResult | null }) {
   if (!result) return null;
@@ -33,24 +34,185 @@ const primaryButton = "touch-target max-w-full whitespace-normal rounded-lg bg-[
 
 export function MetadataButton({ tmdbId, setup = false, missingEpisodes = false }: { tmdbId: number; setup?: boolean; missingEpisodes?: boolean }) {
   const router = useRouter();
+  const { notify } = useNotifications();
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ShowActionResult | null>(null);
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStart = useRef<number | null>(null);
+  const pullDistanceRef = useRef(0);
   const label = setup ? missingEpisodes ? "Retry episode sync" : "Load episode information" : "Refresh Metadata";
-  return <div className="min-w-0"><button className={button} disabled={pending} onClick={() => start(async () => { const response = await syncShowMetadata(tmdbId); setResult(response); if (!response.error) router.refresh(); })}>{pending ? "Synchronizing…" : label}</button><ActionMessage result={result} /></div>;
+  const refreshMetadata = useCallback(() => {
+    if (pending) return;
+    start(async () => {
+      const response = await syncShowMetadata(tmdbId);
+      setResult(response);
+      if (!response.error) router.refresh();
+      if (!setup) notify(response.error ?? response.success ?? "Metadata refreshed.", response.error ? "error" : "success");
+    });
+  }, [notify, pending, router, setup, tmdbId]);
+
+  useEffect(() => {
+    if (setup) return;
+    let wheelEndTimer: number | undefined;
+    const resetPull = () => {
+      touchStart.current = null;
+      pullDistanceRef.current = 0;
+      setPullDistance(0);
+    };
+    const onTouchStart = (event: TouchEvent) => {
+      if (window.scrollY <= 0 && event.touches.length === 1) touchStart.current = event.touches[0].clientY;
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      if (touchStart.current === null || window.scrollY > 0 || event.touches.length !== 1) return;
+      const distance = Math.min(96, Math.max(0, (event.touches[0].clientY - touchStart.current) * 0.5));
+      pullDistanceRef.current = distance;
+      setPullDistance(distance);
+    };
+    const onTouchEnd = () => {
+      const shouldRefresh = pullDistanceRef.current >= 64;
+      resetPull();
+      if (shouldRefresh) refreshMetadata();
+    };
+    const onWheel = (event: WheelEvent) => {
+      if (window.scrollY > 0 || event.deltaY >= 0) {
+        if (event.deltaY > 0) resetPull();
+        return;
+      }
+      const distance = Math.min(96, pullDistanceRef.current + Math.abs(event.deltaY) * 0.35);
+      pullDistanceRef.current = distance;
+      setPullDistance(distance);
+      if (wheelEndTimer !== undefined) window.clearTimeout(wheelEndTimer);
+      wheelEndTimer = window.setTimeout(() => {
+        const shouldRefresh = pullDistanceRef.current >= 64;
+        resetPull();
+        if (shouldRefresh) refreshMetadata();
+      }, 180);
+    };
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", resetPull, { passive: true });
+    window.addEventListener("wheel", onWheel, { passive: true });
+    return () => {
+      if (wheelEndTimer !== undefined) window.clearTimeout(wheelEndTimer);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", resetPull);
+      window.removeEventListener("wheel", onWheel);
+    };
+  }, [setup, refreshMetadata]);
+
+  if (setup) return <div className="min-w-0"><button className={button} disabled={pending} onClick={refreshMetadata}>{pending ? "Synchronizing…" : label}</button><ActionMessage result={result} /></div>;
+  const pullReady = pullDistance >= 64;
+  return <div className="min-w-0"><div aria-hidden={pullDistance === 0 && !pending} className={`fixed left-1/2 top-[calc(0.75rem+var(--safe-area-top))] z-40 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 whitespace-nowrap rounded-full border border-[var(--control-border)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold shadow-lg transition-opacity ${pullDistance > 0 || pending ? "opacity-100" : "pointer-events-none opacity-0"}`} role="status">{pending ? "Refreshing metadata…" : pullReady ? "Release to refresh" : "Pull down or scroll up to refresh"}</div><button className="interactive-control sr-only focus:not-sr-only focus:fixed focus:left-1/2 focus:top-[calc(0.75rem+var(--safe-area-top))] focus:z-50 focus:-translate-x-1/2 focus:rounded-lg focus:border focus:bg-[var(--surface)] focus:px-3 focus:py-2" disabled={pending} onClick={refreshMetadata}>Refresh metadata</button></div>;
 }
 
 export function RemoveShowButton({ tmdbId }: { tmdbId: number }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ShowActionResult | null>(null);
-  return <div className="min-w-0"><button className={`${button} text-[var(--danger)]`} disabled={pending} onClick={() => start(async () => { const response = await removeFromLibrary("tv", tmdbId); setResult(response); if (!response.error) router.push("/shows"); })}>{pending ? "Removing…" : "Remove from library"}</button><p className="mt-1 break-words text-xs text-[var(--muted)]">Watch history will be preserved.</p><ActionMessage result={result} /></div>;
+  return (
+    <div className="w-full min-w-0">
+      <button
+        className={`${button} w-full text-[var(--danger)]`}
+        disabled={pending}
+        onClick={() =>
+          start(async () => {
+            const response = await removeFromLibrary("tv", tmdbId);
+            setResult(response);
+            if (!response.error) router.push("/shows");
+          })
+        }
+      >
+        {pending ? "Removing…" : "Remove from library"}
+      </button>
+      {/* <p className="mt-1 break-words text-xs text-[var(--muted)]">
+        Watch history will be preserved.
+      </p> */}
+      <ActionMessage result={result} />
+    </div>
+  );
 }
 
 export function SettingsControls({ tmdbId, mediaId, membership }: { tmdbId: number; mediaId: string; membership: UserShow }) {
+  const { notify } = useNotifications();
   const [pending, start] = useTransition();
-  const [result, setResult] = useState<ShowActionResult | null>(null);
-  const run = (values: { status?: ShowTrackingStatus; isFavourite?: boolean }) => start(async () => setResult(await updateShowSettings(tmdbId, mediaId, values)));
-  return <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"><button className={button} disabled={pending} onClick={() => run({ isFavourite: !membership.is_favourite })}><span aria-hidden="true">{membership.is_favourite ? "★" : "☆"}</span> {membership.is_favourite ? "Favourite" : "Add favourite"}</button><div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center"><label htmlFor={`show-status-${mediaId}`} className="text-sm">Status</label><select id={`show-status-${mediaId}`} className="interactive-control touch-target w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-[var(--foreground)] sm:w-auto" value={membership.status} disabled={pending} onChange={(event) => run({ status: event.target.value as ShowTrackingStatus })}><option value="active">Active</option><option value="paused">Paused</option><option value="dropped">Dropped</option></select></div><RemoveShowButton tmdbId={tmdbId} /><ActionMessage result={result} /></div>;
+  const [status, setStatus] = useState<ShowTrackingStatus>(membership.status);
+  const savedStatus = useRef<ShowTrackingStatus>(membership.status);
+  const queuedStatus = useRef<ShowTrackingStatus | null>(null);
+  const statusSaving = useRef(false);
+  const run = (values: { status?: ShowTrackingStatus; isFavourite?: boolean }) => start(async () => {
+    const response = await updateShowSettings(tmdbId, mediaId, values);
+    notify(response.error ?? response.success ?? "Show settings updated.", response.error ? "error" : "success");
+  });
+  const statuses = [
+    { label: "Active", value: "active" },
+    { label: "Paused", value: "paused" },
+    { label: "Dropped", value: "dropped" },
+  ] as const;
+  const selectStatus = (nextStatus: ShowTrackingStatus) => {
+    if (nextStatus === status) return;
+    setStatus(nextStatus);
+    queuedStatus.current = nextStatus;
+    if (statusSaving.current) return;
+    statusSaving.current = true;
+    start(async () => {
+      try {
+        while (queuedStatus.current !== null) {
+          const statusToSave = queuedStatus.current;
+          queuedStatus.current = null;
+          const response = await updateShowSettings(tmdbId, mediaId, { status: statusToSave });
+          notify(response.error ?? response.success ?? "Show settings updated.", response.error ? "error" : "success");
+          if (response.error) {
+            if (queuedStatus.current === null) setStatus(savedStatus.current);
+          } else savedStatus.current = statusToSave;
+        }
+      } finally {
+        statusSaving.current = false;
+      }
+    });
+  };
+  const indicatorPosition = status === "active" ? "translate-x-0" : status === "paused" ? "translate-x-full" : "translate-x-[200%]";
+  return (
+    <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="grid w-full min-w-0 grid-cols-2 gap-3 sm:w-auto">
+        <button
+          className={`${button} w-full`}
+          disabled={pending}
+          onClick={() => run({ isFavourite: !membership.is_favourite })}
+        >
+          <span aria-hidden="true">{membership.is_favourite ? "★" : "☆"}</span>{" "}
+          {membership.is_favourite ? "Favourite" : "Add favourite"}
+        </button>
+        <RemoveShowButton tmdbId={tmdbId} />
+      </div>
+      <fieldset
+        aria-label="Tracking status"
+        className="min-w-0"
+      >
+        <div className="relative grid w-full min-w-0 grid-cols-3 rounded-full border border-[var(--control-border)] bg-[var(--surface)] sm:w-auto">
+          <span
+            aria-hidden="true"
+            className={`pointer-events-none absolute inset-y-0 left-0 w-1/3 transition-transform duration-200 ease-out ${indicatorPosition}`}
+          >
+            <span className="absolute inset-x-1 inset-y-1 rounded-full bg-[var(--accent)] shadow-sm" />
+          </span>
+          {statuses.map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              className={`interactive-control touch-target relative z-10 min-w-0 cursor-pointer rounded-full px-2 text-sm font-semibold transition-colors duration-200 before:absolute before:inset-1 before:rounded-full before:transition-colors ${status === item.value ? "text-[var(--accent-foreground)]" : "text-[var(--muted)] hover:text-[var(--foreground)] hover:before:bg-[var(--surface-elevated)] active:before:bg-[var(--accent-soft)]"}`}
+              aria-pressed={status === item.value}
+              onClick={() => selectStatus(item.value)}
+            >
+              <span className="relative z-10">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+    </div>
+  );
 }
 
 export function InitialProgressForm({ tmdbId, episodes }: { tmdbId: number; episodes: Episode[] }) {
