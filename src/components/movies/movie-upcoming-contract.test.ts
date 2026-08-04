@@ -13,7 +13,24 @@ describe("Movies Upcoming route contract", () => {
     expect(page).toContain("Choose a release and streaming region"); expect(page).toContain("/profile/settings");
     expect(data).not.toContain("release_date:"); expect(data).not.toContain('?? "US"');
   });
-  it("uses a 320px-safe one-column grid", () => expect(read("src/components/movies/movie-upcoming-sections.tsx")).toContain('grid-cols-1'));
+  it("uses release rows instead of the poster grid", () => {
+    const sections=read("src/components/movies/movie-upcoming-sections.tsx"); const row=read("src/components/movies/upcoming-movie-card.tsx");
+    expect(sections).toContain('max-w-3xl'); expect(sections).toContain('space-y-3'); expect(sections).not.toContain('sm:grid-cols-3');
+    expect(row).toContain('grid-cols-[4rem_minmax(0,1fr)_3.75rem]'); expect(row).toContain('min-w-0');
+  });
+  it("keeps both statuses, full titles, and accessible countdown wording without synopsis", () => {
+    const source=read("src/components/movies/upcoming-movie-card.tsx");
+    expect(source).toContain("theatricalStatus"); expect(source).toContain("digitalStatus"); expect(source).toContain('title={movie.title}');
+    expect(source).toContain("proximity.accessibleLabel"); expect(source).not.toMatch(/overview|synopsis|description/);
+  });
+  it("uses a row-shaped localized loading skeleton", () => {
+    const loading=read("src/app/(app)/movies/(library)/upcoming/loading.tsx");
+    expect(loading).toContain('data-skeleton-region="movie-release-list"'); expect(loading).toContain('grid-cols-[4rem_minmax(0,1fr)_3.75rem]'); expect(loading).not.toContain('sm:grid-cols-3');
+  });
+  it("does not alter the Movies Watch List poster sections", () => {
+    expect(read("src/app/(app)/movies/(library)/page.tsx")).toContain("MovieSection");
+    expect(read("src/components/movies/movie-sections.tsx")).toContain("MovieCard");
+  });
   it("scopes the subnavigation away from movie detail routes", () => {
     expect(read("src/app/(app)/movies/(library)/layout.tsx")).toContain("MovieSubnav");
     expect(read("src/app/(app)/movies/[tmdbId]/page.tsx")).not.toContain("MovieSubnav");

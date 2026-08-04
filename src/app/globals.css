@@ -156,6 +156,32 @@ body {
     0 10px 24px color-mix(in srgb, var(--foreground) 18%, transparent);
 }
 
+.movie-release-row-interactive {
+  border-color: var(--border);
+  transition:
+    border-color 170ms ease,
+    background-color 170ms ease,
+    box-shadow 170ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .movie-release-row-interactive:hover {
+    border-color: var(--control-border);
+    background: var(--surface-elevated);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 14%, transparent);
+  }
+}
+
+.movie-release-row-interactive:active {
+  border-color: var(--control-border);
+  background: var(--surface-elevated);
+}
+
+.movie-release-row-interactive:focus-visible {
+  border-color: var(--control-border);
+  box-shadow: 0 0 0 5px var(--foreground);
+}
+
 .poster-overlay-action {
   border-color: color-mix(in srgb, white 50%, transparent);
   background: color-mix(in srgb, #111 78%, transparent);
@@ -257,6 +283,10 @@ body {
   .poster-overlay-action,
   .poster-overlay-action:active:not(:disabled) {
     transform: none !important;
+    transition: none !important;
+  }
+
+  .movie-release-row-interactive {
     transition: none !important;
   }
 

@@ -10,6 +10,13 @@ export type MovieUpcomingRow = {
   digital_date: string | null; release_dates_synced_at: string | null;
 };
 
+export type MovieReleaseProximity = {
+  visiblePrimary: string;
+  visibleSecondary: string | null;
+  accessibleLabel: string;
+  primaryDate: string | null;
+};
+
 export function calendarDayDifference(today: string, date: string): number | null {
   if (!parseDateOnly(today) || !parseDateOnly(date)) return null;
   if (date === today) return 0;
@@ -42,6 +49,70 @@ export function digitalStatus(date: string | null, today: string): string {
   if (days === 0) return "Digital release today";
   if (days === 1) return "Digital release tomorrow";
   return `Digital release in ${days} days`;
+}
+
+export function movieReleaseProximity(
+  movie: Pick<MovieUpcomingRow, "theatrical_date" | "digital_date">,
+  today: string,
+  section: "out-now" | "coming-soon" | "tba",
+): MovieReleaseProximity {
+  if (section === "tba") {
+    return {
+      visiblePrimary: "TBA",
+      visibleSecondary: null,
+      accessibleLabel: "Release date to be announced",
+      primaryDate: null,
+    };
+  }
+  const dates = [movie.theatrical_date, movie.digital_date].filter(
+    (date): date is string => date !== null && parseDateOnly(date) !== null,
+  );
+  const primaryDate =
+    section === "coming-soon"
+      ? dates.filter((date) => date >= today).sort()[0] ?? null
+      : dates.filter((date) => date <= today).sort().at(-1) ?? null;
+  if (!primaryDate) {
+    return {
+      visiblePrimary: "TBA",
+      visibleSecondary: null,
+      accessibleLabel: "Release date to be announced",
+      primaryDate: null,
+    };
+  }
+  const difference = calendarDayDifference(today, primaryDate);
+  if (difference === null) {
+    return {
+      visiblePrimary: "TBA",
+      visibleSecondary: null,
+      accessibleLabel: "Release date to be announced",
+      primaryDate: null,
+    };
+  }
+  if (difference === 0) {
+    return {
+      visiblePrimary: "TODAY",
+      visibleSecondary: null,
+      accessibleLabel:
+        section === "coming-soon"
+          ? "The next release is today"
+          : "The latest release is today",
+      primaryDate,
+    };
+  }
+  const days = Math.abs(difference);
+  return section === "coming-soon"
+    ? {
+        visiblePrimary: String(days),
+        visibleSecondary: days === 1 ? "DAY" : "DAYS",
+        accessibleLabel: `${days} ${days === 1 ? "day" : "days"} until the next release`,
+        primaryDate,
+      }
+    : {
+        visiblePrimary: String(days),
+        visibleSecondary: days === 1 ? "DAY AGO" : "DAYS AGO",
+        accessibleLabel: `${days} ${days === 1 ? "day" : "days"} since the latest release`,
+        primaryDate,
+      };
 }
 
 export function isMovieReleaseMetadataStale(value: string | null, now: Date): boolean {
