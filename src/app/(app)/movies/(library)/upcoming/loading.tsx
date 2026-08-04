@@ -11,7 +11,7 @@ export default function MovieUpcomingLoading() {
       <div
         aria-hidden="true"
         data-skeleton-region="movie-release-list"
-        className="mx-auto max-w-3xl space-y-3"
+        className="w-full space-y-3"
       >
         {Array.from({ length: 4 }, (_, i) => (
           <div

@@ -6,5 +6,5 @@ function Section({ title, movies, today, section }: { title: string; movies: Mov
   return <section className="space-y-3"><h2 className="text-2xl font-semibold tracking-tight">{title} · {movies.length}</h2><ul className={list}>{movies.map((movie) => <li className="min-w-0" key={movie.membership_id}><UpcomingMovieCard movie={movie} today={today} section={section} /></li>)}</ul></section>;
 }
 export function MovieUpcomingSections(props: { outNow: MovieUpcomingRow[]; comingSoon: MovieUpcomingRow[]; datesNotAnnounced: MovieUpcomingRow[]; today: string }) {
-  return <div className="mx-auto max-w-3xl space-y-10"><Section title="Out Now" movies={props.outNow} today={props.today} section="out-now" /><Section title="Coming Soon" movies={props.comingSoon} today={props.today} section="coming-soon" /><Section title="Dates not announced" movies={props.datesNotAnnounced} today={props.today} section="tba" /></div>;
+  return <div className="w-full space-y-10"><Section title="Out Now" movies={props.outNow} today={props.today} section="out-now" /><Section title="Coming Soon" movies={props.comingSoon} today={props.today} section="coming-soon" /><Section title="Dates not announced" movies={props.datesNotAnnounced} today={props.today} section="tba" /></div>;
 }

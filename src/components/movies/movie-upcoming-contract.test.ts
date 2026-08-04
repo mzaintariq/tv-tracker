@@ -15,7 +15,7 @@ describe("Movies Upcoming route contract", () => {
   });
   it("uses release rows instead of the poster grid", () => {
     const sections=read("src/components/movies/movie-upcoming-sections.tsx"); const row=read("src/components/movies/upcoming-movie-card.tsx");
-    expect(sections).toContain('max-w-3xl'); expect(sections).toContain('space-y-3'); expect(sections).not.toContain('sm:grid-cols-3');
+    expect(sections).toContain('w-full'); expect(sections).not.toContain('max-w-3xl'); expect(sections).toContain('space-y-3'); expect(sections).not.toContain('sm:grid-cols-3');
     expect(row).toContain('grid-cols-[4rem_minmax(0,1fr)_3.75rem]'); expect(row).toContain('min-w-0');
   });
   it("keeps both statuses, full titles, and accessible countdown wording without synopsis", () => {
