@@ -11,6 +11,7 @@ function movie(
   watchedAt: string | null = null,
   favourite = false,
   createdAt = "2026-01-01T00:00:00Z",
+  releaseDate: string | null = null,
 ): MovieSnapshot {
   return {
     membership: {
@@ -27,6 +28,7 @@ function movie(
       tmdb_id: title.length,
       media_type: "movie",
       title,
+      release_date: releaseDate,
     } as MediaItem,
   };
 }
@@ -43,6 +45,21 @@ describe("movie section derivation", () => {
       "Next",
       "Seen",
     ]);
+  });
+
+  it("splits unwatched movies by the general date-only release date", () => {
+    const result = deriveMovieSections([
+      movie("Future B", null, false, "2026-01-04T00:00:00Z", "2026-08-20"),
+      movie("Future A", null, false, "2026-01-03T00:00:00Z", "2026-08-10"),
+      movie("Today", null, false, "2026-01-02T00:00:00Z", "2026-08-04"),
+      movie("Past", null, false, "2026-01-01T00:00:00Z", "2026-08-03"),
+      movie("Missing"),
+      movie("Watched Future", "2026-08-01T00:00:00Z", false, "2026-01-05T00:00:00Z", "2026-08-30"),
+    ], "2026-08-04");
+    expect(result.upcoming.map((item) => item.media.title)).toEqual(["Future A","Future B"]);
+    expect(result.watchNext.map((item) => item.media.title)).toEqual(["Today","Missing","Past"]);
+    expect(result.watched.map((item) => item.media.title)).toEqual(["Watched Future"]);
+    expect(result.watchNext.filter((item) => result.upcoming.includes(item))).toEqual([]);
   });
 
   it("sorts deterministically and limits recently watched", () => {

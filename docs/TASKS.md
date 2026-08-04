@@ -236,6 +236,14 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 ## Phase 7 — Movies and profile statistics
 
 * [x] Add shared regional movie release metadata foundation
+* [x] Add Movies Upcoming route and segmented navigation
+* [x] Add owner-scoped regional movie Upcoming projection
+* [x] Add theatrical and digital calendar-day countdowns
+* [x] Add missing-region and dates-not-announced states
+* [x] Add bounded stale movie release refresh
+* [x] Add regional Out Now section with a 30-day calendar window
+* [x] Separate future general-release movies from Watch Next
+* [x] Scope Movies segmented navigation away from detail routes
 
 * [x] Add movie Watch Next
 * [x] Add watched movies

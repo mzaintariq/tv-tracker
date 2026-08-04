@@ -4,8 +4,27 @@ import { revalidatePath } from "next/cache";
 import { parseTmdbId } from "@/lib/media/types";
 import { parseManualWatchedAt, parseUuid } from "@/lib/shows/validation";
 import { createClient } from "@/lib/supabase/server";
+import { synchronizeMovie } from "@/lib/movies/sync";
+import { isMovieReleaseMetadataStale } from "@/lib/movies/upcoming";
+import { settleWithConcurrency } from "@/lib/shows/freshness";
 
 export type MovieActionResult = { error?: string; success?: string };
+export type MovieUpcomingRefreshResult = { attempted: number; failed: number };
+
+export async function refreshStaleMovieUpcoming(value: unknown): Promise<MovieUpcomingRefreshResult> {
+  const ids = Array.isArray(value) ? [...new Set(value.filter((item): item is number => Number.isInteger(item) && item > 0))].slice(0, 100) : [];
+  if (!ids.length) return { attempted: 0, failed: 0 };
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { attempted: 0, failed: ids.length };
+  const result = await supabase.rpc("load_movie_upcoming_refresh_candidates", { p_tmdb_ids: ids });
+  if (result.error) return { attempted: 0, failed: ids.length };
+  const candidates = result.data.filter((row) => isMovieReleaseMetadataStale(row.release_dates_synced_at, new Date()));
+  const settled = await settleWithConcurrency(candidates, 2, (row) => synchronizeMovie(row.tmdb_id));
+  const failed = settled.filter((item) => item.status === "rejected" || !item.value.releaseDatesSynchronized).length;
+  revalidatePath("/movies/upcoming");
+  return { attempted: candidates.length, failed };
+}
 
 async function ownedMovie(tmdbIdRaw: unknown, mediaIdRaw: unknown) {
   const tmdbId = parseTmdbId(tmdbIdRaw);
@@ -41,6 +60,7 @@ async function ownedMovie(tmdbIdRaw: unknown, mediaIdRaw: unknown) {
 
 function refresh(tmdbId: number) {
   revalidatePath("/movies");
+  revalidatePath("/movies/upcoming");
   revalidatePath(`/movies/${tmdbId}`);
   revalidatePath("/explore");
   revalidatePath("/profile");

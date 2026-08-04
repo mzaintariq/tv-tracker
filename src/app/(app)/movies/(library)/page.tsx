@@ -12,7 +12,7 @@ export default async function MoviesPage() {
   if (!user) redirect("/login");
   const list = await loadMovies(user.id);
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-10">
+    <div className="space-y-10">
       {!list.movies.length ? (
         <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center">
           <h2 className="text-xl font-semibold">No movies yet</h2>
@@ -33,6 +33,12 @@ export default async function MoviesPage() {
             description="Movies in your library that you have not watched."
             movies={list.watchNext}
             quickMarkWatched
+            limitInitially
+          />
+          <MovieSection
+            title="Upcoming"
+            description="Unwatched movies with a future general release date."
+            movies={list.upcoming}
             limitInitially
           />
           <MovieSection

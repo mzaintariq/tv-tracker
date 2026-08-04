@@ -16,6 +16,7 @@ export type MovieSections<
 > = {
   movies: MovieSnapshot<TMedia>[];
   watchNext: MovieSnapshot<TMedia>[];
+  upcoming: MovieSnapshot<TMedia>[];
   recentlyWatched: MovieSnapshot<TMedia>[];
   watched: MovieSnapshot<TMedia>[];
   favourites: MovieSnapshot<TMedia>[];
@@ -41,15 +42,20 @@ const watchedCompare = <TMedia extends MovieLibraryMedia>(
 
 export function deriveMovieSections<TMedia extends MovieLibraryMedia>(
   movies: readonly MovieSnapshot<TMedia>[],
+  today = "9999-12-31",
 ): MovieSections<TMedia> {
   const all = [...movies];
   const watchNext = all
-    .filter((movie) => movie.membership.watched_at === null)
+    .filter((movie) => movie.membership.watched_at === null && (!movie.media.release_date || movie.media.release_date <= today))
     .sort(
       (left, right) =>
         right.membership.created_at.localeCompare(left.membership.created_at) ||
         titleCompare(left, right),
     );
+  const upcoming = all
+    .filter((movie) => movie.membership.watched_at === null && movie.media.release_date !== null && movie.media.release_date > today)
+    .sort((left, right) =>
+      (left.media.release_date ?? "").localeCompare(right.media.release_date ?? "") || titleCompare(left, right));
   const watched = all
     .filter((movie) => movie.membership.watched_at !== null)
     .sort(watchedCompare);
@@ -59,6 +65,7 @@ export function deriveMovieSections<TMedia extends MovieLibraryMedia>(
   return {
     movies: all,
     watchNext,
+    upcoming,
     recentlyWatched: watched.slice(0, RECENTLY_WATCHED_MOVIES_LIMIT),
     watched,
     favourites,

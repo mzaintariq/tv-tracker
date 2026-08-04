@@ -626,6 +626,19 @@ export type Database = {
         }[];
       };
       load_upcoming_data: { Args: { p_today: string }; Returns: Json };
+      load_movie_upcoming: {
+        Args: { p_region: string; p_today: string };
+        Returns: {
+          membership_id: string; media_item_id: string; tmdb_id: number; title: string;
+          poster_path: string | null; watched_at: string | null; is_favourite: boolean;
+          theatrical_date: string | null; theatrical_type: number | null;
+          digital_date: string | null; release_dates_synced_at: string | null;
+        }[];
+      };
+      load_movie_upcoming_refresh_candidates: {
+        Args: { p_tmdb_ids: number[] };
+        Returns: { tmdb_id: number; release_dates_synced_at: string | null }[];
+      };
       load_upcoming_refresh_candidates: {
         Args: { p_tmdb_ids: number[] };
         Returns: Json;

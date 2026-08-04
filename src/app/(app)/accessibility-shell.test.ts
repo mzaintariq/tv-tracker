@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 const neutralizedRoutes = [
   "src/app/(app)/shows/page.tsx",
   "src/app/(app)/shows/upcoming/page.tsx",
-  "src/app/(app)/movies/page.tsx",
-  "src/app/(app)/movies/loading.tsx",
+  "src/app/(app)/movies/(library)/page.tsx",
+  "src/app/(app)/movies/(library)/loading.tsx",
   "src/app/(app)/profile/import/page.tsx",
   "src/app/(app)/profile/import/loading.tsx",
   "src/app/(app)/profile/import/[importId]/page.tsx",
