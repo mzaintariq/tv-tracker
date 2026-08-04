@@ -28,13 +28,13 @@ select throws_matching($$select public.reconcile_movie_release_dates('2e000000-0
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','1e000000-0000-0000-0000-000000000001',true);
-select is((select count(*)::integer from public.movie_release_dates),1,'User A reads shared metadata');
+select is((select count(*)::integer from public.movie_release_dates where media_item_id='2e000000-0000-0000-0000-000000000001'),1,'User A reads the shared fixture metadata');
 select throws_ok($$insert into public.movie_release_dates(media_item_id,region,release_type,release_date) values ('2e000000-0000-0000-0000-000000000001','CH',4,'2026-08-05')$$,'42501',null,'authenticated insert is denied');
 select throws_ok($$update public.movie_release_dates set note='changed'$$,'42501',null,'authenticated update is denied');
 select throws_ok($$delete from public.movie_release_dates$$,'42501',null,'authenticated delete is denied');
 select throws_ok($$select public.reconcile_movie_release_dates('2e000000-0000-0000-0000-000000000001','[]')$$,'42501',null,'authenticated RPC execution is denied');
 select set_config('request.jwt.claim.sub','1e000000-0000-0000-0000-000000000002',true);
-select is((select count(*)::integer from public.movie_release_dates),1,'User B reads the same shared metadata');
+select is((select count(*)::integer from public.movie_release_dates where media_item_id='2e000000-0000-0000-0000-000000000001'),1,'User B reads the same shared fixture metadata');
 
 select * from finish();
 rollback;

@@ -57,7 +57,7 @@ function movie(index: number): MovieSnapshot {
 }
 
 async function renderLimitedSection(
-  title: "Watch Next" | "Watched",
+  title: "Watch Next" | "Watched" | "Upcoming",
   count: number,
 ) {
   globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -77,7 +77,7 @@ async function renderLimitedSection(
 }
 
 describe("limited movie sections", () => {
-  it.each(["Watch Next", "Watched"] as const)(
+  it.each(["Watch Next", "Watched", "Upcoming"] as const)(
     "limits Movie %s to 10, expands, and restores order on collapse",
     async (title) => {
       const renderer = await renderLimitedSection(title, 12);
@@ -129,6 +129,11 @@ describe("limited movie sections", () => {
         .findAllByType("button")
         .filter((button) => button.children.includes("Mark watched")),
     ).toHaveLength(10);
+  });
+
+  it("does not add quick watched actions to Upcoming", async () => {
+    const renderer = await renderLimitedSection("Upcoming", 12);
+    expect(renderer.root.findAllByType("button").filter((button) => button.children.includes("Mark watched"))).toHaveLength(0);
   });
 
   it("composes server-rendered children without render-function or component props", () => {

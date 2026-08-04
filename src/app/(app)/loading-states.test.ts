@@ -1,7 +1,7 @@
 import { createElement, type ComponentType } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import MoviesLoading from "./movies/loading";
+import MoviesLoading from "./movies/(library)/loading";
 import MovieDetailLoading from "./movies/[tmdbId]/loading";
 import ProfileLoading from "./profile/loading";
 import ProfileSettingsLoading from "./profile/settings/loading";

@@ -8,11 +8,15 @@ import {
 } from "@/lib/movies/movies";
 import { createClient } from "@/lib/supabase/server";
 import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
+import { dateInTimeZone, validTimeZone } from "@/lib/date-time";
 
 export async function loadMovies(_userId: string): Promise<MovieSections> {
   void _userId;
   const supabase = await createClient();
-  const result = await supabase.rpc("load_movie_library_data");
+  const [result, profile] = await Promise.all([
+    supabase.rpc("load_movie_library_data"),
+    supabase.from("profiles").select("timezone").eq("id", _userId).single(),
+  ]);
   if (result.error) {
     const code = logSafeReadFailure(
       "movies",
@@ -22,11 +26,13 @@ export async function loadMovies(_userId: string): Promise<MovieSections> {
     );
     throw new Error(`Could not load movie metadata. [${code}]`);
   }
+  if (profile.error) throw new Error("Could not load movie timezone.");
   const payload = result.data as {
     movies?: MovieSnapshot<MovieLibraryMedia>[];
   } | null;
   return deriveMovieSections(
     Array.isArray(payload?.movies) ? payload.movies : [],
+    dateInTimeZone(new Date(), validTimeZone(profile.data.timezone)),
   );
 }
 

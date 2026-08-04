@@ -8,8 +8,8 @@ describe("primary media section headings", () => {
       "src/app/(app)/shows/loading.tsx",
       "src/app/(app)/shows/upcoming/page.tsx",
       "src/app/(app)/shows/upcoming/loading.tsx",
-      "src/app/(app)/movies/page.tsx",
-      "src/app/(app)/movies/loading.tsx",
+      "src/app/(app)/movies/(library)/page.tsx",
+      "src/app/(app)/movies/(library)/loading.tsx",
     ];
     const removedCopy = [
       "Your watch list and television progress.",

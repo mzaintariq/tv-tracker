@@ -107,6 +107,7 @@ export async function addToLibrary(
     revalidatePath("/explore");
     revalidatePath("/shows");
     revalidatePath("/movies");
+    revalidatePath("/movies/upcoming");
 
     return { success: "Added to your watchlist." };
   } catch (error) {
