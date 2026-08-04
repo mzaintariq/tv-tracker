@@ -6,9 +6,9 @@ import { isMediaType, parseTmdbId, type MediaType } from "@/lib/media/types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { TmdbApiError } from "@/lib/tmdb/client";
-import { getMovieDetails, getTvDetails } from "@/lib/tmdb/endpoints";
+import { getTvDetails } from "@/lib/tmdb/endpoints";
+import { synchronizeMovie } from "@/lib/movies/sync";
 import {
-  mapTmdbMovieDetailsToCacheRow,
   mapTmdbTvDetailsToCacheRow,
 } from "@/lib/tmdb/mappers";
 
@@ -30,7 +30,7 @@ export async function prepareShowProgress(
   if (userError || !user)
     return { error: "You must be signed in to set show progress." };
   try {
-    const cacheRow = await upsertMediaItem("tv", tmdbId);
+    const cacheRow = await fetchShowCacheRow(tmdbId);
     const { error } = await createAdminClient()
       .from("media_items")
       .upsert(cacheRow, { onConflict: "tmdb_id,media_type" });
@@ -52,14 +52,9 @@ function uniqueViolation(error: { code?: string; message?: string }): boolean {
   );
 }
 
-async function upsertMediaItem(mediaType: MediaType, tmdbId: number) {
-  if (mediaType === "tv") {
-    const details = await getTvDetails(tmdbId);
-    return mapTmdbTvDetailsToCacheRow(details);
-  }
-
-  const details = await getMovieDetails(tmdbId);
-  return mapTmdbMovieDetailsToCacheRow(details);
+async function fetchShowCacheRow(tmdbId: number) {
+  const details = await getTvDetails(tmdbId);
+  return mapTmdbTvDetailsToCacheRow(details);
 }
 
 export async function addToLibrary(
@@ -94,24 +89,11 @@ export async function addToLibrary(
   }
 
   try {
-    const cacheRow = await upsertMediaItem(mediaType, tmdbId);
-    const admin = createAdminClient();
-
-    const { data: mediaItem, error: upsertError } = await admin
-      .from("media_items")
-      .upsert(cacheRow, { onConflict: "tmdb_id,media_type" })
-      .select("id")
-      .single();
-
-    if (upsertError || !mediaItem) {
-      return {
-        error: upsertError?.message ?? "Could not cache media metadata.",
-      };
-    }
+    const movieSync = await synchronizeMovie(tmdbId);
 
     const { error } = await supabase.from("user_movies").insert({
       user_id: user.id,
-      media_item_id: mediaItem.id,
+      media_item_id: movieSync.mediaItemId,
     });
 
     if (error) {

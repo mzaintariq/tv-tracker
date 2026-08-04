@@ -235,6 +235,8 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ## Phase 7 — Movies and profile statistics
 
+* [x] Add shared regional movie release metadata foundation
+
 * [x] Add movie Watch Next
 * [x] Add watched movies
 * [x] Add movie favourites
