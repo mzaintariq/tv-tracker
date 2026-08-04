@@ -41,6 +41,7 @@ function snapshot(
     tmdb_status: "Returning Series",
     last_synced_at: NOW.toISOString(),
     episodes_synced_at: NOW.toISOString(),
+    release_dates_synced_at: null,
     created_at: NOW.toISOString(),
     updated_at: NOW.toISOString(),
   } satisfies MediaItem;

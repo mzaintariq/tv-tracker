@@ -8,6 +8,7 @@ import type {
   TmdbTvDetails,
   TmdbTvListItem,
   TmdbSeasonDetails,
+  TmdbMovieReleaseDatesResponse,
 } from "@/lib/tmdb/types";
 
 const PAGE = 1;
@@ -90,10 +91,18 @@ export async function getTvDetails(
   });
 }
 
-export async function getMovieDetails(
-  tmdbId: number,
-): Promise<TmdbMovieDetails> {
+export async function getMovieDetails(tmdbId: number): Promise<TmdbMovieDetails> {
   return fetchTmdb<TmdbMovieDetails>({
     path: `/movie/${tmdbId}`,
+  });
+}
+
+export async function getMovieReleaseDates(
+  tmdbId: number,
+  forceRefresh = false,
+): Promise<TmdbMovieReleaseDatesResponse> {
+  return fetchTmdb<TmdbMovieReleaseDatesResponse>({
+    path: `/movie/${tmdbId}/release_dates`,
+    forceRefresh,
   });
 }

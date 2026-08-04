@@ -78,3 +78,22 @@ export type TmdbMovieDetails = TmdbMovieListItem & {
   runtime?: number | null;
   imdb_id?: string | null;
 };
+
+export type TmdbMovieReleaseDate = {
+  certification: string;
+  descriptors?: string[];
+  iso_639_1?: string | null;
+  note: string;
+  release_date: string;
+  type: number;
+};
+
+export type TmdbMovieReleaseDateRegion = {
+  iso_3166_1: string;
+  release_dates: TmdbMovieReleaseDate[];
+};
+
+export type TmdbMovieReleaseDatesResponse = {
+  id: number;
+  results: TmdbMovieReleaseDateRegion[];
+};

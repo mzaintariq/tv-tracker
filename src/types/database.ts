@@ -10,6 +10,8 @@ export type ThemePreference = "light" | "dark" | "system";
 
 export type MediaType = "tv" | "movie";
 
+export type MovieReleaseDate = Database["public"]["Tables"]["movie_release_dates"]["Row"];
+
 export type ShowTrackingStatus = "active" | "paused" | "dropped";
 
 export type Database = {
@@ -65,6 +67,7 @@ export type Database = {
           tmdb_status: string | null;
           last_synced_at: string;
           episodes_synced_at: string | null;
+          release_dates_synced_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -84,6 +87,7 @@ export type Database = {
           tmdb_status?: string | null;
           last_synced_at?: string;
           episodes_synced_at?: string | null;
+          release_dates_synced_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -103,6 +107,7 @@ export type Database = {
           tmdb_status?: string | null;
           last_synced_at?: string;
           episodes_synced_at?: string | null;
+          release_dates_synced_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -139,6 +144,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "user_shows_media_item_id_fkey";
+            columns: ["media_item_id"];
+            isOneToOne: false;
+            referencedRelation: "media_items";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      movie_release_dates: {
+        Row: {
+          id: string;
+          media_item_id: string;
+          region: string;
+          release_type: number;
+          release_date: string;
+          certification: string | null;
+          note: string | null;
+          language: string | null;
+          source: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          media_item_id: string;
+          region: string;
+          release_type: number;
+          release_date: string;
+          certification?: string | null;
+          note?: string | null;
+          language?: string | null;
+          source?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["movie_release_dates"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "movie_release_dates_media_item_id_fkey";
             columns: ["media_item_id"];
             isOneToOne: false;
             referencedRelation: "media_items";
@@ -537,6 +580,10 @@ export type Database = {
       };
       reconcile_show_episodes: {
         Args: { p_media_item_id: string; p_episodes: Json };
+        Returns: undefined;
+      };
+      reconcile_movie_release_dates: {
+        Args: { p_media_item_id: string; p_release_dates: Json };
         Returns: undefined;
       };
       load_watch_list_episode_data: {
