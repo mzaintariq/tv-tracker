@@ -38,6 +38,25 @@ describe("movie Upcoming countdowns", () => {
     expect(result.datesNotAnnounced.map((item) => item.membership_id)).toEqual(["missing"]);
     expect([...result.outNow,...result.comingSoon,...result.datesNotAnnounced].map((item) => item.membership_id)).not.toContain("old");
   });
+  it("excludes dates many years old from Out Now", () => {
+    const result = partitionUpcomingMovies([
+      row({membership_id:"2012",theatrical_date:"2012-03-12"}),
+      row({membership_id:"recent",digital_date:"2026-07-05"}),
+    ],"2026-08-04");
+    expect(result.outNow.map((item) => item.membership_id)).toEqual(["recent"]);
+    expect(result.comingSoon).toEqual([]);
+    expect(result.datesNotAnnounced).toEqual([]);
+  });
+  it("includes watched movies for meaningful regional events but not TBA", () => {
+    const result = partitionUpcomingMovies([
+      row({membership_id:"watched-future",watched_at:"2026-01-01T00:00:00Z",theatrical_date:"2026-09-01"}),
+      row({membership_id:"watched-recent",watched_at:"2026-01-01T00:00:00Z",digital_date:"2026-08-03"}),
+      row({membership_id:"watched-missing",watched_at:"2026-01-01T00:00:00Z"}),
+    ],"2026-08-04");
+    expect(result.comingSoon.map((item) => item.membership_id)).toEqual(["watched-future"]);
+    expect(result.outNow.map((item) => item.membership_id)).toEqual(["watched-recent"]);
+    expect(result.datesNotAnnounced).toEqual([]);
+  });
   it("sorts Out Now newest first with stable title ties", () => {
     const result = partitionUpcomingMovies([
       row({membership_id:"older",title:"Zulu",theatrical_date:"2026-07-25"}),

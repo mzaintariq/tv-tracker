@@ -137,6 +137,6 @@ export function partitionUpcomingMovies(rows: readonly MovieUpcomingRow[], today
   return {
     outNow,
     comingSoon,
-    datesNotAnnounced: rows.filter((row) => !row.theatrical_date && !row.digital_date).sort(titleCompare),
+    datesNotAnnounced: rows.filter((row) => row.watched_at === null && !row.theatrical_date && !row.digital_date).sort(titleCompare),
   };
 }

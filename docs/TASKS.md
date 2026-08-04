@@ -244,6 +244,9 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Add regional Out Now section with a 30-day calendar window
 * [x] Separate future general-release movies from Watch Next
 * [x] Scope Movies segmented navigation away from detail routes
+* [x] Include watched memberships for meaningful regional release events
+* [x] Keep Dates Not Announced unwatched-only and exclude stale catalogue memberships
+* [x] Preserve current regional re-releases for older movies
 
 * [x] Add movie Watch Next
 * [x] Add watched movies
