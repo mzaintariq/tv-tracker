@@ -23,6 +23,10 @@ describe("Movies Upcoming route contract", () => {
     expect(source).toContain("theatricalStatus"); expect(source).toContain("digitalStatus"); expect(source).toContain('title={movie.title}');
     expect(source).toContain("proximity.accessibleLabel"); expect(source).not.toMatch(/overview|synopsis|description/);
   });
+  it("shows the accessible Watched badge only behind watched membership state", () => {
+    const source=read("src/components/movies/upcoming-movie-card.tsx");
+    expect(source).toContain("movie.watched_at ?"); expect(source).toContain(">Watched"); expect(source).toContain("already watched");
+  });
   it("uses a row-shaped localized loading skeleton", () => {
     const loading=read("src/app/(app)/movies/(library)/upcoming/loading.tsx");
     expect(loading).toContain('data-skeleton-region="movie-release-list"'); expect(loading).toContain('grid-cols-[4rem_minmax(0,1fr)_3.75rem]'); expect(loading).not.toContain('sm:grid-cols-3');

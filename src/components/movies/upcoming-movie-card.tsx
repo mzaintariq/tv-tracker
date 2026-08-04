@@ -11,7 +11,10 @@ export function UpcomingMovieCard({ movie, today, section }: { movie: MovieUpcom
           <MediaPoster source={movie.poster_path} title={movie.title} alt="" sizes="(max-width: 639px) 64px, 80px" />
         </div>
         <div className="min-w-0 self-center">
-          <h3 className="line-clamp-2 break-words font-semibold leading-snug" title={movie.title}>{movie.title}</h3>
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <h3 className="line-clamp-2 min-w-0 break-words font-semibold leading-snug" title={movie.title}>{movie.title}</h3>
+            {movie.watched_at ? <span className="rounded-full border border-[var(--control-border)] px-2 py-0.5 text-xs font-semibold text-[var(--muted)]">Watched<span className="sr-only"> (already watched)</span></span> : null}
+          </div>
           <p className="mt-2 break-words text-sm leading-snug text-[var(--foreground)]">{theatricalStatus(movie.theatrical_date, movie.theatrical_type, today)}</p>
           <p className="mt-1 break-words text-sm leading-snug text-[var(--muted)]">{digitalStatus(movie.digital_date, today)}</p>
         </div>
