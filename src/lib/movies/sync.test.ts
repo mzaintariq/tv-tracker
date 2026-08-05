@@ -58,6 +58,13 @@ describe("movie metadata synchronization", () => {
     });
   });
 
+  it("bypasses both TMDB caches for trusted manual refresh", async () => {
+    adminMock();
+    await synchronizeMovie(10, true);
+    expect(getMovieDetails).toHaveBeenCalledWith(10, true);
+    expect(getMovieReleaseDates).toHaveBeenCalledWith(10, true);
+  });
+
   it("preserves core success when the supplemental fetch fails", async () => {
     const admin = adminMock();
     const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);

@@ -1,0 +1,25 @@
+begin;
+select plan(16);
+
+select has_column('public','media_items','genres','genres column exists');
+select has_column('public','media_items','vote_average','vote average column exists');
+select has_column('public','media_items','networks','networks column exists');
+select has_column('public','media_items','production_companies','companies column exists');
+select has_column('public','media_items','rich_metadata_synced_at','rich freshness column exists');
+select lives_ok($$insert into public.media_items(id,tmdb_id,media_type,title) values ('4e000000-0000-0000-0000-000000000001',99001,'tv','Existing-compatible')$$,'old insert shape remains valid');
+select is((select genres from public.media_items where tmdb_id=99001),'[]'::jsonb,'new arrays safely default empty');
+select is((select rich_metadata_synced_at from public.media_items where tmdb_id=99001),null,'legacy rows remain explicitly stale');
+set local role service_role;
+select lives_ok($$update public.media_items set genres='[{"id":1,"name":"Drama"}]',vote_average=8.5,vote_count=20,original_language='en',networks='[{"id":4,"name":"Network"}]' where tmdb_id=99001$$,'trusted metadata update succeeds');
+select lives_ok($$update public.media_items set rich_metadata_synced_at=now() where tmdb_id=99001$$,'trusted freshness update succeeds');
+select throws_ok($$update public.media_items set vote_average=11 where tmdb_id=99001$$,'23514',null,'vote range is enforced');
+select throws_ok($$update public.media_items set genres='{}' where tmdb_id=99001$$,'23514',null,'array shape is enforced');
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','1e000000-0000-0000-0000-000000000001',true);
+select is((select count(*)::integer from public.media_items where tmdb_id=99001),1,'authenticated clients read shared metadata');
+select throws_ok($$update public.media_items set vote_count=21 where tmdb_id=99001$$,'42501',null,'authenticated direct metadata writes remain denied');
+select throws_ok($$update public.media_items set rich_metadata_synced_at=now() where tmdb_id=99001$$,'42501',null,'authenticated direct freshness writes remain denied');
+select is((select count(*)::integer from public.media_items where tmdb_id=99001),1,'metadata has one shared row without user duplication');
+select * from finish();
+rollback;

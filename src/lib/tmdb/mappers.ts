@@ -6,6 +6,7 @@ import type {
   TmdbTvDetails,
   TmdbTvListItem,
 } from "@/lib/tmdb/types";
+import { normalizeCount, normalizeCountries, normalizeDate, normalizeLanguage, normalizeNamedEntities, normalizeVote, STABLE_LIMITS } from "@/lib/tmdb/normalize";
 
 function averageEpisodeRuntime(
   episodeRunTimes: number[] | undefined,
@@ -63,6 +64,7 @@ export function mapTmdbTvDetailsToCacheRow(
   details: TmdbTvDetails,
 ): MediaItemCacheRow {
   const imdbId = details.external_ids?.imdb_id?.trim() || null;
+  const synchronizedAt = new Date().toISOString();
 
   return {
     tmdb_id: details.id,
@@ -79,7 +81,17 @@ export function mapTmdbTvDetailsToCacheRow(
       details.episode_run_time,
     ),
     tmdb_status: details.status ?? null,
-    last_synced_at: new Date().toISOString(),
+    genres: normalizeNamedEntities(details.genres, STABLE_LIMITS.genres),
+    vote_average: normalizeVote(details.vote_average, 10),
+    vote_count: normalizeCount(details.vote_count),
+    original_language: normalizeLanguage(details.original_language),
+    last_air_date: normalizeDate(details.last_air_date),
+    networks: normalizeNamedEntities(details.networks, STABLE_LIMITS.networks),
+    creators: normalizeNamedEntities(details.created_by, STABLE_LIMITS.creators),
+    origin_countries: normalizeCountries(details.origin_country),
+    production_companies: [],
+    rich_metadata_synced_at: synchronizedAt,
+    last_synced_at: synchronizedAt,
   };
 }
 
@@ -87,6 +99,7 @@ export function mapTmdbMovieDetailsToCacheRow(
   details: TmdbMovieDetails,
 ): MediaItemCacheRow {
   const imdbId = details.imdb_id?.trim() || null;
+  const synchronizedAt = new Date().toISOString();
   const runtime =
     typeof details.runtime === "number" && details.runtime > 0
       ? details.runtime
@@ -105,7 +118,17 @@ export function mapTmdbMovieDetailsToCacheRow(
     runtime_minutes: runtime,
     average_episode_runtime_minutes: null,
     tmdb_status: details.status ?? null,
-    last_synced_at: new Date().toISOString(),
+    genres: normalizeNamedEntities(details.genres, STABLE_LIMITS.genres),
+    vote_average: normalizeVote(details.vote_average, 10),
+    vote_count: normalizeCount(details.vote_count),
+    original_language: normalizeLanguage(details.original_language),
+    last_air_date: null,
+    networks: [],
+    creators: [],
+    origin_countries: [],
+    production_companies: normalizeNamedEntities(details.production_companies, STABLE_LIMITS.companies),
+    rich_metadata_synced_at: synchronizedAt,
+    last_synced_at: synchronizedAt,
   };
 }
 

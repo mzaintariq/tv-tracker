@@ -9,12 +9,32 @@ import type {
   TmdbTvListItem,
   TmdbSeasonDetails,
   TmdbMovieReleaseDatesResponse,
+  TmdbCreditsResponse,
+  TmdbVideosResponse,
+  TmdbWatchProvidersResponse,
+  TmdbTvContentRatingsResponse,
 } from "@/lib/tmdb/types";
 
 const PAGE = 1;
 
 function excludeAdultParams() {
   return { include_adult: false, page: PAGE } as const;
+}
+
+export function getTvAggregateCredits(tmdbId: number): Promise<TmdbCreditsResponse> {
+  return fetchTmdb({ path: `/tv/${tmdbId}/aggregate_credits`, revalidateSeconds: 86400 });
+}
+export function getMovieCredits(tmdbId: number): Promise<TmdbCreditsResponse> {
+  return fetchTmdb({ path: `/movie/${tmdbId}/credits`, revalidateSeconds: 86400 });
+}
+export function getVideos(mediaType: "tv" | "movie", tmdbId: number): Promise<TmdbVideosResponse> {
+  return fetchTmdb({ path: `/${mediaType}/${tmdbId}/videos`, revalidateSeconds: 43200 });
+}
+export function getWatchProviders(mediaType: "tv" | "movie", tmdbId: number): Promise<TmdbWatchProvidersResponse> {
+  return fetchTmdb({ path: `/${mediaType}/${tmdbId}/watch/providers`, revalidateSeconds: 21600 });
+}
+export function getTvContentRatings(tmdbId: number): Promise<TmdbTvContentRatingsResponse> {
+  return fetchTmdb({ path: `/tv/${tmdbId}/content_ratings`, revalidateSeconds: 86400 });
 }
 
 export async function getTvSeason(
@@ -91,9 +111,13 @@ export async function getTvDetails(
   });
 }
 
-export async function getMovieDetails(tmdbId: number): Promise<TmdbMovieDetails> {
+export async function getMovieDetails(
+  tmdbId: number,
+  forceRefresh = false,
+): Promise<TmdbMovieDetails> {
   return fetchTmdb<TmdbMovieDetails>({
     path: `/movie/${tmdbId}`,
+    forceRefresh,
   });
 }
 

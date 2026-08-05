@@ -235,6 +235,21 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 
 ## Phase 7 — Movies and profile statistics
 
+### Shared rich-media metadata foundation
+
+* [x] Add bounded stable TV and movie metadata to the shared cache
+* [x] Extend the existing trusted synchronization mappers
+* [x] Add server-only cached cast, trailer, provider, and TV-rating endpoints
+* [x] Add normalized cast and movie-director projections
+* [x] Add regional provider and certification selection without fallback
+* [x] Add validated external-link projections
+* [x] Isolate supplemental loader failures from core details
+* [x] Document future rich-detail image guardrails
+* [x] Add explicit seven-day rich metadata freshness
+* [x] Lazily synchronize and reload legacy detail rows
+* [x] Add forced movie metadata refresh with safe feedback
+* [x] Reuse bounded touch pull-to-refresh across show and movie details
+
 * [x] Add shared regional movie release metadata foundation
 * [x] Add Movies Upcoming route and segmented navigation
 * [x] Add owner-scoped regional movie Upcoming projection
