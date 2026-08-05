@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
         pathname: "/t/p/**",
       },
     ],
+    minimumCacheTTL: 2678400,
+    formats: ["image/webp"],
+    qualities: [75],
   },
 };
 
