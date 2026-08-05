@@ -8,11 +8,12 @@ const detail = (
   membership: ShowDetailData["membership"] = null,
 ): ShowDetailData => ({
   membership,
-  media: {
+    media: {
     id: "media",
     tmdb_id: 254528,
     media_type: "tv",
-    title: "Test Show",
+      title: "Test Show",
+      rich_metadata_synced_at: new Date().toISOString(),
   } as ShowDetailData["media"],
   episodes: [
     {
@@ -46,6 +47,26 @@ describe("loadShowPageData", () => {
       synchronize,
     });
     expect(synchronize).not.toHaveBeenCalled();
+  });
+
+  it("refreshes and reloads a legacy row even when episodes exist", async () => {
+    const legacy = detail();
+    legacy.media.rich_metadata_synced_at = null;
+    const refreshed = detail();
+    const load = vi.fn().mockResolvedValueOnce(legacy).mockResolvedValueOnce(refreshed);
+    const synchronize = vi.fn().mockResolvedValue({});
+    const result = await loadShowPageData("user", 254528, { load, synchronize });
+    expect(synchronize).toHaveBeenCalledOnce();
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(result.detail).toBe(refreshed);
+  });
+
+  it("keeps usable cached detail when rich metadata refresh fails", async () => {
+    const legacy = detail();
+    legacy.media.rich_metadata_synced_at = null;
+    const result = await loadShowPageData("user", 254528, { load: vi.fn().mockResolvedValue(legacy), synchronize: vi.fn().mockRejectedValue(new Error("raw provider detail")) });
+    expect(result.detail).toBe(legacy);
+    expect(result.syncError).toBe("Metadata could not be refreshed. Cached information is still available.");
   });
 
   it("preserves existing library membership", async () => {

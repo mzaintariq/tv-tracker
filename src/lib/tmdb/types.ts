@@ -45,11 +45,22 @@ export type TmdbExternalIds = {
   twitter_id?: string | null;
 };
 
+export type TmdbNamedEntity = { id: number; name: string };
+export type TmdbCreator = TmdbNamedEntity & { profile_path?: TmdbImagePath };
+
 export type TmdbTvDetails = TmdbTvListItem & {
   status?: string;
   episode_run_time?: number[];
   external_ids?: TmdbExternalIds;
   seasons?: TmdbSeasonSummary[];
+  genres?: TmdbNamedEntity[];
+  vote_count?: number;
+  original_language?: string;
+  last_air_date?: string | null;
+  networks?: TmdbNamedEntity[];
+  created_by?: TmdbCreator[];
+  origin_country?: string[];
+  homepage?: string | null;
 };
 
 export type TmdbSeasonSummary = {
@@ -77,7 +88,26 @@ export type TmdbMovieDetails = TmdbMovieListItem & {
   status?: string;
   runtime?: number | null;
   imdb_id?: string | null;
+  genres?: TmdbNamedEntity[];
+  vote_count?: number;
+  original_language?: string;
+  production_companies?: TmdbNamedEntity[];
+  homepage?: string | null;
 };
+
+export type TmdbCastMember = {
+  id: number; name: string; character?: string; profile_path?: TmdbImagePath;
+  order?: number; roles?: { character?: string; episode_count?: number }[];
+};
+export type TmdbCrewMember = { id: number; name: string; job?: string };
+export type TmdbCreditsResponse = { id: number; cast?: TmdbCastMember[]; crew?: TmdbCrewMember[] };
+export type TmdbVideo = { id: string; key: string; site: string; type: string; name: string; official?: boolean; iso_639_1?: string; published_at?: string };
+export type TmdbVideosResponse = { id: number; results?: TmdbVideo[] };
+export type TmdbWatchProvider = { provider_id: number; provider_name: string; logo_path?: TmdbImagePath; display_priority?: number };
+export type TmdbWatchProviderRegion = { link?: string; flatrate?: TmdbWatchProvider[]; free?: TmdbWatchProvider[]; ads?: TmdbWatchProvider[]; rent?: TmdbWatchProvider[]; buy?: TmdbWatchProvider[] };
+export type TmdbWatchProvidersResponse = { id: number; results?: Record<string, TmdbWatchProviderRegion> };
+export type TmdbTvContentRating = { iso_3166_1: string; rating: string };
+export type TmdbTvContentRatingsResponse = { id: number; results?: TmdbTvContentRating[] };
 
 export type TmdbMovieReleaseDate = {
   certification: string;

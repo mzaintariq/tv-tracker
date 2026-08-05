@@ -52,8 +52,9 @@ describe("pre-membership episode refresh", () => {
 
   it("retains already-added refresh wording", () => {
     expect(normalizedControls).toContain(
-      'setup ? missingEpisodes ? "Retry episode sync" : "Load episode information" : "Refresh Metadata"',
+      'missingEpisodes ? "Retry episode sync" : "Load episode information"',
     );
+    expect(normalizedControls).toContain("MetadataRefreshControl");
   });
 
   it("keeps membership creation inside initial progress submission", () => {

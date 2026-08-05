@@ -26,6 +26,16 @@ export type MediaItemCacheRow = {
   runtime_minutes: number | null;
   average_episode_runtime_minutes: number | null;
   tmdb_status: string | null;
+  genres: { id: number; name: string }[];
+  vote_average: number | null;
+  vote_count: number | null;
+  original_language: string | null;
+  last_air_date: string | null;
+  networks: { id: number; name: string }[];
+  creators: { id: number; name: string }[];
+  origin_countries: string[];
+  production_companies: { id: number; name: string }[];
+  rich_metadata_synced_at: string;
   last_synced_at: string;
 };
 

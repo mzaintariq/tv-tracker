@@ -9,6 +9,8 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
 import { dateInTimeZone, validTimeZone } from "@/lib/date-time";
+import { isRichMetadataStale } from "@/lib/media/rich-metadata-freshness";
+import { synchronizeMovie } from "@/lib/movies/sync";
 
 export async function loadMovies(_userId: string): Promise<MovieSections> {
   void _userId;
@@ -36,7 +38,7 @@ export async function loadMovies(_userId: string): Promise<MovieSections> {
   );
 }
 
-export async function loadMovieDetail(
+async function loadCachedMovieDetail(
   userId: string,
   tmdbId: number,
 ): Promise<MovieSnapshot | null> {
@@ -59,4 +61,33 @@ export async function loadMovieDetail(
     .maybeSingle();
   if (membershipError) throw new Error(membershipError.message);
   return membership ? { membership, media } : null;
+}
+
+type MovieDetailDependencies = {
+  load: typeof loadCachedMovieDetail;
+  synchronize: typeof synchronizeMovie;
+};
+
+export async function loadMovieDetail(
+  userId: string,
+  tmdbId: number,
+  overrides: Partial<MovieDetailDependencies> = {},
+  now = new Date(),
+): Promise<MovieSnapshot | null> {
+  const dependencies: MovieDetailDependencies = {
+    load: loadCachedMovieDetail,
+    synchronize: synchronizeMovie,
+    ...overrides,
+  };
+  let detail = await dependencies.load(userId, tmdbId);
+  if (!detail || !isRichMetadataStale(detail.media.rich_metadata_synced_at, now))
+    return detail;
+  try {
+    await dependencies.synchronize(tmdbId);
+    detail = await dependencies.load(userId, tmdbId);
+  } catch {
+    // Rich metadata is supplemental to a usable cached library detail.
+    // Keep the legacy row and leave its freshness null/stale for a later retry.
+  }
+  return detail;
 }

@@ -8,8 +8,25 @@ import { synchronizeMovie } from "@/lib/movies/sync";
 import { isMovieReleaseMetadataStale } from "@/lib/movies/upcoming";
 import { settleWithConcurrency } from "@/lib/shows/freshness";
 
-export type MovieActionResult = { error?: string; success?: string };
+export type MovieActionResult = { error?: string; success?: string; warning?: string };
 export type MovieUpcomingRefreshResult = { attempted: number; failed: number };
+
+export async function syncMovieMetadata(
+  tmdbIdRaw: unknown,
+  mediaIdRaw: unknown,
+): Promise<MovieActionResult> {
+  const owned = await ownedMovie(tmdbIdRaw, mediaIdRaw);
+  if ("error" in owned) return { error: owned.error };
+  try {
+    const result = await synchronizeMovie(owned.tmdbId, true);
+    refresh(owned.tmdbId);
+    return result.releaseDatesSynchronized
+      ? { success: "Metadata refreshed." }
+      : { success: "Core metadata refreshed.", warning: "Regional release dates could not be refreshed. Cached dates were kept." };
+  } catch {
+    return { error: "Could not refresh metadata. Cached information is still available." };
+  }
+}
 
 export async function refreshStaleMovieUpcoming(value: unknown): Promise<MovieUpcomingRefreshResult> {
   const ids = Array.isArray(value) ? [...new Set(value.filter((item): item is number => Number.isInteger(item) && item > 0))].slice(0, 100) : [];

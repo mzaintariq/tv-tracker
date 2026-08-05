@@ -11,8 +11,11 @@ export type MovieSyncResult = {
   releaseDatesSynchronized: boolean;
 };
 
-export async function synchronizeMovie(tmdbId: number): Promise<MovieSyncResult> {
-  const details = await getMovieDetails(tmdbId);
+export async function synchronizeMovie(
+  tmdbId: number,
+  forceRefresh = false,
+): Promise<MovieSyncResult> {
+  const details = await getMovieDetails(tmdbId, forceRefresh);
   const admin = createAdminClient();
   const { data: media, error: mediaError } = await admin
     .from("media_items")
@@ -25,7 +28,7 @@ export async function synchronizeMovie(tmdbId: number): Promise<MovieSyncResult>
     throw new Error(mediaError?.message ?? "Could not cache movie metadata.");
 
   try {
-    const response = await getMovieReleaseDates(tmdbId);
+    const response = await getMovieReleaseDates(tmdbId, forceRefresh);
     const releases = normalizeTmdbMovieReleaseDates(response);
     const { error } = await admin.rpc("reconcile_movie_release_dates", {
       p_media_item_id: media.id,

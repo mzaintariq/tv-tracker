@@ -3,6 +3,7 @@ import "server-only";
 import { loadShowDetail, type ShowDetailData } from "@/lib/shows/data";
 import { synchronizeShow } from "@/lib/shows/sync";
 import { TmdbApiError } from "@/lib/tmdb/client";
+import { isRichMetadataStale } from "@/lib/media/rich-metadata-freshness";
 
 type Dependencies = {
   load: typeof loadShowDetail;
@@ -23,10 +24,15 @@ export async function loadShowPageData(
   userId: string,
   tmdbId: number,
   overrides: Partial<Dependencies> = {},
+  now = new Date(),
 ): Promise<ShowPageData> {
   const { load, synchronize } = { ...dependencies, ...overrides };
   let detail = await load(userId, tmdbId);
-  if (detail?.episodes.length)
+  const needsEpisodes = !detail?.episodes.length;
+  const needsRichMetadata = Boolean(
+    detail && isRichMetadataStale(detail.media.rich_metadata_synced_at, now),
+  );
+  if (detail && !needsEpisodes && !needsRichMetadata)
     return { detail, syncError: null, tmdbNotFound: false };
   try {
     await synchronize(tmdbId);
@@ -40,8 +46,9 @@ export async function loadShowPageData(
     if (!detail) throw error;
     return {
       detail,
-      syncError:
-        "Episode metadata could not be synchronized. You can retry below.",
+      syncError: needsEpisodes
+        ? "Episode metadata could not be synchronized. You can retry below."
+        : "Metadata could not be refreshed. Cached information is still available.",
       tmdbNotFound: false,
     };
   }

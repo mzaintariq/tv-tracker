@@ -18,12 +18,14 @@ type FetchTmdbOptions = {
   path: string;
   searchParams?: Record<string, string | number | boolean | undefined>;
   forceRefresh?: boolean;
+  revalidateSeconds?: number;
 };
 
 export async function fetchTmdb<T>({
   path,
   searchParams,
   forceRefresh = false,
+  revalidateSeconds = 300,
 }: FetchTmdbOptions): Promise<T> {
   const token = getTmdbApiReadToken();
   const url = new URL(`${TMDB_API_BASE_URL}${path}`);
@@ -43,7 +45,7 @@ export async function fetchTmdb<T>({
       headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
       ...(forceRefresh
         ? { cache: "no-store" as const }
-        : { next: { revalidate: 300 } }),
+        : { next: { revalidate: revalidateSeconds } }),
     });
     if (response.ok) return (await response.json()) as T;
     if ((response.status !== 429 && response.status < 500) || attempt === 2)

@@ -128,3 +128,12 @@ export function selectUnambiguousRegionalCertification(
   );
   return values.size === 1 ? [...values][0] : null;
 }
+
+export function selectRegionalMovieCertification(
+  releases: readonly RegionalReleaseSelection[],
+  region: string,
+): string | null {
+  const theatrical = selectRegionalTheatricalDate(releases, region);
+  if (theatrical?.certification?.trim()) return theatrical.certification.trim();
+  return selectUnambiguousRegionalCertification(releases, region);
+}

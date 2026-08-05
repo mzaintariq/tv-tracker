@@ -7,9 +7,11 @@ import {
   setMovieWatched,
   toggleMovieFavourite,
   updateMovieWatchedAt,
+  syncMovieMetadata,
   type MovieActionResult,
 } from "@/app/actions/movies";
 import type { UserMovie } from "@/types/database";
+import { MetadataRefreshControl } from "@/components/media/metadata-refresh-control";
 
 const button =
   "interactive-control touch-target max-w-full whitespace-normal rounded-lg border bg-[var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--foreground)]";
@@ -78,6 +80,11 @@ export function MovieControls({
           {membership.is_favourite ? "Favourite" : "Add favourite"}
         </button>
       </div>
+      <MetadataRefreshControl
+        tmdbId={tmdbId}
+        mediaId={mediaId}
+        refreshAction={syncMovieMetadata}
+      />
       {membership.watched_at ? (
         <div className="flex w-full min-w-0 max-w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end">
           <label htmlFor="movie-watched-date" className="break-words text-sm">
