@@ -11,6 +11,7 @@ import { logSafeReadFailure } from "@/lib/supabase/read-diagnostics";
 import { dateInTimeZone, validTimeZone } from "@/lib/date-time";
 import { isRichMetadataStale } from "@/lib/media/rich-metadata-freshness";
 import { synchronizeMovie } from "@/lib/movies/sync";
+import type { MovieReleaseDate } from "@/types/database";
 
 export async function loadMovies(_userId: string): Promise<MovieSections> {
   void _userId;
@@ -90,4 +91,31 @@ export async function loadMovieDetail(
     // Keep the legacy row and leave its freshness null/stale for a later retry.
   }
   return detail;
+}
+
+export type MovieRegionalContext = {
+  region: string | null;
+  timeZone: string;
+  releases: MovieReleaseDate[];
+};
+
+export async function loadMovieRegionalContext(
+  userId: string,
+  mediaItemId: string,
+): Promise<MovieRegionalContext> {
+  const supabase = await createClient();
+  const [profile, releases] = await Promise.all([
+    supabase.from("profiles").select("region,timezone").eq("id", userId).single(),
+    supabase
+      .from("movie_release_dates")
+      .select("*")
+      .eq("media_item_id", mediaItemId),
+  ]);
+  if (profile.error) throw new Error("movie_detail_profile_read_failed");
+  if (releases.error) throw new Error("movie_detail_release_read_failed");
+  return {
+    region: profile.data.region,
+    timeZone: validTimeZone(profile.data.timezone),
+    releases: releases.data ?? [],
+  };
 }

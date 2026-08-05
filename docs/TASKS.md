@@ -250,6 +250,18 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Add forced movie metadata refresh with safe feedback
 * [x] Reuse bounded touch pull-to-refresh across show and movie details
 
+### Enriched Movie Detail
+
+* [x] Add persisted rich metadata hero and overview
+* [x] Add explicit-region theatrical, digital, and certification facts
+* [x] Add isolated regional provider section with attribution
+* [x] Add text-only top cast and director section
+* [x] Add preferred-trailer link without iframe or thumbnail
+* [x] Add validated TMDB, IMDb, and official homepage links
+* [x] Stream optional sections behind localized Suspense fallbacks
+* [x] Preserve tracking, favourite, refresh, and pull-to-refresh controls
+* [x] Keep backdrops, recommendations, and new image roles deferred
+
 * [x] Add shared regional movie release metadata foundation
 * [x] Add Movies Upcoming route and segmented navigation
 * [x] Add owner-scoped regional movie Upcoming projection

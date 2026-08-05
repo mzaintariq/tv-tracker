@@ -1,8 +1,8 @@
 import "server-only";
 
 import { cache } from "react";
-import { getMovieCredits, getTvAggregateCredits, getTvContentRatings, getVideos, getWatchProviders } from "@/lib/tmdb/endpoints";
-import { normalizeCast, normalizeDirectors, normalizeProviders, selectPreferredTrailer, selectTvCertification, type CastProjection, type DirectorProjection, type ProviderGroups, type TrailerProjection } from "@/lib/tmdb/extras-normalize";
+import { getMovieCredits, getMovieDetails, getTvAggregateCredits, getTvContentRatings, getVideos, getWatchProviders } from "@/lib/tmdb/endpoints";
+import { normalizeCast, normalizeDirectors, normalizeExternalLinks, normalizeProviders, selectPreferredTrailer, selectTvCertification, type CastProjection, type DirectorProjection, type ProviderGroups, type TrailerProjection } from "@/lib/tmdb/extras-normalize";
 
 export type OptionalMetadataFailure = "credits" | "videos" | "providers" | "content_ratings";
 export type OptionalResult<T> = { data: T; failure: null } | { data: T; failure: OptionalMetadataFailure };
@@ -13,6 +13,10 @@ export const loadMovieCredits = cache(async (tmdbId: number): Promise<{ cast: Ca
 export const loadPreferredTrailer = cache(async (mediaType: "tv" | "movie", tmdbId: number, preferredLanguage = "en"): Promise<TrailerProjection | null> => selectPreferredTrailer((await getVideos(mediaType, tmdbId)).results ?? [], preferredLanguage));
 export const loadRegionalWatchProviders = cache(async (mediaType: "tv" | "movie", tmdbId: number, region: string): Promise<ProviderGroups> => { const selected = region.trim().toUpperCase(); if (!/^[A-Z]{2}$/.test(selected)) return normalizeProviders(selected); const response = await getWatchProviders(mediaType, tmdbId); return normalizeProviders(selected, response.results?.[selected]); });
 export const loadTvRegionalCertification = cache(async (tmdbId: number, region: string): Promise<string | null> => { const selected = region.trim().toUpperCase(); if (!/^[A-Z]{2}$/.test(selected)) return null; return selectTvCertification((await getTvContentRatings(tmdbId)).results ?? [], selected); });
+export const loadMovieExternalLinks = cache(async (tmdbId: number) => {
+  const details = await getMovieDetails(tmdbId);
+  return normalizeExternalLinks("movie", tmdbId, details.imdb_id, details.homepage);
+});
 
 // A future detail route can use this bundle without allowing any supplemental
 // TMDB failure to make its core database-backed detail unavailable.
