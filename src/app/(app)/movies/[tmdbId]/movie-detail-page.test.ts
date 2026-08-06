@@ -6,10 +6,11 @@ const source = fs.readFileSync(path.join(process.cwd(), "src/app/(app)/movies/[t
 
 describe("enriched movie detail page contract", () => {
   it("renders core hero facts and preserves tracking controls", () => {
-    for (const contract of ["Genres", "TMDB rating", "Original language", "Library status", "MovieControls", "watchedAt", "is_favourite"]) expect(source).toContain(contract);
+    for (const contract of ["Genres", "TMDB rating", "languageDisplayName", "movieReleaseStatuses", "MovieControls", "title={movie.media.title}"]) expect(source).toContain(contract);
+    expect(source).not.toContain("Library status");
   });
   it("renders regional release facts without substituting the general release", () => {
-    for (const contract of ["selectRegionalTheatricalDate", "selectRegionalDigitalDate", "selectRegionalMovieCertification", "Limited theatrical release", "Digital release", "Region"]) expect(source).toContain(contract);
+    for (const contract of ["selectRegionalTheatricalDate", "selectRegionalDigitalDate", "selectRegionalMovieCertification", "Limited theatrical release", "Digital release", "regionLabel"]) expect(source).toContain(contract);
   });
   it("starts four optional loaders and isolates them behind localized Suspense", () => {
     for (const loader of ["loadMovieCredits", "loadRegionalWatchProviders", "loadPreferredTrailer", "loadMovieExternalLinks"]) expect(source).toContain(loader);
@@ -21,7 +22,7 @@ describe("enriched movie detail page contract", () => {
   });
   it("uses the required vertical section order", () => {
     const markup = source.slice(source.indexOf("return ("));
-    const labels = ["<header", "<MovieControls", "Overview", "Release information", "ProvidersSection", "CreditsSection", "TrailerSection", "Production information", "ExternalLinksSection"];
+    const labels = ["<header", "<MovieControls", "Release information", "ProvidersSection", "CreditsSection", "More information", "ExternalLinksFact"];
     let previous = -1; for (const label of labels) { const index = markup.indexOf(label); expect(index).toBeGreaterThan(previous); previous = index; }
   });
 });

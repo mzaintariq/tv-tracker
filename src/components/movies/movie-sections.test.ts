@@ -133,7 +133,11 @@ describe("limited movie sections", () => {
 
   it("does not add quick watched actions to Upcoming", async () => {
     const renderer = await renderLimitedSection("Upcoming", 12);
-    expect(renderer.root.findAllByType("button").filter((button) => button.children.includes("Mark watched"))).toHaveLength(0);
+    expect(
+      renderer.root
+        .findAllByType("button")
+        .filter((button) => button.children.includes("Mark watched")),
+    ).toHaveLength(0);
   });
 
   it("composes server-rendered children without render-function or component props", () => {

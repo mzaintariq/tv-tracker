@@ -25,7 +25,7 @@ describe("Movies Upcoming route contract", () => {
   });
   it("shows the accessible Watched badge only behind watched membership state", () => {
     const source=read("src/components/movies/upcoming-movie-card.tsx");
-    expect(source).toContain("movie.watched_at ?"); expect(source).toContain(">Watched"); expect(source).toContain("already watched");
+    expect(source).toContain("movie.watched_at ?"); expect(source).toContain("Watched"); expect(source).toContain("already watched");
   });
   it("uses a row-shaped localized loading skeleton", () => {
     const loading=read("src/app/(app)/movies/(library)/upcoming/loading.tsx");

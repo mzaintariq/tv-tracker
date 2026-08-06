@@ -1,46 +1,303 @@
 import type { ReactNode } from "react";
-import type { CastProjection, DirectorProjection, ProviderGroups, TrailerProjection } from "@/lib/tmdb/extras-normalize";
+import type {
+  CastProjection,
+  DirectorProjection,
+  ProviderGroups,
+  TrailerProjection,
+} from "@/lib/tmdb/extras-normalize";
 
-const sectionClass = "min-w-0 space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6";
-const linkClass = "interactive-control touch-target inline-flex max-w-full items-center rounded-lg border border-[var(--control-border)] px-3 py-2 font-semibold";
+const sectionClass =
+  "min-w-0 space-y-2 sm:space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 sm:p-6";
 
 export function OptionalSectionSkeleton({ label }: { label: string }) {
-  return <section aria-label={label} aria-busy="true" className={sectionClass}><p role="status" className="text-sm text-[var(--muted)]">Loading {label.toLowerCase()}…</p><div aria-hidden="true" className="h-16 rounded-lg bg-[var(--surface-elevated)]" /></section>;
+  return (
+    <section aria-label={label} aria-busy="true" className={sectionClass}>
+      <p role="status" className="text-sm text-[var(--muted)]">
+        Loading {label.toLowerCase()}…
+      </p>
+      <div
+        aria-hidden="true"
+        className="h-16 rounded-lg bg-[var(--surface-elevated)]"
+      />
+    </section>
+  );
 }
 
-export async function ProvidersSection({ regionLabel, promise }: { regionLabel: string | null; promise: Promise<ProviderGroups> | null }) {
-  if (!regionLabel || !promise) return <section className={sectionClass}><h2 className="text-2xl font-semibold">Where to watch</h2><p className="text-[var(--muted)]">Choose a release and streaming region in Profile Settings to see availability.</p></section>;
+export async function ProvidersSection({
+  regionLabel,
+  promise,
+}: {
+  regionLabel: string | null;
+  promise: Promise<ProviderGroups> | null;
+}) {
+  if (!regionLabel || !promise)
+    return (
+      <div className="space-y-1 sm:space-y-2">
+        <h2 className="text-lg font-semibold sm:text-xl">Where to watch</h2>
+        <section className={sectionClass}>
+          <p className="text-xs text-[var(--muted)] sm:text-sm">
+            Choose a release and streaming region in Profile Settings to see
+            availability.
+          </p>
+        </section>
+      </div>
+    );
   let providers: ProviderGroups;
-  try { providers = await promise; } catch { return <LocalFailure title="Where to watch" />; }
-  const labels = { stream: "Stream", free: "Free", ads: "Ad-supported", rent: "Rent", buy: "Buy" } as const;
-  const available = Object.entries(providers.groups).filter((entry) => entry[1].length) as Array<[keyof typeof labels, ProviderGroups["groups"][keyof typeof labels]]>;
-  return <section className={sectionClass}><div><h2 className="text-2xl font-semibold">Where to watch</h2><p className="text-sm text-[var(--muted)]">Availability in {regionLabel}</p></div>{available.length ? <div className="space-y-4">{available.map(([category, items]) => <div key={category}><h3 className="font-semibold">{labels[category]}</h3><ul aria-label={`${labels[category]} providers`} className="mt-2 flex min-w-0 flex-wrap gap-2">{items.map((provider) => <li key={provider.providerId} className="rounded-full border border-[var(--control-border)] px-3 py-2 text-sm">{provider.providerName}</li>)}</ul></div>)}</div> : <p className="text-[var(--muted)]">No watch providers are currently listed for this region.</p>}{providers.attributionLink ? <p className="text-sm text-[var(--muted)]">Availability data supplied by JustWatch via TMDB. <a className="underline underline-offset-4" href={providers.attributionLink} target="_blank" rel="noopener noreferrer">View availability on TMDB<span className="sr-only"> (opens in a new tab)</span></a>.</p> : <p className="text-sm text-[var(--muted)]">Availability data supplied by JustWatch via TMDB.</p>}</section>;
+  try {
+    providers = await promise;
+  } catch {
+    return <LocalFailure title="Where to watch" />;
+  }
+  const labels = {
+    stream: "Stream",
+    free: "Free",
+    ads: "Ad-supported",
+    rent: "Rent",
+    buy: "Buy",
+  } as const;
+  const available = Object.entries(providers.groups).filter(
+    (entry) => entry[1].length,
+  ) as Array<
+    [keyof typeof labels, ProviderGroups["groups"][keyof typeof labels]]
+  >;
+  return (
+    <div className="space-y-1 sm:space-y-2">
+      <h2 className="text-lg font-semibold sm:text-xl">Where to watch</h2>
+      <section className={sectionClass}>
+        {available.length ? (
+          <div className="space-y-3 sm:space-y-4">
+            {available.map(([category, items]) => (
+              <div key={category} className="space-y-1">
+                <div className="flex items-center gap-1">
+                  {category === "stream" ? (
+                    <svg
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="2 2 20 20"
+                    >
+                      <path d="M6.51 18.87c.15.09.32.13.49.13s.36-.05.51-.14l10-6c.3-.18.49-.51.49-.86s-.18-.68-.49-.86l-10-6a.99.99 0 0 0-1.01-.01c-.31.18-.51.51-.51.87v12c0 .36.19.69.51.87Z"></path>
+                    </svg>
+                  ) : category === "rent" ? (
+                    <svg
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M21 4H6.17l-.18-1.15C5.91 2.36 5.49 2 5 2H2v2h2.14l1.87 12.15c.08.49.5.85.99.85h12v-2H7.86l-.31-2H19c.45 0 .84-.3.96-.73l2-7a.99.99 0 0 0-.16-.88c-.19-.25-.49-.4-.8-.4ZM8 18a2 2 0 1 0 0 4 2 2 0 1 0 0-4m9 0a2 2 0 1 0 0 4 2 2 0 1 0 0-4"></path>
+                    </svg>
+                  ) : category === "buy" ? (
+                    <svg
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M13.71 3.29A1 1 0 0 0 13 3H4c-.55 0-1 .45-1 1v9c0 .27.11.52.29.71l8 8c.2.2.45.29.71.29s.51-.1.71-.29l9-9a.996.996 0 0 0 0-1.41zM9 11c-1.11 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2"></path>
+                    </svg>
+                  ) : null}
+
+                  <h3 className="text-xs font-semibold sm:text-sm">
+                    {labels[category]}
+                  </h3>
+                </div>
+
+                <ul
+                  aria-label={`${labels[category]} providers`}
+                  className="flex min-w-0 gap-1 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-x-visible sm:whitespace-normal"
+                >
+                  {items.map((provider) => (
+                    <li
+                      key={provider.providerId}
+                      className="rounded-full bg-[var(--surface-elevated)] px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm"
+                    >
+                      {provider.providerName}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs sm:text-sm text-[var(--muted)]">
+            No watch providers are currently listed for this region.
+          </p>
+        )}
+        {providers.attributionLink ? (
+          <p className="text-xs text-[var(--muted)]">
+            Availability data supplied by JustWatch via TMDB.{" "}
+            <a
+              className="underline underline-offset-4"
+              href={providers.attributionLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View availability on TMDB
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+            .
+          </p>
+        ) : (
+          <p className="text-xs text-[var(--muted)]">
+            Availability data supplied by JustWatch via TMDB.
+          </p>
+        )}
+      </section>
+    </div>
+  );
 }
 
-export async function CreditsSection({ promise }: { promise: Promise<{ cast: CastProjection[]; directors: DirectorProjection[] }> }) {
+export async function CreditsSection({
+  promise,
+}: {
+  promise: Promise<{ cast: CastProjection[]; directors: DirectorProjection[] }>;
+}) {
   let credits: { cast: CastProjection[]; directors: DirectorProjection[] };
-  try { credits = await promise; } catch { return <LocalFailure title="Cast and creators" />; }
+  try {
+    credits = await promise;
+  } catch {
+    return <LocalFailure title="Cast and creators" />;
+  }
   if (!credits.cast.length && !credits.directors.length) return null;
-  return <section className={sectionClass}><h2 className="text-2xl font-semibold">Cast and creators</h2>{credits.directors.length ? <div><h3 className="font-semibold">{credits.directors.length === 1 ? "Director" : "Directors"}</h3><p className="mt-1 break-words">{credits.directors.map((director) => director.name).join(", ")}</p></div> : null}{credits.cast.length ? <div><h3 className="font-semibold">Top cast</h3><ul className="mt-2 grid min-w-0 gap-2 sm:grid-cols-2">{credits.cast.map((person) => <li key={person.personId} className="min-w-0 rounded-lg bg-[var(--surface-elevated)] p-3"><p className="break-words font-medium">{person.name}</p>{person.character ? <p className="break-words text-sm text-[var(--muted)]">as {person.character}</p> : null}</li>)}</ul></div> : null}</section>;
+  return (
+    <div className="space-y-1 sm:space-y-2">
+      <h2 className="text-lg font-semibold sm:text-xl">Cast and creators</h2>
+      <section className={sectionClass}>
+        {credits.directors.length ? (
+          <div>
+            <h3 className="text-xs sm:text-sm font-semibold">
+              {credits.directors.length === 1 ? "Director" : "Directors"}
+            </h3>
+            <p className="text-xs sm:text-sm sm:mt-1 break-words">
+              {credits.directors.map((director) => director.name).join(", ")}
+            </p>
+          </div>
+        ) : null}
+        {credits.cast.length ? (
+          <div>
+            <h3 className="text-xs sm:text-sm font-semibold">Top cast</h3>
+            <ul className="mt-1 sm:mt-2 grid min-w-0 gap-1 sm:gap-2 grid-cols-2 sm:grid-cols-5">
+              {credits.cast.map((person) => (
+                <li
+                  key={person.personId}
+                  className="min-w-0 rounded-lg bg-[var(--surface-elevated)] p-2 sm:p-3"
+                >
+                  <p className="text-xs sm:text-sm break-words font-medium">
+                    {person.name}
+                  </p>
+                  {person.character ? (
+                    <p className="break-words text-xs sm:text-sm text-[var(--muted)]">
+                      as {person.character}
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </section>
+    </div>
+  );
 }
 
-export async function TrailerSection({ promise }: { promise: Promise<TrailerProjection | null> }) {
+export async function TrailerSection({
+  promise,
+}: {
+  promise: Promise<TrailerProjection | null>;
+}) {
   let trailer: TrailerProjection | null;
-  try { trailer = await promise; } catch { return <LocalFailure title="Trailer" />; }
+  try {
+    trailer = await promise;
+  } catch {
+    return null;
+  }
   if (!trailer) return null;
   const url = `https://www.youtube.com/watch?v=${encodeURIComponent(trailer.key)}`;
-  return <section className={sectionClass}><h2 className="text-2xl font-semibold">Trailer</h2><p className="break-words">{trailer.name}</p><a className={linkClass} href={url} target="_blank" rel="noopener noreferrer">Watch trailer on YouTube<span className="sr-only"> (opens in a new tab)</span></a></section>;
+  return (
+    <a
+      className="inline-flex max-w-full items-center gap-1 rounded-full border border-[var(--control-border)] px-2 py-1 text-xs font-semibold sm:px-3 sm:text-sm"
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <svg
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        width="12"
+        height="12"
+        fill="currentColor"
+        viewBox="2 2 20 20"
+      >
+        <path d="M6.51 18.87c.15.09.32.13.49.13s.36-.05.51-.14l10-6c.3-.18.49-.51.49-.86s-.18-.68-.49-.86l-10-6a.99.99 0 0 0-1.01-.01c-.31.18-.51.51-.51.87v12c0 .36.19.69.51.87Z" />
+      </svg>
+      Trailer
+      <span className="sr-only"> (opens in a new tab)</span>
+    </a>
+  );
 }
 
-export async function ExternalLinksSection({ fallback, promise }: { fallback: { tmdb: string; imdb: string | null; homepage: string | null }; promise: Promise<{ tmdb: string; imdb: string | null; homepage: string | null }> }) {
+export async function ExternalLinksFact({
+  fallback,
+  promise,
+}: {
+  fallback: { tmdb: string; imdb: string | null; homepage: string | null };
+  promise: Promise<{
+    tmdb: string;
+    imdb: string | null;
+    homepage: string | null;
+  }>;
+}) {
   let links = fallback;
-  try { links = await promise; } catch { /* Persisted trusted IDs still provide safe links. */ }
-  const destinations: Array<[string, string | null]> = [["View on TMDB", links.tmdb], ["View on IMDb", links.imdb], ["Visit official website", links.homepage]];
-  const available = destinations.filter((entry): entry is [string, string] => Boolean(entry[1]));
+  try {
+    links = await promise;
+  } catch {
+    /* Persisted trusted IDs still provide safe links. */
+  }
+  const destinations: Array<[string, string | null]> = [
+    ["Web", links.homepage],
+    ["TMDB", links.tmdb],
+    ["IMDb", links.imdb],
+  ];
+  const available = destinations.filter((entry): entry is [string, string] =>
+    Boolean(entry[1]),
+  );
   if (!available.length) return null;
-  return <section className={sectionClass}><h2 className="text-2xl font-semibold">External links</h2><div className="flex min-w-0 flex-wrap gap-2">{available.map(([label, url]) => <a key={label} className={linkClass} href={url} target="_blank" rel="noopener noreferrer">{label}<span className="sr-only"> (opens in a new tab)</span></a>)}</div></section>;
+  return (
+    <div className="min-w-0">
+      <dt className="text-xs sm:text-sm font-semibold">Open in</dt>
+      <dd className="mt-1 flex min-w-0 flex-wrap gap-2">
+        {available.map(([label, url]) => (
+          <a
+            key={label}
+            className="inline-flex max-w-full items-center rounded-full border border-[var(--control-border)] px-2 py-1 text-xs font-semibold"
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {label}
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        ))}
+      </dd>
+    </div>
+  );
 }
 
 function LocalFailure({ title }: { title: string }): ReactNode {
-  return <section className={sectionClass}><h2 className="text-2xl font-semibold">{title}</h2><p role="alert" className="text-[var(--muted)]">This information is temporarily unavailable. The rest of the movie page is still available.</p></section>;
+  return (
+    <section className={sectionClass}>
+      <h2 className="text-2xl font-semibold">{title}</h2>
+      <p role="alert" className="text-[var(--muted)]">
+        This information is temporarily unavailable. The rest of the movie page
+        is still available.
+      </p>
+    </section>
+  );
 }

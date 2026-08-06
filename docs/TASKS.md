@@ -261,6 +261,15 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Stream optional sections behind localized Suspense fallbacks
 * [x] Preserve tracking, favourite, refresh, and pull-to-refresh controls
 * [x] Keep backdrops, recommendations, and new image roles deferred
+* [x] Replace library status with deterministic regional release-state badges
+* [x] Convert movie tracking actions to compact accessible icon actions
+* [x] Hide watched-date editing behind an Edit disclosure
+* [x] Remove the prominent Movie Detail metadata-refresh button
+* [x] Preserve shared top-only pull-to-refresh behavior
+* [x] Restore shared desktop wheel-overscroll metadata refresh
+* [x] Remove the redundant Show Detail metadata-refresh button
+* [x] Route Movie actions and metadata-refresh feedback through notifications only
+* [x] Audit and defer IMDb/Rotten Tomatoes scores pending an approved provider
 
 * [x] Add shared regional movie release metadata foundation
 * [x] Add Movies Upcoming route and segmented navigation
