@@ -118,8 +118,15 @@ export async function updateMovieWatchedAt(
   tmdbIdRaw: unknown,
   mediaIdRaw: unknown,
   watchedAtRaw: unknown,
+  timeZoneRaw?: unknown,
 ): Promise<MovieActionResult> {
-  const watchedAt = parseManualWatchedAt(watchedAtRaw);
+  const timeZone = typeof timeZoneRaw === "string" ? timeZoneRaw : "UTC";
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone }).format(new Date());
+  } catch {
+    return { error: "Choose a valid historical watched date." };
+  }
+  const watchedAt = parseManualWatchedAt(watchedAtRaw, new Date(), timeZone);
   if (!watchedAt) return { error: "Choose a valid historical watched date." };
   const owned = await ownedMovie(tmdbIdRaw, mediaIdRaw);
   if ("error" in owned) return { error: owned.error };

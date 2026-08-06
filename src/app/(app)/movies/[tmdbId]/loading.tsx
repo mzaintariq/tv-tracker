@@ -24,6 +24,12 @@ export default function MovieDetailLoading() {
             />
           </div>
         </header>
+        <div className="mt-8 space-y-6">
+          <div className="h-40 rounded-xl border border-[var(--border)] bg-[var(--surface)]" />
+          {["overview", "release", "providers", "credits", "trailer"].map((section) => (
+            <section key={section} data-skeleton-region={section} className="h-28 rounded-xl border border-[var(--border)] bg-[var(--surface)]" />
+          ))}
+        </div>
       </div>
     </article>
   );
