@@ -8,6 +8,7 @@ describe("enriched show detail page contract", () => {
     expect(page).toContain('type View = "overview" | "episodes"');
     expect(page).toContain('requestedView === "overview"');
     expect(page).toContain('aria-current={selected ? "page" : undefined}');
+    expect(page).toContain("scroll={false}");
     expect(page).toContain("<Link");
   });
 

@@ -269,6 +269,7 @@ function ViewLink({
   return (
     <Link
       href={`/shows/${tmdbId}?view=${view}`}
+      scroll={false}
       aria-current={selected ? "page" : undefined}
       className={`touch-target -mb-px inline-flex w-full items-center justify-center border-b-2 px-1 py-2 text-sm font-semibold sm:w-auto ${selected ? "border-[var(--accent)] text-[var(--foreground)]" : "interactive-control border-transparent text-[var(--muted)] hover:text-[var(--foreground)]"}`}
     >

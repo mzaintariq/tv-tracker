@@ -64,6 +64,9 @@ export async function ProvidersSection({
     <div className="space-y-1 sm:space-y-2">
       <h2 className="text-lg font-semibold sm:text-xl">Where to watch</h2>
       <section className={sectionClass}>
+        <p className="text-xs text-[var(--muted)] sm:text-sm">
+          Availability for {regionLabel}
+        </p>
         {available.length ? (
           <div className="space-y-3 sm:space-y-4">
             {available.map(([category, items]) => (

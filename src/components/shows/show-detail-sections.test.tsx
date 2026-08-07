@@ -7,7 +7,7 @@ const emptyGroups = { stream: [], free: [], ads: [], rent: [], buy: [] };
 describe("show optional detail sections", () => {
   it("groups regional providers and retains attribution", async () => {
     const html = renderToStaticMarkup(await ShowProvidersSection({ regionLabel: "Pakistan (PK)", promise: Promise.resolve({ region: "PK", attributionLink: "https://example.com/watch", groups: { ...emptyGroups, stream: [{ providerId: 1, providerName: "Stream One", logoPath: null, displayPriority: 1, category: "stream" }] } }) }));
-    expect(html).toContain("Pakistan (PK)"); expect(html).toContain("Stream One"); expect(html).toContain("JustWatch via TMDB"); expect(html).toContain("overflow-x-auto"); expect(html).toContain("whitespace-nowrap"); expect(html).not.toContain("img");
+    expect(html).toContain("Pakistan (PK)"); expect(html).toContain("Stream One"); expect(html).toContain("JustWatch via TMDB"); expect(html).toContain("overflow-x-auto"); expect(html).toContain("whitespace-nowrap"); expect(html).toContain("<svg"); expect(html).not.toContain("img");
   });
 
   it("treats empty providers as valid and hides raw failures", async () => {

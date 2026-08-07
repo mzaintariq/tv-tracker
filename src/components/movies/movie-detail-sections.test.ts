@@ -5,7 +5,7 @@ import { CreditsSection, ExternalLinksFact, ProvidersSection, TrailerSection } f
 describe("movie optional detail sections", () => {
   it("groups providers and retains attribution", async () => {
     const html = renderToStaticMarkup(await ProvidersSection({ regionLabel: "Pakistan (PK)", promise: Promise.resolve({ region: "PK", attributionLink: "https://example.com/watch", groups: { stream: [{ providerId: 1, providerName: "Stream One", logoPath: null, displayPriority: 1, category: "stream" }], free: [], ads: [], rent: [], buy: [] } }) }));
-    expect(html).toContain("Stream One"); expect(html).toContain("JustWatch via TMDB");
+    expect(html).toContain("Availability for Pakistan (PK)"); expect(html).toContain("Stream One"); expect(html).toContain("JustWatch via TMDB");
   });
   it("renders valid empty and isolated failure states without raw errors", async () => {
     const empty = renderToStaticMarkup(await ProvidersSection({ regionLabel: "Pakistan (PK)", promise: Promise.resolve({ region: "PK", attributionLink: null, groups: { stream: [], free: [], ads: [], rent: [], buy: [] } }) }));
