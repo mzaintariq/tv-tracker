@@ -126,7 +126,7 @@ export function MovieControls({
       </div>
 
       {watched && watchedLabel ? (
-        <div className="min-w-0">
+        <div className="min-w-0 space-y-2">
           <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
             <p className="break-words">
               <span className="font-semibold">Watched on</span>{" "}
@@ -136,7 +136,7 @@ export function MovieControls({
             </p>
             <button
               type="button"
-              className="interactive-control touch-target rounded px-2 text-sm font-medium underline-offset-4 hover:underline cursor-pointer"
+              className="shrink-0 cursor-pointer rounded px-2 py-2 text-sm font-medium no-underline underline-offset-4 hover:underline focus-visible:underline"
               aria-expanded={editingDate}
               aria-controls="movie-watched-date-editor"
               onClick={() => {

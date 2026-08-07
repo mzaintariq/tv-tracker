@@ -274,7 +274,7 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 ### Enriched Show Detail
 
 * [x] Add native URL-backed Overview and Episodes views
-* [x] Default tracked shows to Overview and preserve setup-first non-member behavior
+* [x] Default tracked shows to Episodes and preserve setup-first non-member behavior
 * [x] Keep the shared hero, tracking controls, progress, and pull-to-refresh across views
 * [x] Add persisted show facts and explicit-region TV certification
 * [x] Add isolated explicit-region providers with JustWatch/TMDB attribution

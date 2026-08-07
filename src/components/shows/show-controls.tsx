@@ -1,12 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  useRef,
-  useState,
-  useSyncExternalStore,
-  useTransition,
-} from "react";
+import { useRef, useState, useSyncExternalStore, useTransition } from "react";
 
 import { removeFromLibrary } from "@/app/actions/library";
 import {
@@ -81,14 +76,24 @@ export function MetadataButton({
         refreshAction={syncShowMetadata}
       />
     );
-  return <SetupMetadataButton tmdbId={tmdbId} missingEpisodes={missingEpisodes} />;
+  return (
+    <SetupMetadataButton tmdbId={tmdbId} missingEpisodes={missingEpisodes} />
+  );
 }
 
-function SetupMetadataButton({ tmdbId, missingEpisodes }: { tmdbId: number; missingEpisodes: boolean }) {
+function SetupMetadataButton({
+  tmdbId,
+  missingEpisodes,
+}: {
+  tmdbId: number;
+  missingEpisodes: boolean;
+}) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ShowActionResult | null>(null);
-  const label = missingEpisodes ? "Retry episode sync" : "Load episode information";
+  const label = missingEpisodes
+    ? "Retry episode sync"
+    : "Load episode information";
   const refreshMetadata = () => {
     if (pending) return;
     start(async () => {
@@ -99,7 +104,9 @@ function SetupMetadataButton({ tmdbId, missingEpisodes }: { tmdbId: number; miss
   };
   return (
     <div className="min-w-0">
-      <button className={button} disabled={pending} onClick={refreshMetadata}>{pending ? "Synchronizing…" : label}</button>
+      <button className={button} disabled={pending} onClick={refreshMetadata}>
+        {pending ? "Synchronizing…" : label}
+      </button>
       <ActionMessage result={result} />
     </div>
   );
@@ -124,9 +131,6 @@ export function RemoveShowButton({ tmdbId }: { tmdbId: number }) {
       >
         {pending ? "Removing…" : "Remove from library"}
       </button>
-      {/* <p className="mt-1 break-words text-xs text-[var(--muted)]">
-        Watch history will be preserved.
-      </p> */}
       <ActionMessage result={result} />
     </div>
   );
@@ -197,8 +201,8 @@ export function SettingsControls({
         ? "translate-x-full"
         : "translate-x-[200%]";
   return (
-    <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-      <div className="grid w-full min-w-0 grid-cols-2 gap-3 sm:w-auto">
+    <div className="mb-0 flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:w-auto sm:grid-cols-2 sm:gap-3">
         <button
           className={`${button} w-full`}
           disabled={pending}
@@ -461,15 +465,13 @@ export function EpisodeControls({
   today: string;
   timeZone: string;
 }) {
+  const { notify } = useNotifications();
   const displayTimeZone = useSyncExternalStore(
     () => () => undefined,
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || timeZone,
     () => timeZone,
   );
   const [pending, start] = useTransition();
-  const [actionResult, setActionResult] = useState<ShowActionResult | null>(
-    null,
-  );
   const [dateResult, setDateResult] = useState<ShowActionResult | null>(null);
   const [editingDate, setEditingDate] = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
@@ -494,8 +496,15 @@ export function EpisodeControls({
           onClick={() =>
             start(async () => {
               setDateResult(null);
-              setActionResult(
-                await setEpisodeWatched(tmdbId, mediaId, episode.id, !watched),
+              const response = await setEpisodeWatched(
+                tmdbId,
+                mediaId,
+                episode.id,
+                !watched,
+              );
+              notify(
+                response.error ?? response.success ?? "Episode updated.",
+                response.error ? "error" : "success",
               );
             })
           }
@@ -514,13 +523,15 @@ export function EpisodeControls({
           onClick={() =>
             start(async () => {
               setDateResult(null);
-              setActionResult(
-                await markPreviousEpisodes(
-                  tmdbId,
-                  mediaId,
-                  episode.season_number,
-                  episode.episode_number,
-                ),
+              const response = await markPreviousEpisodes(
+                tmdbId,
+                mediaId,
+                episode.season_number,
+                episode.episode_number,
+              );
+              notify(
+                response.error ?? response.success ?? "Episodes updated.",
+                response.error ? "error" : "success",
               );
             })
           }
@@ -544,7 +555,7 @@ export function EpisodeControls({
             <button
               ref={dateTriggerRef}
               type="button"
-              className="interactive-control touch-target shrink-0 cursor-pointer rounded px-2 text-sm font-medium no-underline underline-offset-4 hover:underline focus-visible:underline"
+              className="shrink-0 cursor-pointer rounded px-2 py-2 text-sm font-medium no-underline underline-offset-4 hover:underline focus-visible:underline"
               aria-label={`${editingDate ? "Cancel editing" : "Edit"} watched date for ${coordinate}: ${episode.title}`}
               aria-expanded={editingDate}
               aria-controls={`date-editor-${episode.id}`}
@@ -566,7 +577,7 @@ export function EpisodeControls({
               id={`date-editor-${episode.id}`}
               className="flex w-full min-w-0 max-w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"
             >
-              <label htmlFor={dateId} className="break-words text-sm">
+              <label htmlFor={dateId} className="sr-only">
                 Watched date for {coordinate}
               </label>
               <input
@@ -587,7 +598,6 @@ export function EpisodeControls({
                   const value = dateInputRef.current?.value;
                   if (value)
                     start(async () => {
-                      setActionResult(null);
                       const response = await updateWatchedDate(
                         tmdbId,
                         mediaId,
@@ -610,7 +620,6 @@ export function EpisodeControls({
         </div>
       ) : null}
       <ActionMessage id={errorId} result={dateResult} />
-      <ActionMessage result={actionResult} />
     </div>
   );
 }
