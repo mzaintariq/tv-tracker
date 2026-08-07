@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
-import { getMovieCredits, getMovieDetails, getTvAggregateCredits, getTvContentRatings, getVideos, getWatchProviders } from "@/lib/tmdb/endpoints";
+import { getMovieCredits, getMovieDetails, getTvAggregateCredits, getTvContentRatings, getTvDetails, getVideos, getWatchProviders } from "@/lib/tmdb/endpoints";
 import { normalizeCast, normalizeDirectors, normalizeExternalLinks, normalizeProviders, selectPreferredTrailer, selectTvCertification, type CastProjection, type DirectorProjection, type ProviderGroups, type TrailerProjection } from "@/lib/tmdb/extras-normalize";
 
 export type OptionalMetadataFailure = "credits" | "videos" | "providers" | "content_ratings";
@@ -16,6 +16,15 @@ export const loadTvRegionalCertification = cache(async (tmdbId: number, region: 
 export const loadMovieExternalLinks = cache(async (tmdbId: number) => {
   const details = await getMovieDetails(tmdbId);
   return normalizeExternalLinks("movie", tmdbId, details.imdb_id, details.homepage);
+});
+export const loadTvExternalLinks = cache(async (tmdbId: number) => {
+  const details = await getTvDetails(tmdbId);
+  return normalizeExternalLinks(
+    "tv",
+    tmdbId,
+    details.external_ids?.imdb_id,
+    details.homepage,
+  );
 });
 
 // A future detail route can use this bundle without allowing any supplemental

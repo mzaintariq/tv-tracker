@@ -37,7 +37,7 @@ export function ProgressBar({ progress }: { progress: ShowProgress }) {
           style={{ width: `${progress.percentage}%` }}
         />
       </div>
-      <p className="mt-1 break-words text-sm text-[var(--muted)]">
+      <p className="mt-1 break-words text-xs sm:text-sm text-[var(--muted)]">
         <span className="font-medium text-[var(--foreground)]">
           {stateLabel}
         </span>

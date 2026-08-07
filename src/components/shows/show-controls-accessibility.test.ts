@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import { readFileSync } from "node:fs";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -49,6 +50,30 @@ beforeAll(() => {
 });
 
 describe("show control accessibility", () => {
+  it("stacks favourite and remove as full-width mobile actions", () => {
+    const source = readFileSync(
+      "src/components/shows/show-controls.tsx",
+      "utf8",
+    );
+    expect(source).toContain("grid-cols-1");
+    expect(source).toContain("sm:grid-cols-2");
+    expect(source).toContain("w-full");
+  });
+
+  it("routes episode action feedback through global notifications", () => {
+    const source = readFileSync(
+      "src/components/shows/show-controls.tsx",
+      "utf8",
+    );
+    const episodeControls = source.slice(
+      source.indexOf("export function EpisodeControls"),
+      source.indexOf("export function SeasonControls"),
+    );
+    expect(episodeControls).toContain("const { notify } = useNotifications()");
+    expect(episodeControls).toContain('"Episode updated."');
+    expect(episodeControls).not.toContain("actionResult");
+  });
+
   it("presents tracking status as one named three-way toggle", async () => {
     const membership = { status: "paused", is_favourite: false } as UserShow;
     const renderer = await mount(

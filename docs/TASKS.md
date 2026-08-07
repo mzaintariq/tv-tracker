@@ -271,6 +271,18 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Route Movie actions and metadata-refresh feedback through notifications only
 * [x] Audit and defer IMDb/Rotten Tomatoes scores pending an approved provider
 
+### Enriched Show Detail
+
+* [x] Add native URL-backed Overview and Episodes views
+* [x] Default tracked shows to Episodes and preserve setup-first non-member behavior
+* [x] Keep the shared hero, tracking controls, progress, and pull-to-refresh across views
+* [x] Add persisted show facts and explicit-region TV certification
+* [x] Add isolated explicit-region providers with JustWatch/TMDB attribution
+* [x] Add persisted creators and text-only aggregate top-10 cast
+* [x] Add preferred YouTube trailer and validated external links
+* [x] Preserve season disclosures, Season 0, episode actions, and watched-date editing
+* [x] Keep recommendations, TV release times, and new image roles deferred
+
 * [x] Add shared regional movie release metadata foundation
 * [x] Add Movies Upcoming route and segmented navigation
 * [x] Add owner-scoped regional movie Upcoming projection
