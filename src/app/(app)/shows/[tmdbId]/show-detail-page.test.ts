@@ -2,28 +2,40 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const page = readFileSync("src/app/(app)/shows/[tmdbId]/page.tsx", "utf8");
+const tabs = readFileSync(
+  "src/components/shows/show-detail-tabs.tsx",
+  "utf8",
+);
 
 describe("enriched show detail page contract", () => {
   it("uses native URL-backed views with an accessible selected state", () => {
-    expect(page).toContain('type View = "overview" | "episodes"');
+    expect(tabs).toContain('type ShowDetailView = "episodes" | "overview"');
     expect(page).toContain('requestedView === "overview"');
-    expect(page).toContain('aria-current={selected ? "page" : undefined}');
-    expect(page).toContain("scroll={false}");
-    expect(page).toContain("<Link");
+    expect(tabs).toContain('aria-current={selected ? "page" : undefined}');
+    expect(tabs).toContain("<a");
   });
 
   it("puts Episodes first, defaults safely to it, and underlines selection", () => {
     expect(page).toContain(': "episodes";');
-    const navigation = page.slice(page.indexOf('aria-label="Show detail views"'));
+    const navigation = tabs.slice(tabs.indexOf('aria-label="Show detail views"'));
     expect(navigation.indexOf('view="episodes"')).toBeLessThan(
       navigation.indexOf('view="overview"'),
     );
-    expect(page).toContain("border-b-2");
-    expect(page).toContain('border-[var(--accent)]');
-    expect(page).toContain("grid-cols-2");
-    expect(page).toContain("w-full");
-    expect(page).toContain("sm:w-auto");
-    expect(page).not.toContain('selected ? "bg-[var(--accent)]');
+    expect(tabs).toContain("border-b-2");
+    expect(tabs).toContain('border-[var(--accent)]');
+    expect(tabs).toContain("grid-cols-2");
+    expect(tabs).toContain("w-full");
+    expect(tabs).toContain("sm:w-auto");
+    expect(tabs).not.toContain('selected ? "bg-[var(--accent)]');
+  });
+
+  it("switches views locally while preserving URL history and scroll", () => {
+    expect(tabs).toContain("event.preventDefault()");
+    expect(tabs).toContain("window.history.pushState");
+    expect(tabs).toContain('window.addEventListener("popstate"');
+    expect(tabs).toContain("setView(nextView)");
+    expect(tabs).toContain('hidden={view !== "episodes"}');
+    expect(tabs).toContain('hidden={view !== "overview"}');
   });
 
   it("keeps non-members in the existing setup-first episode experience", () => {
@@ -69,7 +81,7 @@ describe("enriched show detail page contract", () => {
     expect(hero).toContain("<ProgressBar");
     const panel = page.slice(
       page.indexOf('aria-label="Show tracking actions"'),
-      page.indexOf('aria-label="Show detail views"'),
+      page.indexOf("<ShowDetailTabs"),
     );
     expect(panel).not.toContain("<ProgressBar");
     expect(panel).toContain("<SettingsControls");

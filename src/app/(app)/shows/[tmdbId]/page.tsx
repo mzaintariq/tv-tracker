@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { MediaPoster } from "@/components/media/media-poster";
@@ -10,6 +9,10 @@ import {
   SettingsControls,
 } from "@/components/shows/show-controls";
 import { ProgressBar } from "@/components/shows/progress-bar";
+import {
+  ShowDetailTabs,
+  type ShowDetailView,
+} from "@/components/shows/show-detail-tabs";
 import {
   OptionalShowSectionSkeleton,
   ShowCreditsSection,
@@ -47,7 +50,6 @@ import type {
   WatchedEpisode,
 } from "@/types/database";
 
-type View = "overview" | "episodes";
 const sectionClass =
   "min-w-0 space-y-2 sm:space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 sm:p-6";
 
@@ -80,7 +82,7 @@ export default async function ShowDetailPage({
   const timeZone = profileResult.data?.timezone ?? "UTC";
   const region = profileResult.data?.region ?? null;
   const requestedView = (await searchParams).view;
-  const view: View =
+  const view: ShowDetailView =
     requestedView === "overview" && detail.membership ? "overview" : "episodes";
   const watchedMap = new Map(
     detail.watched.map((row) => [row.episode_id, row]),
@@ -214,32 +216,27 @@ export default async function ShowDetailPage({
         <MetadataButton tmdbId={tmdbId} />
       )}
       {detail.membership ? (
-        <nav
-          aria-label="Show detail views"
-          className="grid min-w-0 grid-cols-2 border-b border-[var(--border)] sm:flex sm:items-center sm:gap-6"
-        >
-          <ViewLink
-            tmdbId={tmdbId}
-            view="episodes"
-            selected={view === "episodes"}
-          >
-            Episodes
-          </ViewLink>
-          <ViewLink
-            tmdbId={tmdbId}
-            view="overview"
-            selected={view === "overview"}
-          >
-            Overview
-          </ViewLink>
-        </nav>
-      ) : null}
-      {view === "overview" ? (
-        <Overview
+        <ShowDetailTabs
           tmdbId={tmdbId}
-          media={detail.media}
-          region={region}
-          certification={certification}
+          initialView={view}
+          episodes={
+            <Episodes
+              tmdbId={tmdbId}
+              detail={detail}
+              watchedMap={watchedMap}
+              watchedIds={watchedIds}
+              today={today}
+              timeZone={timeZone}
+            />
+          }
+          overview={
+            <Overview
+              tmdbId={tmdbId}
+              media={detail.media}
+              region={region}
+              certification={certification}
+            />
+          }
         />
       ) : (
         <Episodes
@@ -252,29 +249,6 @@ export default async function ShowDetailPage({
         />
       )}
     </article>
-  );
-}
-
-function ViewLink({
-  tmdbId,
-  view,
-  selected,
-  children,
-}: {
-  tmdbId: number;
-  view: View;
-  selected: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={`/shows/${tmdbId}?view=${view}`}
-      scroll={false}
-      aria-current={selected ? "page" : undefined}
-      className={`touch-target -mb-px inline-flex w-full items-center justify-center border-b-2 px-1 py-2 text-sm font-semibold sm:w-auto ${selected ? "border-[var(--accent)] text-[var(--foreground)]" : "interactive-control border-transparent text-[var(--muted)] hover:text-[var(--foreground)]"}`}
-    >
-      {children}
-    </Link>
   );
 }
 
