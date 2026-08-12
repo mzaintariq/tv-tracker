@@ -1,4 +1,6 @@
 "use client";
+import { RouteErrorState } from "@/components/ui/route-error-state";
+
 export default function ShowsError({
   reset,
 }: {
@@ -6,17 +8,12 @@ export default function ShowsError({
   reset: () => void;
 }) {
   return (
-    <section>
-      <h1 className="text-3xl font-semibold">Could not load TV shows</h1>
-      <p className="mt-3 text-[var(--muted)]">
-        Your watch list could not be loaded. Try again in a moment.
-      </p>
-      <button
-        className="mt-5 rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]"
-        onClick={reset}
-      >
-        Try again
-      </button>
-    </section>
+    <RouteErrorState
+      title="Could not load TV shows"
+      description="Your watch list is temporarily unavailable. Please try again."
+      reset={reset}
+      backHref="/movies"
+      backLabel="Go to Movies"
+    />
   );
 }

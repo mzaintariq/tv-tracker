@@ -26,13 +26,13 @@ export function MovieCard({
             sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, 25vw"
           />
         </div>
-        <div className="min-w-0 space-y-1 p-4">
+        <div className="min-w-0 space-y-0 sm:space-y-1 p-3 sm:p-4">
           <PosterCardTitle
             as="h3"
             title={movie.media.title}
             favourite={movie.membership.is_favourite}
           />
-          <p className="break-words text-sm text-[var(--muted)]">
+          <p className="break-words text-xs sm:text-sm text-[var(--muted)]">
             {yearFromDate(movie.media.release_date) ?? "Year unknown"} ·{" "}
             {movie.membership.watched_at ? "Watched" : "Watch Next"}
           </p>

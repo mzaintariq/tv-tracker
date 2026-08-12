@@ -39,6 +39,7 @@ export function RouteErrorState({
             setPending(true);
             reset();
             router.refresh();
+            if (typeof window !== "undefined") window.location.reload();
           }}
           className="touch-target rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]"
         >

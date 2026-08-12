@@ -22,7 +22,7 @@ export function AuthenticatedAppShell({
         <main
           id="main-content"
           tabIndex={-1}
-          className="app-main-content flex-1 pt-6 md:pt-8"
+          className="app-main-content flex-1"
         >
           {children}
         </main>

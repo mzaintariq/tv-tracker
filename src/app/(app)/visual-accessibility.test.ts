@@ -22,7 +22,6 @@ const interactiveSources = [
 const touchTargetSources = [
   "src/components/explore/explore-toolbar.tsx",
   "src/components/explore/media-card.tsx",
-  "src/components/shows/quick-episode-action.tsx",
   "src/components/shows/show-subnav.tsx",
   "src/components/shows/show-controls.tsx",
   "src/components/shows/limited-watch-list-section.tsx",
@@ -101,6 +100,16 @@ describe("Phase 9D.4 visual accessibility contracts", () => {
     for (const path of touchTargetSources) {
       expect(readFileSync(path, "utf8"), path).toContain("touch-target");
     }
+  });
+
+  it("keeps the watch-list episode action compact", () => {
+    const source = readFileSync(
+      "src/components/shows/quick-episode-action.tsx",
+      "utf8",
+    );
+    expect(source).not.toContain("touch-target");
+    expect(source).toContain("px-2 py-2");
+    expect(source).toContain("text-xs sm:text-sm");
   });
 
   it("preserves Phase 9D.2 names and Phase 9D.3 one-column narrow grids", () => {

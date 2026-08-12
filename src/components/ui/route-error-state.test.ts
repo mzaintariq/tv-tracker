@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { act, create } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
@@ -10,24 +11,30 @@ vi.mock("next/link", () => ({
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh }) }));
 import AppError from "@/app/(app)/error";
 import MoviesError from "@/app/(app)/movies/error";
+import MovieUpcomingError from "@/app/(app)/movies/(library)/upcoming/error";
 import ProfileError from "@/app/(app)/profile/error";
 import ProfileSettingsError from "@/app/(app)/profile/settings/error";
 import ImportError from "@/app/(app)/profile/import/error";
 import ImportDetailError from "@/app/(app)/profile/import/[importId]/error";
 import ShowDetailError from "@/app/(app)/shows/[tmdbId]/error";
 import MovieDetailError from "@/app/(app)/movies/[tmdbId]/error";
+import ShowsError from "@/app/(app)/shows/error";
+import ShowsUpcomingError from "@/app/(app)/shows/upcoming/error";
 import { RouteErrorState } from "./route-error-state";
 
 const raw = "Supabase PostgreSQL TMDB Error: token at stack trace";
 const boundaries = [
   [AppError, "Something went wrong"],
   [MoviesError, "Movies could not be loaded"],
+  [MovieUpcomingError, "Upcoming movies could not be loaded"],
   [ProfileError, "Profile could not be loaded"],
   [ProfileSettingsError, "Settings could not be loaded"],
   [ImportError, "Import data could not be loaded"],
   [ImportDetailError, "Import data could not be loaded"],
   [ShowDetailError, "This show could not be loaded"],
   [MovieDetailError, "This movie could not be loaded"],
+  [ShowsError, "Could not load TV shows"],
+  [ShowsUpcomingError, "Could not load Upcoming"],
 ] as const;
 
 describe("safe route error states", () => {
@@ -64,6 +71,9 @@ describe("safe route error states", () => {
     await act(() => mounted.root.findByType("button").props.onClick());
     expect(reset).toHaveBeenCalledOnce();
     expect(refresh).toHaveBeenCalledOnce();
+    expect(
+      readFileSync("src/components/ui/route-error-state.tsx", "utf8"),
+    ).toContain("window.location.reload()");
     expect(mounted.root.findByType("a").props.href).toBe("/shows");
     const alert = mounted.root.findByProps({ role: "alert" });
     expect(alert.findAllByType("button")).toHaveLength(0);

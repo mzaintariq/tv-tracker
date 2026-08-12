@@ -21,13 +21,13 @@ export function ShowCard({ show }: { show: ShowCardData }) {
             sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, 25vw"
           />
         </div>
-        <div className="min-w-0 space-y-3 p-4">
+        <div className="min-w-0 space-y-2 sm:space-y-3 p-3 sm:p-4">
           <div className="min-w-0">
             <PosterCardTitle
               title={show.media.title}
               favourite={show.membership.is_favourite}
             />
-            <p className="break-words text-sm capitalize text-[var(--muted)]">
+            <p className="break-words text-xs sm:text-sm capitalize text-[var(--muted)]">
               {yearFromDate(show.media.release_date) ?? "Year unknown"} ·{" "}
               {show.membership.status}
             </p>

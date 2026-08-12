@@ -4,7 +4,7 @@ import { LimitedWatchListSection } from "@/components/shows/limited-watch-list-s
 import type { MovieLibraryMedia, MovieSnapshot } from "@/lib/movies/movies";
 
 const movieGridClassName =
-  "grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4";
+  "grid grid-cols-1 gap-2 sm:gap-4 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4";
 
 export function MovieSection({
   title,
@@ -52,13 +52,13 @@ export function MovieSection({
   }
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-2 sm:space-y-3">
       <div className="min-w-0">
-        <h2 className="break-words text-2xl font-semibold tracking-tight">
+        <h2 className="break-words text-xl sm:text-2xl font-semibold tracking-tight">
           {title} · {movies.length}
         </h2>
         {description ? (
-          <p className="mt-1 break-words text-sm text-[var(--muted)]">
+          <p className="mt-0 sm:mt-1 break-words text-xs sm:text-sm text-[var(--muted)]">
             {description}
           </p>
         ) : null}

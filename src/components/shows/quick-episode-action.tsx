@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { setEpisodeWatched, type ShowActionResult } from "@/app/actions/shows";
+import { useTransition } from "react";
+import { setEpisodeWatched } from "@/app/actions/shows";
+import { useNotifications } from "@/components/ui/notifications";
 
 export function QuickEpisodeAction({
   tmdbId,
@@ -14,8 +15,8 @@ export function QuickEpisodeAction({
   episodeId: string;
   watched: boolean;
 }) {
+  const { notify } = useNotifications();
   const [pending, startTransition] = useTransition();
-  const [result, setResult] = useState<ShowActionResult | null>(null);
   const label = watched ? "Undo" : "Mark Watched";
 
   return (
@@ -23,27 +24,24 @@ export function QuickEpisodeAction({
       <button
         type="button"
         disabled={pending}
-        className="touch-target max-w-full cursor-pointer whitespace-normal rounded-lg bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_88%,var(--foreground))]"
+        className="w-full cursor-pointer whitespace-normal rounded-lg bg-[var(--accent)] px-2 py-2 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_88%,var(--foreground))]"
         onClick={() =>
-          startTransition(async () =>
-            setResult(
-              await setEpisodeWatched(tmdbId, mediaId, episodeId, !watched),
-            ),
-          )
+          startTransition(async () => {
+            const response = await setEpisodeWatched(
+              tmdbId,
+              mediaId,
+              episodeId,
+              !watched,
+            );
+            notify(
+              response.error ?? response.success ?? "Episode updated.",
+              response.error ? "error" : "success",
+            );
+          })
         }
       >
         {pending ? "Saving…" : label}
       </button>
-      {result?.error ? (
-        <p role="alert" className="break-words text-xs text-[var(--danger)]">
-          {result.error}
-        </p>
-      ) : null}
-      {result?.success ? (
-        <p role="status" className="break-words text-xs text-[var(--success)]">
-          {result.success}
-        </p>
-      ) : null}
     </div>
   );
 }

@@ -34,7 +34,7 @@ export function UpcomingMovieCard({
         <div className="min-w-0 self-center">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <h3
-              className="line-clamp-2 min-w-0 break-words font-semibold leading-snug"
+              className="line-clamp-2 min-w-0 break-words text-sm font-semibold leading-snug sm:text-base"
               title={movie.title}
             >
               {movie.title}
@@ -45,14 +45,14 @@ export function UpcomingMovieCard({
               </span>
             ) : null}
           </div>
-          <p className="mt-2 break-words text-sm leading-snug text-[var(--foreground)]">
+          <p className="mt-1 break-words text-xs leading-snug text-[var(--foreground)] sm:mt-2 sm:text-sm">
             {theatricalStatus(
               movie.theatrical_date,
               movie.theatrical_type,
               today,
             )}
           </p>
-          <p className="mt-1 break-words text-sm leading-snug text-[var(--muted)]">
+          <p className="mt-1 break-words text-xs leading-snug text-[var(--muted)] sm:text-sm">
             {digitalStatus(movie.digital_date, today)}
           </p>
         </div>

@@ -17,7 +17,7 @@ function episodeNumber(season: number, episode: number) {
 }
 
 const SHOW_GRID_CLASS =
-  "grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4";
+  "grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4";
 const RECENT_LIST_CLASS =
   "min-w-0 divide-y divide-[var(--border)] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)]";
 const NEEDS_DATA_GRID_CLASS =
@@ -37,10 +37,10 @@ export function ShowGrid({ shows }: { shows: DerivedShow[] }) {
 
 export function WatchNextGrid({ items }: { items: WatchNextItem[] }) {
   return (
-    <ul className="grid min-w-0 gap-4 lg:grid-cols-2">
+    <ul className="grid min-w-0 gap-3 sm:gap-4 lg:grid-cols-2">
       {items.map((item) => (
         <li key={item.membership.id} className="min-w-0">
-          <article className="grid h-full min-w-0 grid-cols-[72px_minmax(0,1fr)] rounded-xl border border-[var(--border)] bg-[var(--surface)] min-[360px]:grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]">
+          <article className="grid h-full min-w-0 grid-cols-[72px_minmax(0,1fr)] rounded-xl border border-[var(--border)] bg-[var(--surface)] min-[360px]:grid-cols-[102px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]">
             <Link
               href={`/shows/${item.media.tmdb_id}`}
               className="poster-interactive-surface relative min-h-32 overflow-hidden rounded-l-xl border border-transparent bg-[var(--surface-elevated)] sm:min-h-40"
@@ -49,25 +49,25 @@ export function WatchNextGrid({ items }: { items: WatchNextItem[] }) {
                 source={item.media.poster_path}
                 title={item.media.title}
                 alt={`${item.media.title} poster`}
-                sizes="(max-width: 359px) 72px, (max-width: 639px) 88px, 120px"
+                sizes="(max-width: 359px) 72px, (max-width: 639px) 102px, 120px"
                 fallbackClassName="text-xl font-semibold text-[var(--muted)]"
               />
             </Link>
-            <div className="flex min-w-0 flex-col justify-between gap-4 p-4">
+            <div className="flex min-w-0 flex-col justify-between gap-2 sm:gap-4 p-3 sm:p-4">
               <div className="min-w-0">
                 <Link
                   href={`/shows/${item.media.tmdb_id}`}
-                  className="break-words font-semibold hover:underline"
+                  className="break-words text-sm sm:text-base font-semibold hover:underline"
                 >
                   {item.media.title}
                 </Link>
-                <p className="mt-1 text-sm font-medium">
+                <p className="mt-0 sm:mt-1 text-xs sm:text-sm font-medium">
                   {episodeNumber(
                     item.episode.season_number,
                     item.episode.episode_number,
                   )}
                 </p>
-                <p className="break-words text-sm text-[var(--muted)]">
+                <p className="break-words text-xs sm:text-sm text-[var(--muted)]">
                   {item.episode.title}
                 </p>
               </div>
@@ -165,10 +165,10 @@ export function WatchNextWatchListSection({
   return (
     <section className="min-w-0 space-y-3">
       <div className="min-w-0">
-        <h2 className="break-words text-2xl font-semibold tracking-tight">
+        <h2 className="break-words text-xl sm:text-2xl font-semibold tracking-tight">
           {formatSectionHeading("Watch Next", items.length)}
         </h2>
-        <p className="mt-1 break-words text-sm text-[var(--muted)]">
+        <p className="mt-1 break-words text-xs text-[var(--muted)] sm:text-sm">
           Continue shows you watched recently or that recently aired a new
           episode.
         </p>
@@ -223,15 +223,15 @@ export function SecondaryRecentlyWatchedSection({
   if (!items.length) return null;
   return (
     <details className="group min-w-0 rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-      <summary className="interactive-control touch-target flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-4 py-3 marker:content-none [&::-webkit-details-marker]:hidden">
-        <span className="text-2xl font-semibold">
+      <summary className="interactive-control touch-target flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-3 sm:px-4 py-3 marker:content-none [&::-webkit-details-marker]:hidden">
+        <span className="text-xl sm:text-2xl font-semibold">
           Recently Watched · {items.length}
         </span>
         <span aria-hidden="true" className="text-xl group-open:rotate-90">
           ›
         </span>
       </summary>
-      <div className="border-t border-[var(--border)] p-4">
+      <div className="border-t border-[var(--border)] p-3 sm:p-4">
         <LimitedWatchListSection
           sectionId="recently-watched"
           title="Recently Watched episodes"
@@ -244,16 +244,16 @@ export function SecondaryRecentlyWatchedSection({
           {items.map((item) => (
             <li
               key={item.watched.id}
-              className="flex min-w-0 flex-col justify-between gap-3 p-4 sm:flex-row sm:items-center"
+              className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-3 sm:p-4"
             >
               <div className="min-w-0">
                 <Link
                   href={`/shows/${item.media.tmdb_id}`}
-                  className="break-words font-semibold hover:underline"
+                  className="break-words text-sm sm:text-base font-semibold hover:underline"
                 >
                   {item.media.title}
                 </Link>
-                <p className="break-words text-sm">
+                <p className="break-words text-xs sm:text-sm">
                   {episodeNumber(
                     item.episode.season_number,
                     item.episode.episode_number,
@@ -262,7 +262,7 @@ export function SecondaryRecentlyWatchedSection({
                 </p>
                 <time
                   dateTime={item.watched.watched_at}
-                  className="break-words text-sm text-[var(--muted)]"
+                  className="break-words text-xs sm:text-sm text-[var(--muted)]"
                 >
                   {formatTimestamp(item.watched.watched_at, timeZone)}
                 </time>

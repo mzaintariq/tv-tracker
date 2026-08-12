@@ -8,6 +8,7 @@
   --safe-area-right: env(safe-area-inset-right, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-left: env(safe-area-inset-left, 0px);
+  --app-content-top: calc(1.5rem + var(--safe-area-top));
   --mobile-nav-clearance: calc(
     var(--mobile-nav-height) + var(--safe-area-bottom) + 1.5rem
   );
@@ -244,9 +245,16 @@ body {
 }
 
 .app-main-content {
+  padding-top: var(--app-content-top);
   padding-right: calc(1rem + var(--safe-area-right));
   padding-bottom: var(--mobile-nav-clearance);
   padding-left: calc(1rem + var(--safe-area-left));
+}
+
+.app-section-subnav {
+  top: var(--app-content-top);
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .mobile-bottom-nav {
@@ -256,10 +264,18 @@ body {
 }
 
 @media (min-width: 48rem) {
+  :root {
+    --app-content-top: 2rem;
+  }
+
   .app-main-content {
     padding-right: 2rem;
     padding-bottom: 2rem;
     padding-left: 2rem;
+  }
+
+  .app-section-subnav {
+    left: calc(50% + 7rem);
   }
 }
 

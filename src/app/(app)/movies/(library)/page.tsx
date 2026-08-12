@@ -12,7 +12,7 @@ export default async function MoviesPage() {
   if (!user) redirect("/login");
   const list = await loadMovies(user.id);
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 sm:space-y-10">
       {!list.movies.length ? (
         <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center">
           <h2 className="text-xl font-semibold">No movies yet</h2>

@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
       },
   ),
   refresh: vi.fn(),
+  notify: vi.fn(),
   now: "2026-07-15T12:00:00.000Z",
 }));
 
@@ -22,6 +23,10 @@ vi.mock("@/app/actions/movies", () => ({
   setMovieWatched: mocks.setMovieWatched,
 }));
 
+vi.mock("@/components/ui/notifications", () => ({
+  useNotifications: () => ({ notify: mocks.notify }),
+}));
+
 import { QuickMarkMovieWatched } from "./quick-mark-movie-watched";
 
 describe("QuickMarkMovieWatched", () => {
@@ -31,6 +36,7 @@ describe("QuickMarkMovieWatched", () => {
       success: "Movie marked watched.",
     });
     mocks.refresh.mockReset();
+    mocks.notify.mockReset();
     vi.spyOn(Date.prototype, "toISOString").mockReturnValue(mocks.now);
   });
 
@@ -61,6 +67,10 @@ describe("QuickMarkMovieWatched", () => {
       "11111111-1111-4111-8111-111111111111",
       true,
       mocks.now,
+    );
+    expect(mocks.notify).toHaveBeenCalledWith(
+      "Movie marked watched.",
+      "success",
     );
     expect(mocks.refresh).toHaveBeenCalledOnce();
   });
@@ -127,8 +137,10 @@ describe("QuickMarkMovieWatched", () => {
     });
 
     expect(mocks.refresh).not.toHaveBeenCalled();
-    expect(renderer.root.findByProps({ role: "alert" }).children).toContain(
+    expect(mocks.notify).toHaveBeenCalledWith(
       "The movie could not be updated. Please try again.",
+      "error",
     );
+    expect(renderer.root.findAllByProps({ role: "alert" })).toHaveLength(0);
   });
 });

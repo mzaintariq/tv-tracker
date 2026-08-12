@@ -4,7 +4,7 @@ const read = (path: string) => readFileSync(path, "utf8");
 describe("Movies Upcoming route contract", () => {
   it("has URL-backed accessible navigation and localized states", () => {
     const nav=read("src/components/movies/movie-subnav.tsx");
-    expect(nav).toContain('href: "/movies/upcoming"'); expect(nav).toContain('aria-current'); expect(nav).toContain("sticky");
+    expect(nav).toContain('href: "/movies/upcoming"'); expect(nav).toContain('aria-current'); expect(nav).toContain("app-section-subnav fixed");
     expect(read("src/app/(app)/movies/(library)/upcoming/loading.tsx")).toContain('role="status"');
     expect(read("src/app/(app)/movies/(library)/upcoming/error.tsx")).toContain("reset={reset}");
   });

@@ -6,12 +6,11 @@ import { readFileSync } from "node:fs";
 import { ShowSubnav } from "@/components/shows/show-subnav";
 
 describe("ShowSubnav", () => {
-  it("uses a sticky compact navigation with an exposed current view", () => {
+  it("uses a fixed compact navigation with an exposed current view", () => {
     const html = renderToStaticMarkup(
       createElement(ShowSubnav, { current: "upcoming" }),
     );
-    expect(html).toContain("sticky");
-    expect(html).toContain("safe-area-top");
+    expect(html).toContain("app-section-subnav fixed");
     expect(html).toContain('aria-label="TV Shows views"');
     expect(html).toContain('aria-current="page"');
     expect(html).toContain('href="/shows"');

@@ -1,6 +1,6 @@
 import { UpcomingMovieCard } from "@/components/movies/upcoming-movie-card";
 import type { MovieUpcomingRow } from "@/lib/movies/upcoming";
-const list = "space-y-3";
+const list = "space-y-2 sm:space-y-3";
 function Section({
   title,
   movies,
@@ -14,8 +14,8 @@ function Section({
 }) {
   if (!movies.length) return null;
   return (
-    <section className="space-y-3">
-      <h2 className="text-2xl font-semibold tracking-tight">
+    <section className="space-y-2 sm:space-y-3">
+      <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
         {title} · {movies.length}
       </h2>
       <ul className={list}>
@@ -35,7 +35,7 @@ export function MovieUpcomingSections(props: {
   today: string;
 }) {
   return (
-    <div className="w-full space-y-10">
+    <div className="w-full space-y-8 sm:space-y-10">
       <Section
         title="Out Now"
         movies={props.outNow}

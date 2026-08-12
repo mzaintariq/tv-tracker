@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useTransition } from "react";
 
-import { setMovieWatched, type MovieActionResult } from "@/app/actions/movies";
+import { setMovieWatched } from "@/app/actions/movies";
+import { useNotifications } from "@/components/ui/notifications";
 
 type QuickMarkMovieWatchedProps = {
   title: string;
@@ -17,9 +18,9 @@ export function QuickMarkMovieWatched({
   mediaId,
 }: QuickMarkMovieWatchedProps) {
   const router = useRouter();
+  const { notify } = useNotifications();
   const [pending, startTransition] = useTransition();
   const pendingRef = useRef(false);
-  const [result, setResult] = useState<MovieActionResult | null>(null);
 
   const onMarkWatched = () => {
     if (pendingRef.current || pending) return;
@@ -33,7 +34,10 @@ export function QuickMarkMovieWatched({
           true,
           watchedAt,
         );
-        setResult(response);
+        notify(
+          response.error ?? response.success ?? "Movie updated.",
+          response.error ? "error" : "success",
+        );
         if (!response.error) router.refresh();
       } finally {
         pendingRef.current = false;
@@ -53,16 +57,6 @@ export function QuickMarkMovieWatched({
       >
         <span aria-hidden="true">{pending ? "…" : "✓"}</span>
       </button>
-      {result?.error ? (
-        <p role="alert" className="sr-only">
-          {result.error}
-        </p>
-      ) : null}
-      {result?.success ? (
-        <p role="status" className="sr-only">
-          {result.success}
-        </p>
-      ) : null}
     </div>
   );
 }

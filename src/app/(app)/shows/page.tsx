@@ -20,7 +20,7 @@ export default async function ShowsPage() {
   const list = await loadWatchList(user.id);
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-10">
+    <div className="mx-auto w-full max-w-6xl space-y-8 sm:space-y-10">
       <ShowSubnav current="watch-list" />
       {!list.shows.length ? (
         <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center">

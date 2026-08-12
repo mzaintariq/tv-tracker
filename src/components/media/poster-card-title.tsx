@@ -13,7 +13,7 @@ export function PosterCardTitle({
 }: PosterCardTitleProps) {
   const Heading: ElementType = as;
   return (
-    <Heading className="truncate font-semibold" title={title}>
+    <Heading className="truncate font-semibold text-sm sm:text-base" title={title}>
       {title}
       {favourite ? (
         <>

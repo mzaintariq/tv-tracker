@@ -3,7 +3,7 @@ import type { ShowProgress } from "@/lib/shows/progress";
 export function ProgressBar({ progress }: { progress: ShowProgress }) {
   if (progress.state === "none")
     return (
-      <p className="break-words text-sm text-[var(--muted)]">
+      <p className="break-words text-xs sm:text-sm text-[var(--muted)]">
         {progress.total
           ? `0 of ${progress.total} watched`
           : "No released episodes"}
@@ -30,7 +30,7 @@ export function ProgressBar({ progress }: { progress: ShowProgress }) {
         aria-valuemax={100}
         aria-valuenow={progress.percentage}
         aria-valuetext={`${stateLabel}: ${progress.watched} of ${progress.total} watched, ${progress.percentage}%`}
-        className="progress-track h-2 overflow-hidden rounded-full"
+        className="progress-track h-[0.375rem] sm:h-2 overflow-hidden rounded-full"
       >
         <div
           className={`progress-fill h-full ${fill}`}

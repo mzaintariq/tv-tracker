@@ -62,7 +62,7 @@ export function LimitedWatchListSection({
 
   return (
     <section
-      className="min-w-0 space-y-3"
+      className="min-w-0 space-y-2 sm:space-y-3"
       aria-labelledby={showHeading ? headingId : undefined}
       aria-label={showHeading ? undefined : title}
     >
@@ -70,13 +70,13 @@ export function LimitedWatchListSection({
         {showHeading ? (
           <h2
             id={headingId}
-            className="break-words text-2xl font-semibold tracking-tight"
+            className="break-words text-xl sm:text-2xl font-semibold tracking-tight"
           >
             {formatSectionHeading(title, totalCount)}
           </h2>
         ) : null}
         {description ? (
-          <p className="mt-1 break-words text-sm text-[var(--muted)]">
+          <p className="mt-0 sm:mt-1 break-words text-xs sm:text-sm text-[var(--muted)]">
             {description}
           </p>
         ) : null}
@@ -88,7 +88,7 @@ export function LimitedWatchListSection({
         <button
           ref={toggleRef}
           type="button"
-          className="interactive-control touch-target inline-flex max-w-full cursor-pointer items-center whitespace-normal rounded-lg border bg-[var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-elevated)]"
+          className="interactive-control touch-target inline-flex w-full cursor-pointer items-center justify-center whitespace-normal rounded-lg border bg-[var(--surface)] px-3 py-2 text-xs sm:text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-elevated)]"
           aria-expanded={expanded}
           aria-controls={listId}
           onClick={onToggle}

@@ -63,6 +63,8 @@ describe("MediaPoster consumers", () => {
     );
     expect(titlePrimitive).toContain('aria-hidden="true"');
     expect(titlePrimitive).toContain('className="sr-only"');
-    expect(titlePrimitive).toContain('className="truncate font-semibold"');
+    expect(titlePrimitive).toContain(
+      'className="truncate font-semibold text-sm sm:text-base"',
+    );
   });
 });
