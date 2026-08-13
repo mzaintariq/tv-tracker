@@ -18,7 +18,7 @@ export function AuthenticatedAppShell({
       </a>
       {themeSync}
       {desktopNavigation}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col md:ml-56">
         <main
           id="main-content"
           tabIndex={-1}

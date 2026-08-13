@@ -4,9 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { APP_NAV_ITEMS } from "@/components/nav/nav-items";
+import { useAppNavigation } from "@/components/nav/app-navigation-state";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const { pendingHref, selectHref } = useAppNavigation();
+  const selectedPath = pendingHref ?? pathname;
 
   return (
     <nav
@@ -16,12 +19,14 @@ export function MobileBottomNav() {
       <ul className="mx-auto grid max-w-lg grid-cols-4">
         {APP_NAV_ITEMS.map((item) => {
           const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+            selectedPath === item.href ||
+            selectedPath.startsWith(`${item.href}/`);
 
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
+                onClick={(event) => selectHref(item.href, event)}
                 className={`flex min-h-14 flex-col items-center justify-center gap-1 px-2 text-xs font-medium transition ${
                   active
                     ? "text-[var(--accent)]"

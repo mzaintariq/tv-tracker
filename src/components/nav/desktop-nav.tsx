@@ -4,12 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { APP_NAV_ITEMS } from "@/components/nav/nav-items";
+import { useAppNavigation } from "@/components/nav/app-navigation-state";
 
 export function DesktopNav() {
   const pathname = usePathname();
+  const { pendingHref, selectHref } = useAppNavigation();
+  const selectedPath = pendingHref ?? pathname;
 
   return (
-    <aside className="hidden w-56 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] md:flex md:flex-col">
+    <aside className="fixed inset-y-0 left-0 hidden w-56 border-r border-[var(--border)] bg-[var(--surface)] md:flex md:flex-col">
       <div className="px-5 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
           TrackTV
@@ -21,12 +24,14 @@ export function DesktopNav() {
       >
         {APP_NAV_ITEMS.map((item) => {
           const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+            selectedPath === item.href ||
+            selectedPath.startsWith(`${item.href}/`);
 
           return (
             <Link
               key={item.href}
               href={item.href}
+              onClick={(event) => selectHref(item.href, event)}
               className={`rounded-lg px-3 py-2.5 text-sm font-medium transition ${
                 active
                   ? "bg-[var(--accent-soft)] text-[var(--accent)]"

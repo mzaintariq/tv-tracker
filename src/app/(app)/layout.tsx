@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import { AuthenticatedAppShell } from "@/components/layout/authenticated-app-shell";
 import { DesktopNav } from "@/components/nav/desktop-nav";
 import { MobileBottomNav } from "@/components/nav/mobile-bottom-nav";
+import {
+  AppNavigationContent,
+  AppNavigationProvider,
+} from "@/components/nav/app-navigation-state";
 import { ThemeSync } from "@/components/theme/theme-sync";
 import { NotificationProvider } from "@/components/ui/notifications";
 import { isThemePreference } from "@/lib/profile";
@@ -32,12 +36,16 @@ export default async function AppLayout({
     profile && isThemePreference(profile.theme) ? profile.theme : "system";
 
   return (
-    <AuthenticatedAppShell
-      themeSync={<ThemeSync theme={profileTheme} />}
-      desktopNavigation={<DesktopNav />}
-      mobileNavigation={<MobileBottomNav />}
-    >
-      <NotificationProvider>{children}</NotificationProvider>
-    </AuthenticatedAppShell>
+    <AppNavigationProvider>
+      <AuthenticatedAppShell
+        themeSync={<ThemeSync theme={profileTheme} />}
+        desktopNavigation={<DesktopNav />}
+        mobileNavigation={<MobileBottomNav />}
+      >
+        <NotificationProvider>
+          <AppNavigationContent>{children}</AppNavigationContent>
+        </NotificationProvider>
+      </AuthenticatedAppShell>
+    </AppNavigationProvider>
   );
 }
