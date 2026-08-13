@@ -22,7 +22,7 @@ export default function ShowDetailLoading() {
         </header>
         <section
           data-skeleton-region="tracking-setup"
-          className="h-40 rounded-xl border border-[var(--border)] bg-[var(--surface)]"
+          className="h-36 rounded-xl border border-[var(--border)] bg-[var(--surface)] sm:h-40"
         />
         <section data-skeleton-region="episodes" className="min-w-0 space-y-3">
           <div className="h-8 w-36 max-w-full rounded bg-[var(--surface-elevated)]" />

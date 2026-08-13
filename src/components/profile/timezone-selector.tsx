@@ -52,12 +52,12 @@ export function TimeZoneSelector({
 
   return (
     <section className="min-w-0">
-      <h2 className="break-words text-xl font-semibold">Timezone</h2>
-      <p className="mt-1 break-words text-[var(--muted)]">
+      <h2 className="break-words text-lg font-semibold sm:text-xl">Timezone</h2>
+      <p className="mt-1 break-words text-xs text-[var(--muted)] sm:text-base">
         Used to decide which releases appear under Today and Tomorrow.
       </p>
-      <div className="mt-4 flex w-full min-w-0 max-w-lg flex-col gap-3">
-        <label htmlFor="profile-timezone" className="text-sm font-medium">
+      <div className="mt-3 flex w-full min-w-0 max-w-lg flex-col gap-2 sm:mt-4 sm:gap-3">
+        <label htmlFor="profile-timezone" className="text-xs font-medium sm:text-sm">
           Timezone
         </label>
         <select
@@ -78,7 +78,7 @@ export function TimeZoneSelector({
             type="button"
             disabled={pending}
             onClick={useBrowserTimeZone}
-            className="touch-target rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)]"
+            className="touch-target rounded-lg bg-[var(--accent)] px-3 text-xs font-semibold text-[var(--accent-foreground)] sm:px-4 sm:text-sm"
           >
             {pending ? "Saving…" : "Use browser timezone"}
           </button>
@@ -86,18 +86,18 @@ export function TimeZoneSelector({
             type="button"
             disabled={pending || selected === currentTimeZone}
             onClick={() => save(selected)}
-            className="interactive-control touch-target rounded-lg border bg-[var(--surface)] px-4 text-sm font-semibold"
+            className="interactive-control touch-target rounded-lg border bg-[var(--surface)] px-3 text-xs font-semibold sm:px-4 sm:text-sm"
           >
             Save timezone
           </button>
         </div>
         {result?.error ? (
-          <p role="alert" className="text-sm text-[var(--danger)]">
+          <p role="alert" className="text-xs text-[var(--danger)] sm:text-sm">
             {result.error}
           </p>
         ) : null}
         {result?.success ? (
-          <p role="status" className="text-sm text-[var(--success)]">
+          <p role="status" className="text-xs text-[var(--success)] sm:text-sm">
             {result.success}
           </p>
         ) : null}

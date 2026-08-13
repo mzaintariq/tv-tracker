@@ -8,7 +8,11 @@ import {
 } from "@/app/actions/profile";
 import { REGION_OPTIONS } from "@/lib/regions";
 
-export function RegionSelector({ currentRegion }: { currentRegion: string | null }) {
+export function RegionSelector({
+  currentRegion,
+}: {
+  currentRegion: string | null;
+}) {
   const [selected, setSelected] = useState(currentRegion ?? "");
   const [saved, setSaved] = useState(currentRegion ?? "");
   const [result, setResult] = useState<RegionActionResult | null>(null);
@@ -28,12 +32,17 @@ export function RegionSelector({ currentRegion }: { currentRegion: string | null
 
   return (
     <section className="min-w-0">
-      <h2 className="break-words text-xl font-semibold">Regional information</h2>
-      <div className="mt-4 flex w-full min-w-0 max-w-lg flex-col gap-3">
-        <label htmlFor="profile-region" className="text-sm font-medium">
+      <h2 className="break-words text-lg font-semibold sm:text-xl">
+        Regional information
+      </h2>
+      <div className="mt-3 flex w-full min-w-0 max-w-lg flex-col gap-2 sm:mt-4 sm:gap-3">
+        <label htmlFor="profile-region" className="text-xs font-medium sm:text-sm">
           Release and streaming region
         </label>
-        <p id="profile-region-help" className="break-words text-sm text-[var(--muted)]">
+        <p
+          id="profile-region-help"
+          className="break-words text-xs text-[var(--muted)] sm:text-sm"
+        >
           Controls theatrical, digital, streaming-provider, and certification
           information. It does not change your timezone or watched-date display.
         </p>
@@ -51,24 +60,35 @@ export function RegionSelector({ currentRegion }: { currentRegion: string | null
         >
           <option value="">Choose a region</option>
           {REGION_OPTIONS.map(({ code, name }) => (
-            <option key={code} value={code}>{name}</option>
+            <option key={code} value={code}>
+              {name}
+            </option>
           ))}
         </select>
         <button
           type="button"
           disabled={pending || !selected || selected === saved}
           onClick={save}
-          className="touch-target w-full rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] sm:w-auto sm:self-start"
+          className="touch-target w-full rounded-lg bg-[var(--accent)] px-3 text-xs font-semibold text-[var(--accent-foreground)] sm:w-auto sm:self-start sm:px-4 sm:text-sm"
         >
           {pending ? "Saving…" : "Save region"}
         </button>
         {result?.error ? (
-          <p id="profile-region-error" role="alert" className="text-sm text-[var(--danger)]">
+          <p
+            id="profile-region-error"
+            role="alert"
+            className="text-xs text-[var(--danger)] sm:text-sm"
+          >
             {result.error}
           </p>
         ) : null}
         {result?.success ? (
-          <p role="status" className="text-sm text-[var(--success)]">{result.success}</p>
+          <p
+            role="status"
+            className="text-xs text-[var(--success)] sm:text-sm"
+          >
+            {result.success}
+          </p>
         ) : null}
       </div>
     </section>

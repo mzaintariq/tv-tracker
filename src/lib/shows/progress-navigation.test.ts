@@ -15,9 +15,10 @@ describe("show progress navigation contract", () => {
   });
 
   it("shows write errors, prevents navigation after failure, and blocks duplicate clicks", () => {
-    expect(card).toContain("setError(result.error)");
+    expect(card).toContain("result.error ?? result.success");
+    expect(card).toContain('result.error ? "error" : "success"');
+    expect(card).toMatch(/if \(result\.error\) \{\s*return;/);
     expect(card).toContain("disabled={isPending}");
-    expect(card).toContain('role="alert"');
   });
 
   it("prepares metadata before overlay navigation to the setup flow", () => {

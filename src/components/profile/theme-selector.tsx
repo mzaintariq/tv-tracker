@@ -39,8 +39,8 @@ export function ThemeSelector() {
   };
 
   return (
-    <fieldset className="flex min-w-0 flex-col gap-3" disabled={pending}>
-      <legend className="text-sm font-medium text-[var(--foreground)]">
+    <fieldset className="flex min-w-0 flex-col gap-2 sm:gap-3" disabled={pending}>
+      <legend className="text-xs font-medium text-[var(--foreground)] sm:text-sm">
         Theme
       </legend>
       <div className="flex min-w-0 flex-col gap-2">
@@ -51,7 +51,7 @@ export function ThemeSelector() {
             <label
               key={option.value}
               htmlFor={optionId}
-              className="interactive-control touch-target flex min-w-0 max-w-full cursor-pointer items-center gap-3 rounded-lg border bg-[var(--surface)] px-3 py-2 text-[var(--foreground)]"
+              className="interactive-control touch-target flex min-w-0 max-w-full cursor-pointer items-center gap-2 rounded-lg border bg-[var(--surface)] px-3 py-2 text-sm text-[var(--foreground)] sm:gap-3 sm:text-base"
             >
               <input
                 id={optionId}
@@ -70,7 +70,7 @@ export function ThemeSelector() {
       {error ? (
         <p
           id="theme-error"
-          className="text-sm text-[var(--danger)]"
+          className="text-xs text-[var(--danger)] sm:text-sm"
           role="alert"
         >
           {error}

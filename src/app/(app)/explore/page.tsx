@@ -43,12 +43,12 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
         : "Trending this week";
 
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-[var(--foreground)]">
+    <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 sm:gap-8">
+      <header className="space-y-1 sm:space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-[var(--foreground)] sm:text-3xl">
           Explore
         </h1>
-        <p className="text-base text-[var(--muted)]">
+        <p className="text-sm text-[var(--muted)] sm:text-base">
           Search TMDB or browse trending shows and movies, then add them to your
           library.
         </p>
@@ -56,8 +56,8 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
 
       <Suspense fallback={null}>
         <ExploreToolbar filter={data.filter} query={data.query}>
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-[var(--foreground)]">
+          <div className="space-y-2 sm:space-y-4">
+            <h2 className="text-base font-semibold text-[var(--foreground)] sm:text-lg">
               {heading}
             </h2>
 

@@ -103,11 +103,11 @@ export function ExploreToolbar({
   }, [searchValue]);
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-4">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="space-y-3 sm:space-y-4">
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
-          <label className="flex min-w-0 flex-1 flex-col gap-2">
-            <span className="text-sm font-medium text-[var(--foreground)]">
+          <label className="flex min-w-0 flex-1 flex-col gap-1 sm:gap-2">
+            <span className="text-xs font-medium text-[var(--foreground)] sm:text-sm">
               Search shows and movies
             </span>
             <input
@@ -129,7 +129,7 @@ export function ExploreToolbar({
         </div>
 
         <div
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap gap-1.5 sm:gap-2"
           role="group"
           aria-label="Media type filter"
         >
@@ -148,8 +148,8 @@ export function ExploreToolbar({
                 }}
                 className={
                   selected
-                    ? "touch-target min-h-11 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] shadow-[inset_0_0_0_2px_var(--foreground)]"
-                    : "interactive-control touch-target min-h-11 rounded-lg border bg-[var(--surface)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-elevated)]"
+                    ? "touch-target min-h-11 rounded-lg bg-[var(--accent)] px-3 text-xs font-semibold text-[var(--accent-foreground)] shadow-[inset_0_0_0_2px_var(--foreground)] sm:px-4 sm:text-sm"
+                    : "interactive-control touch-target min-h-11 rounded-lg border bg-[var(--surface)] px-3 text-xs font-medium text-[var(--foreground)] hover:bg-[var(--surface-elevated)] sm:px-4 sm:text-sm"
                 }
               >
                 {item.label}
@@ -161,8 +161,8 @@ export function ExploreToolbar({
 
       <div aria-busy={isPending || !responseIsCurrent} className="min-w-0">
         {isPending || !responseIsCurrent ? (
-          <div className="space-y-4">
-            <p className="text-sm text-[var(--muted)]" role="status">
+          <div className="space-y-2 sm:space-y-4">
+            <p className="text-xs text-[var(--muted)] sm:text-sm" role="status">
               Loading results…
             </p>
             <div aria-hidden="true">

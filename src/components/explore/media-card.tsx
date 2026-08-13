@@ -12,6 +12,7 @@ import {
 import type { ExploreMediaItem } from "@/lib/media/types";
 import { MediaPoster } from "@/components/media/media-poster";
 import { PosterCardTitle } from "@/components/media/poster-card-title";
+import { useNotifications } from "@/components/ui/notifications";
 
 type MediaCardProps = {
   item: ExploreMediaItem;
@@ -19,8 +20,8 @@ type MediaCardProps = {
 
 export function MediaCard({ item }: MediaCardProps) {
   const router = useRouter();
+  const { notify } = useNotifications();
   const [inLibrary, setInLibrary] = useState(item.inLibrary);
-  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const mediaLabel = item.mediaType === "tv" ? "TV show" : "Movie";
   const actionLabel = inLibrary
@@ -33,8 +34,6 @@ export function MediaCard({ item }: MediaCardProps) {
   const detailHref = `/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`;
 
   function handleToggle() {
-    setError(null);
-
     if (
       inLibrary &&
       item.mediaType === "movie" &&
@@ -52,8 +51,11 @@ export function MediaCard({ item }: MediaCardProps) {
           ? await prepareShowProgress(item.tmdbId)
           : await addToLibrary(item.mediaType, item.tmdbId);
 
+      notify(
+        result.error ?? result.success ?? "Library updated.",
+        result.error ? "error" : "success",
+      );
       if (result.error) {
-        setError(result.error);
         return;
       }
 
@@ -67,13 +69,13 @@ export function MediaCard({ item }: MediaCardProps) {
   }
 
   return (
-    <article className="flex min-w-0 flex-col gap-3">
+    <article className="flex min-w-0 flex-col gap-1 sm:gap-3">
       <div className="relative aspect-[2/3]">
         {inLibrary ? (
           <Link
             href={detailHref}
             aria-label={`Open ${item.title}`}
-            className="poster-interactive-surface block h-full overflow-hidden rounded-lg border bg-[var(--surface-elevated)]"
+            className="poster-interactive-surface block h-full overflow-hidden rounded-xl border bg-[var(--surface-elevated)]"
           >
             <MediaPoster
               source={item.posterPath}
@@ -84,7 +86,7 @@ export function MediaCard({ item }: MediaCardProps) {
             />
           </Link>
         ) : (
-          <div className="block h-full overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]">
+          <div className="block h-full overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] [transform:translateZ(0)]">
             <MediaPoster
               source={item.posterPath}
               title={item.title}
@@ -108,7 +110,7 @@ export function MediaCard({ item }: MediaCardProps) {
         </button>
       </div>
 
-      <div className="min-w-0 space-y-1">
+      <div className="min-w-0 space-y-0 sm:space-y-1">
         {inLibrary ? (
           <Link href={detailHref} title={item.title}>
             <PosterCardTitle title={item.title} />
@@ -116,17 +118,12 @@ export function MediaCard({ item }: MediaCardProps) {
         ) : (
           <PosterCardTitle title={item.title} />
         )}
-        <p className="break-words text-sm text-[var(--muted)]">
+        <p className="break-words text-xs text-[var(--muted)] sm:text-sm">
           {mediaLabel}
           {item.year ? ` · ${item.year}` : null}
         </p>
       </div>
 
-      {error ? (
-        <p className="text-sm text-[var(--danger)]" role="alert">
-          {error}
-        </p>
-      ) : null}
     </article>
   );
 }

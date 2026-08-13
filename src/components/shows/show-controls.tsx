@@ -58,7 +58,7 @@ function ActionMessage({
 const button =
   "interactive-control touch-target max-w-full cursor-pointer whitespace-normal rounded-lg border bg-[var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-elevated)]";
 const primaryButton =
-  "touch-target max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--accent-foreground)]";
+  "touch-target w-full max-w-full whitespace-normal rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-[var(--accent-foreground)] sm:w-auto sm:px-4 sm:text-sm";
 
 export function MetadataButton({
   tmdbId,
@@ -283,11 +283,14 @@ export function InitialProgressForm({
   }
 
   return (
-    <section className="min-w-0 space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5">
-      <h2 className="break-words text-xl font-semibold">
+    <section className="min-w-0 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 sm:space-y-4 sm:p-6">
+      <h2 className="break-words text-lg font-semibold sm:text-xl">
         Add show and set progress
       </h2>
-      <p id={helpId} className="break-words text-sm text-[var(--muted)]">
+      <p
+        id={helpId}
+        className="break-words text-xs text-[var(--muted)] sm:text-sm"
+      >
         Choose where your regular-episode progress should begin. Specials in
         Season 0 are excluded.
       </p>
@@ -295,7 +298,7 @@ export function InitialProgressForm({
         <>
           <p
             id={unavailableId}
-            className="break-words text-sm text-[var(--warning)]"
+            className="break-words text-xs text-[var(--warning)] sm:text-sm"
           >
             <span className="font-semibold">Warning:</span> Episode information
             could not be loaded. Retry to use episode- and season-based progress
@@ -320,18 +323,19 @@ export function InitialProgressForm({
             .filter(Boolean)
             .join(" ")}
           aria-invalid={selectionInvalid || undefined}
-          className="min-w-0 space-y-4"
+          className="min-w-0 space-y-3 sm:space-y-4"
         >
-          <legend className="break-words font-semibold">
+          <legend className="break-words text-sm font-semibold sm:text-base">
             Starting progress
           </legend>
-          <div className="min-w-0">
+          <div className="flex min-w-0 items-start text-sm sm:text-base">
             <input
               id={`progress-start-${tmdbId}`}
               name={`progress-mode-${tmdbId}`}
               type="radio"
               checked={mode === "start"}
               onChange={() => setMode("start")}
+              className="mt-1 shrink-0 accent-[var(--accent)]"
             />
             <label
               htmlFor={`progress-start-${tmdbId}`}
@@ -340,7 +344,7 @@ export function InitialProgressForm({
               Start from Season 1, Episode 1
             </label>
           </div>
-          <div className="min-w-0">
+          <div className="flex min-w-0 items-start text-sm sm:text-base">
             <input
               id={`progress-before-${tmdbId}`}
               name={`progress-mode-${tmdbId}`}
@@ -348,6 +352,7 @@ export function InitialProgressForm({
               checked={mode === "before_episode"}
               disabled={!hasEpisodeOptions}
               onChange={() => setMode("before_episode")}
+              className="mt-1 shrink-0 accent-[var(--accent)]"
             />
             <label
               htmlFor={`progress-before-${tmdbId}`}
@@ -357,10 +362,10 @@ export function InitialProgressForm({
             </label>
           </div>
           {mode === "before_episode" && hasEpisodeOptions ? (
-            <div className="min-w-0 space-y-2">
+            <div className="min-w-0 space-y-1 sm:space-y-2">
               <label
                 htmlFor={`first-unwatched-${tmdbId}`}
-                className="block break-words text-sm font-medium"
+                className="block break-words text-xs font-medium sm:text-sm"
               >
                 Select the first unwatched episode
               </label>
@@ -368,7 +373,7 @@ export function InitialProgressForm({
                 id={`first-unwatched-${tmdbId}`}
                 aria-describedby={helpId}
                 aria-invalid={!effectiveTarget || undefined}
-                className="interactive-control touch-target w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-[var(--foreground)]"
+                className="interactive-control touch-target w-full min-w-0 max-w-full rounded-lg border bg-[var(--surface)] px-3 text-base text-[var(--foreground)]"
                 value={effectiveTarget}
                 onChange={(event) => setTarget(event.target.value)}
               >
@@ -384,7 +389,7 @@ export function InitialProgressForm({
               </select>
             </div>
           ) : null}
-          <div className="min-w-0">
+          <div className="flex min-w-0 items-start text-sm sm:text-base">
             <input
               id={`progress-seasons-${tmdbId}`}
               name={`progress-mode-${tmdbId}`}
@@ -392,6 +397,7 @@ export function InitialProgressForm({
               checked={mode === "seasons"}
               disabled={!hasEpisodeOptions}
               onChange={() => setMode("seasons")}
+              className="mt-1 shrink-0 accent-[var(--accent)]"
             />
             <label
               htmlFor={`progress-seasons-${tmdbId}`}
@@ -404,16 +410,19 @@ export function InitialProgressForm({
             <fieldset
               aria-describedby={helpId}
               aria-invalid={selected.length === 0 || undefined}
-              className="min-w-0 space-y-2"
+              className="min-w-0 space-y-1 sm:space-y-2"
             >
-              <legend className="break-words text-sm font-medium">
+              <legend className="break-words text-xs font-medium sm:text-sm">
                 Watched regular seasons
               </legend>
-              <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
                 {seasons.map(({ seasonNumber, episodeCount }) => {
                   const id = `watched-season-${tmdbId}-${seasonNumber}`;
                   return (
-                    <div key={seasonNumber} className="min-w-0">
+                    <div
+                      key={seasonNumber}
+                      className="flex min-w-0 items-start text-sm sm:text-base"
+                    >
                       <input
                         id={id}
                         type="checkbox"
@@ -425,6 +434,7 @@ export function InitialProgressForm({
                               : [...current, seasonNumber],
                           )
                         }
+                        className="mt-1 shrink-0 accent-[var(--accent)]"
                       />
                       <label htmlFor={id} className="ml-2 break-words">
                         Season {seasonNumber} ({episodeCount} episode

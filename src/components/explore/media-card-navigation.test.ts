@@ -23,4 +23,11 @@ describe("Explore card navigation", () => {
       /<\/Link>\s*\) : \(\s*<div[\s\S]*?<\/div>\s*\)}\s*<button/,
     );
   });
+
+  it("routes library action feedback through global notifications", () => {
+    expect(source).toContain("useNotifications");
+    expect(source).toContain("const { notify } = useNotifications()");
+    expect(source).toContain("result.error ?? result.success");
+    expect(source).not.toContain("setError");
+  });
 });
