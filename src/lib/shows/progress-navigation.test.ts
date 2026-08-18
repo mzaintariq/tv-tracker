@@ -11,7 +11,7 @@ describe("show progress navigation contract", () => {
       'const detailHref = `/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`',
     );
     expect(card).toContain("inLibrary ? (");
-    expect(card).toContain("<Link href={detailHref}");
+    expect(card).toMatch(/<Link\s+href=\{detailHref\}/);
   });
 
   it("shows write errors, prevents navigation after failure, and blocks duplicate clicks", () => {

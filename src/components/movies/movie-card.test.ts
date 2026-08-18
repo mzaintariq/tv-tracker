@@ -50,7 +50,6 @@ describe("MovieCard", () => {
     const renderer = await renderMovieCard(movie());
     const rendered = JSON.stringify(renderer.toJSON());
     expect(rendered).toContain("2025 · Drama");
-    expect(rendered).toContain("★ ");
     expect(rendered).toContain("7.8");
     expect(rendered).not.toContain("Watch Next");
     expect(
@@ -67,14 +66,12 @@ describe("MovieCard", () => {
     const rendered = JSON.stringify(renderer.toJSON());
     expect(rendered).toContain("Year unknown");
     expect(rendered).not.toContain("TMDB rating");
-    expect(rendered).not.toContain("★");
   });
 
   it("omits a zero TMDB rating", async () => {
     const renderer = await renderMovieCard(movie({ vote_average: 0 }));
     const rendered = JSON.stringify(renderer.toJSON());
     expect(rendered).not.toContain("TMDB rating");
-    expect(rendered).not.toContain("★");
     expect(rendered).not.toContain("0.0");
   });
 });

@@ -18,6 +18,34 @@ type MediaCardProps = {
   item: ExploreMediaItem;
 };
 
+function CardContent({
+  item,
+  mediaLabel,
+}: {
+  item: ExploreMediaItem;
+  mediaLabel: string;
+}) {
+  return (
+    <>
+      <div className="relative aspect-[2/3] w-full max-w-full bg-[var(--surface-elevated)]">
+        <MediaPoster
+          source={item.posterPath}
+          title={item.title}
+          alt=""
+          sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+          fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]"
+        />
+      </div>
+      <div className="min-w-0 space-y-0 p-3 sm:space-y-1 sm:p-4">
+        <PosterCardTitle title={item.title} />
+        <p className="break-words text-xs text-[var(--muted)] sm:text-sm">
+          {item.year ?? "Year unknown"} · {mediaLabel}
+        </p>
+      </div>
+    </>
+  );
+}
+
 export function MediaCard({ item }: MediaCardProps) {
   const router = useRouter();
   const { notify } = useNotifications();
@@ -69,61 +97,32 @@ export function MediaCard({ item }: MediaCardProps) {
   }
 
   return (
-    <article className="flex min-w-0 flex-col gap-1 sm:gap-3">
-      <div className="relative aspect-[2/3]">
-        {inLibrary ? (
-          <Link
-            href={detailHref}
-            aria-label={`Open ${item.title}`}
-            className="poster-interactive-surface block h-full overflow-hidden rounded-xl border bg-[var(--surface-elevated)]"
-          >
-            <MediaPoster
-              source={item.posterPath}
-              title={item.title}
-              alt=""
-              sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-              fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]"
-            />
-          </Link>
-        ) : (
-          <div className="block h-full overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] [transform:translateZ(0)]">
-            <MediaPoster
-              source={item.posterPath}
-              title={item.title}
-              alt=""
-              sizes="(max-width: 359px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-              fallbackClassName="text-2xl font-semibold tracking-wide text-[var(--muted)]"
-            />
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={handleToggle}
-          disabled={isPending}
-          aria-busy={isPending}
-          aria-label={`${actionLabel}: ${item.title}`}
-          className="poster-overlay-action touch-target absolute right-2 top-2 z-10 grid h-11 w-11 cursor-pointer place-items-center rounded-lg border text-2xl font-semibold"
+    <article className="relative min-w-0">
+      {inLibrary ? (
+        <Link
+          href={detailHref}
+          aria-label={`Open ${item.title}`}
+          className="poster-interactive-surface block min-w-0 overflow-hidden rounded-xl border bg-[var(--surface)]"
         >
-          <span aria-hidden="true">
-            {isPending ? "…" : inLibrary ? "−" : "+"}
-          </span>
-        </button>
-      </div>
-
-      <div className="min-w-0 space-y-0 sm:space-y-1">
-        {inLibrary ? (
-          <Link href={detailHref} title={item.title}>
-            <PosterCardTitle title={item.title} />
-          </Link>
-        ) : (
-          <PosterCardTitle title={item.title} />
-        )}
-        <p className="break-words text-xs text-[var(--muted)] sm:text-sm">
-          {mediaLabel}
-          {item.year ? ` · ${item.year}` : null}
-        </p>
-      </div>
-
+          <CardContent item={item} mediaLabel={mediaLabel} />
+        </Link>
+      ) : (
+        <div className="block min-w-0 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] [transform:translateZ(0)]">
+          <CardContent item={item} mediaLabel={mediaLabel} />
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={handleToggle}
+        disabled={isPending}
+        aria-busy={isPending}
+        aria-label={`${actionLabel}: ${item.title}`}
+        className="poster-overlay-action touch-target absolute right-2 top-2 z-10 grid h-11 w-11 cursor-pointer place-items-center rounded-lg border text-2xl font-semibold"
+      >
+        <span aria-hidden="true">
+          {isPending ? "…" : inLibrary ? "−" : "+"}
+        </span>
+      </button>
     </article>
   );
 }
