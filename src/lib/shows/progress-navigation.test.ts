@@ -6,12 +6,9 @@ const action = readFileSync("src/app/actions/library.ts", "utf8");
 const page = readFileSync("src/app/(app)/shows/[tmdbId]/page.tsx", "utf8");
 
 describe("show progress navigation contract", () => {
-  it("links the poster and title to the detail/setup flow", () => {
-    expect(card).toContain(
-      'const detailHref = `/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`',
-    );
-    expect(card).toContain("inLibrary ? (");
-    expect(card).toMatch(/<Link\s+href=\{detailHref\}/);
+  it("opens Quick View from the poster and title", () => {
+    expect(card).toContain("onPreview(item, triggerId)");
+    expect(card).toContain("Quick view: ${item.title}");
   });
 
   it("shows write errors, prevents navigation after failure, and blocks duplicate clicks", () => {
@@ -22,7 +19,6 @@ describe("show progress navigation contract", () => {
   });
 
   it("prepares metadata before overlay navigation to the setup flow", () => {
-    expect(card).toContain('from "next/link"');
     expect(
       card.indexOf("await prepareShowProgress(item.tmdbId)"),
     ).toBeGreaterThan(-1);

@@ -161,6 +161,17 @@ Do not mark a phase complete until all acceptance criteria have been manually ve
 * [x] Run validation commands
 * [x] Commit and merge Phase 3
 
+### Explore Quick View
+
+* [x] Add URL-backed movie and TV preview parsing
+* [x] Keep preview-only history changes out of Explore search navigation
+* [x] Add responsive accessible drawer and mobile sheet
+* [x] Add TMDB-direct core and independently fallible extras loading
+* [x] Preserve query, filter, result grid, scroll, Back, and Forward behavior
+* [x] Reuse Movie Add and Show progress-setup handoff
+* [x] Keep preview opens persistence-free and add no image roles
+* [x] Add focused parsing, security, content, history, and accessibility tests
+
 ## Phase 4 — Television tracking
 
 * [x] Create `episodes` migration

@@ -13,10 +13,10 @@ describe("Explore card navigation", () => {
   );
   const normalizedSource = source.replace(/\s+/g, " ");
 
-  it("links library items and presents unadded posters and titles without false navigation", () => {
-    expect(source).toContain("inLibrary ? (");
-    expect(source).toContain("href={detailHref}");
-    expect(source).toContain('<div className="block min-w-0');
+  it("opens Quick View from member and non-member poster/title surfaces", () => {
+    expect(source).toContain("onPreview(item, triggerId)");
+    expect(source).toContain("aria-label={`Quick view: ${item.title}`}");
+    expect(source).not.toContain("inLibrary ? (");
     expect(source).toContain("<CardContent item={item}");
     expect(source).toContain("bg-[var(--surface)]");
   });
@@ -26,9 +26,7 @@ describe("Explore card navigation", () => {
       '<button type="button" onClick={handleToggle}',
     );
     expect(source).toContain("aria-label={`${actionLabel}: ${item.title}`}");
-    expect(source).toMatch(
-      /<\/Link>\s*\) : \(\s*<div[\s\S]*?<\/div>\s*\)}\s*<button/,
-    );
+    expect(source).toMatch(/<\/button>\s*<button\s*type="button"\s*onClick={handleToggle}/);
   });
 
   it("routes library action feedback through global notifications", () => {

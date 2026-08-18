@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 
 import {
   addToLibrary,
@@ -16,6 +15,8 @@ import { useNotifications } from "@/components/ui/notifications";
 
 type MediaCardProps = {
   item: ExploreMediaItem;
+  onPreview: (item: ExploreMediaItem, triggerId: string) => void;
+  onMembershipChange: (inLibrary: boolean) => void;
 };
 
 function CardContent({
@@ -46,11 +47,11 @@ function CardContent({
   );
 }
 
-export function MediaCard({ item }: MediaCardProps) {
+export function MediaCard({ item, onPreview, onMembershipChange }: MediaCardProps) {
   const router = useRouter();
   const { notify } = useNotifications();
-  const [inLibrary, setInLibrary] = useState(item.inLibrary);
   const [isPending, startTransition] = useTransition();
+  const inLibrary = item.inLibrary;
   const mediaLabel = item.mediaType === "tv" ? "TV show" : "Movie";
   const actionLabel = inLibrary
     ? item.mediaType === "tv"
@@ -59,7 +60,7 @@ export function MediaCard({ item }: MediaCardProps) {
     : item.mediaType === "tv"
       ? "Add to library"
       : "Add to watchlist";
-  const detailHref = `/${item.mediaType === "tv" ? "shows" : "movies"}/${item.tmdbId}`;
+  const triggerId = `explore-preview-${item.mediaType}-${item.tmdbId}`;
 
   function handleToggle() {
     if (
@@ -92,25 +93,21 @@ export function MediaCard({ item }: MediaCardProps) {
         return;
       }
 
-      setInLibrary(!inLibrary);
+      onMembershipChange(!inLibrary);
     });
   }
 
   return (
     <article className="relative min-w-0">
-      {inLibrary ? (
-        <Link
-          href={detailHref}
-          aria-label={`Open ${item.title}`}
-          className="poster-interactive-surface block min-w-0 overflow-hidden rounded-xl border bg-[var(--surface)]"
+      <button
+          id={triggerId}
+          type="button"
+          onClick={() => onPreview(item, triggerId)}
+          aria-label={`Quick view: ${item.title}`}
+          className="poster-interactive-surface block w-full min-w-0 cursor-pointer overflow-hidden rounded-xl border bg-[var(--surface)] text-left"
         >
           <CardContent item={item} mediaLabel={mediaLabel} />
-        </Link>
-      ) : (
-        <div className="block min-w-0 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] [transform:translateZ(0)]">
-          <CardContent item={item} mediaLabel={mediaLabel} />
-        </div>
-      )}
+      </button>
       <button
         type="button"
         onClick={handleToggle}
