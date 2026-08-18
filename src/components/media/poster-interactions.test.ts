@@ -57,7 +57,7 @@ describe("poster interaction polish", () => {
       "utf8",
     );
     const movie = readFileSync("src/components/movies/movie-card.tsx", "utf8");
-    expect(explore).toMatch(/<Link[\s\S]*?<\/Link>[\s\S]*?\)}\s*<button/);
+    expect(explore).toMatch(/<button[\s\S]*?onPreview\(item, triggerId\)[\s\S]*?<\/button>\s*<button/);
     expect(movie).toMatch(/<\/Link>\s*\{action \? \(\s*<div/);
     expect(explore).toContain("absolute right-2 top-2 z-10");
     expect(movie).toContain("absolute right-2 top-2 z-10");

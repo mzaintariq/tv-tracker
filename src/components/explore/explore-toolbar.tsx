@@ -111,6 +111,7 @@ export function ExploreToolbar({
               Search shows and movies
             </span>
             <input
+              id="explore-search-input"
               type="search"
               name="q"
               value={searchValue}

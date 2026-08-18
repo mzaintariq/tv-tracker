@@ -1,4 +1,15 @@
 export type MediaType = "tv" | "movie";
+export type PreviewKey = { mediaType: MediaType; tmdbId: number };
+
+export function parsePreviewKey(value: string | null | undefined): PreviewKey | null {
+  if (!value) return null;
+  const match = /^(movie|tv):([1-9]\d*)$/.exec(value);
+  if (!match) return null;
+  const tmdbId = Number(match[2]);
+  return Number.isSafeInteger(tmdbId)
+    ? { mediaType: match[1] as MediaType, tmdbId }
+    : null;
+}
 
 export type ExploreMediaFilter = "all" | MediaType;
 
