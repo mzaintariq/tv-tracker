@@ -4,6 +4,15 @@ import { yearFromDate } from "@/lib/media/types";
 import type { MovieLibraryMedia, MovieSnapshot } from "@/lib/movies/movies";
 import { PosterCardTitle } from "@/components/media/poster-card-title";
 
+function primaryGenreName(genres: MovieLibraryMedia["genres"]): string | null {
+  if (!Array.isArray(genres)) return null;
+  const first = genres[0];
+  if (!first || typeof first !== "object" || Array.isArray(first)) return null;
+  return typeof first.name === "string" && first.name.trim()
+    ? first.name.trim()
+    : null;
+}
+
 export function MovieCard({
   movie,
   action,
@@ -11,6 +20,14 @@ export function MovieCard({
   movie: MovieSnapshot<MovieLibraryMedia>;
   action?: React.ReactNode;
 }) {
+  const year = yearFromDate(movie.media.release_date);
+  const primaryGenre = primaryGenreName(movie.media.genres);
+  const rating = movie.media.vote_average;
+  const metadata = [
+    year?.toString() ?? "Year unknown",
+    primaryGenre,
+  ].filter((value): value is string => Boolean(value));
+
   return (
     <article className="relative min-w-0">
       <Link
@@ -33,8 +50,16 @@ export function MovieCard({
             favourite={movie.membership.is_favourite}
           />
           <p className="break-words text-xs sm:text-sm text-[var(--muted)]">
-            {yearFromDate(movie.media.release_date) ?? "Year unknown"} ·{" "}
-            {movie.membership.watched_at ? "Watched" : "Watch Next"}
+            {metadata.join(" · ")}
+            {rating !== null && rating > 0 ? (
+              <>
+                {" · "}
+                <span aria-label={`TMDB rating ${rating.toFixed(1)} out of 10`}>
+                  {/* <span aria-hidden="true">★ </span> */}
+                  {rating.toFixed(1)}
+                </span>
+              </>
+            ) : null}
           </p>
         </div>
       </Link>

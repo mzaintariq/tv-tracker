@@ -2,7 +2,13 @@ import type { MediaItem, UserMovie } from "@/types/database";
 
 export type MovieLibraryMedia = Pick<
   MediaItem,
-  "id" | "tmdb_id" | "title" | "poster_path" | "release_date"
+  | "id"
+  | "tmdb_id"
+  | "title"
+  | "poster_path"
+  | "release_date"
+  | "genres"
+  | "vote_average"
 >;
 
 export const RECENTLY_WATCHED_MOVIES_LIMIT = 10;
