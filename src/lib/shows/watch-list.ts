@@ -7,7 +7,14 @@ import type { MediaItem, UserShow } from "@/types/database";
 
 export type WatchListMedia = Pick<
   MediaItem,
-  "id" | "tmdb_id" | "title" | "poster_path" | "release_date" | "tmdb_status"
+  | "id"
+  | "tmdb_id"
+  | "title"
+  | "poster_path"
+  | "release_date"
+  | "tmdb_status"
+  | "genres"
+  | "vote_average"
 >;
 
 export type WatchListEpisode = {
@@ -92,6 +99,8 @@ export type WatchListProjectionRow = {
   poster_path: string | null;
   release_date: string | null;
   tmdb_status: string | null;
+  genres: MediaItem["genres"];
+  vote_average: number | null;
   released_count: number;
   watched_released_count: number;
   latest_regular_watched_at: string | null;
@@ -375,6 +384,8 @@ export function mapWatchListProjection(
         poster_path: row.poster_path,
         release_date: row.release_date,
         tmdb_status: row.tmdb_status,
+        genres: row.genres,
+        vote_average: row.vote_average,
       },
       episodes: [],
       watched: [],

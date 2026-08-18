@@ -1,5 +1,5 @@
 begin;
-select plan(18);
+select plan(20);
 
 select ok(not has_function_privilege('anon', 'public.load_watch_list_projection(date,timestamptz,date)', 'EXECUTE'), 'anonymous cannot execute projection');
 select ok(has_function_privilege('authenticated', 'public.load_watch_list_projection(date,timestamptz,date)', 'EXECUTE'), 'authenticated can execute projection');
@@ -22,6 +22,10 @@ insert into public.media_items(id,tmdb_id,media_type,title,tmdb_status) values
 ('29000000-0000-0000-0000-000000000007',2907,'tv','Dropped','Returning Series'),
 ('29000000-0000-0000-0000-000000000008',2908,'tv','Other User','Returning Series'),
 ('29000000-0000-0000-0000-000000000009',2909,'tv','Newly Aired','Returning Series');
+
+update public.media_items
+set genres = '[{"id":18,"name":"Drama"}]', vote_average = 7.8
+where id = '29000000-0000-0000-0000-000000000001';
 
 insert into public.user_shows(id,user_id,media_item_id,status) values
 ('39000000-0000-0000-0000-000000000001','19000000-0000-0000-0000-000000000001','29000000-0000-0000-0000-000000000001','active'),
@@ -67,6 +71,8 @@ select public.load_watch_list_projection('2026-07-15','2026-06-15T12:00:00Z','20
 select is(jsonb_array_length(value->'shows'),8,'one projection row per owner membership') from projection_result;
 select is((select count(*) from jsonb_array_elements(value->'shows') row where row->>'tmdb_id'='2908'),0::bigint,'other user membership is isolated') from projection_result;
 select is((select row->>'category' from jsonb_array_elements(value->'shows') row where row->>'tmdb_id'='2901'),'watch_next','exact timestamp boundary is inclusive') from projection_result;
+select is((select row->'genres' from jsonb_array_elements(value->'shows') row where row->>'tmdb_id'='2901'),'[{"id": 18, "name": "Drama"}]'::jsonb,'show genres are projected') from projection_result;
+select is((select (row->>'vote_average')::numeric from jsonb_array_elements(value->'shows') row where row->>'tmdb_id'='2901'),7.8::numeric,'show rating is projected') from projection_result;
 select is((select row->>'category' from jsonb_array_elements(value->'shows') row where row->>'tmdb_id'='2902'),'inactive','older timestamp is inactive') from projection_result;
 select is((select row->>'category' from jsonb_array_elements(value->'shows') row where row->>'tmdb_id'='2909'),'watch_next','caller supplied date boundary promotes newly aired episode') from projection_result;
 select is((select row->>'category' from jsonb_array_elements(value->'shows') row where row->>'tmdb_id'='2903'),'not_started','Season 0 and future episodes do not affect progress') from projection_result;

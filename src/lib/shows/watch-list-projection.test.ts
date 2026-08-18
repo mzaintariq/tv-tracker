@@ -18,6 +18,8 @@ const base: WatchListProjectionRow = {
   poster_path: null,
   release_date: "2020-01-01",
   tmdb_status: "Returning Series",
+  genres: [{ id: 18, name: "Drama" }],
+  vote_average: 7.8,
   released_count: 2,
   watched_released_count: 1,
   latest_regular_watched_at: "2026-07-10T00:00:00Z",
@@ -46,6 +48,10 @@ describe("compact Watch List projection mapping", () => {
       percentage: 50,
       state: "partial",
     });
+    expect(result.watchNext[0].media.genres).toEqual([
+      { id: 18, name: "Drama" },
+    ]);
+    expect(result.watchNext[0].media.vote_average).toBe(7.8);
   });
 
   it("groups every projection category and preserves deterministic ordering", () => {
