@@ -23,10 +23,9 @@ export function MovieCard({
   const year = yearFromDate(movie.media.release_date);
   const primaryGenre = primaryGenreName(movie.media.genres);
   const rating = movie.media.vote_average;
-  const metadata = [
-    year?.toString() ?? "Year unknown",
-    primaryGenre,
-  ].filter((value): value is string => Boolean(value));
+  const metadata = [year?.toString() ?? "Year unknown", primaryGenre].filter(
+    (value): value is string => Boolean(value),
+  );
 
   return (
     <article className="relative min-w-0">
